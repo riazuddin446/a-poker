@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">aPoker</string>
+    <string name="autor">By Asier Zorrozua Hernández</string>
+    <string name="play">Play</string>
+    <string name="about">About</string>
+    <string name="exit">Exit</string>
+    <string name="options">Options</string>
+    <string name="nickname">Enter your nickname here:</string>
+    <string name="back">Back</string>
+    <string name="soundON">Sound ON</string>
+    <string name="soundOFF">Sound OFF</string>
+    <string name="join">Join</string>
+    <string name="create">Create</string>
+    <string name="maxPlayers">Max players:</string>
+    <string name="tableName">Enter the table name:</string>
+    <string name="selectaTable">Select a table:</string>
+
+    <string-array name="numberOfPlayers">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+        <string name="save">Save</string>
+        <string name="fold">Fold</string>
+        <string name="check">Check</string>
+        <string name="call">Call</string>
+        <string name="raise">Raise</string>
+
+</resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/menubackground" >
+
+    <AbsoluteLayout
+        android:id="@+id/absoluteLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_x="-2dp"
+            android:layout_y="271dp"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/foldButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/fold" />
+
+            <Button
+                android:id="@+id/checkButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="@string/check" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="352dp"
+            android:layout_y="270dp" >
+
+            <Button
+                android:id="@+id/callButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="@string/call" />
+
+            <Button
+                android:id="@+id/raiseButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="@string/raise" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/exitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_x="489dp"
+            android:layout_y="0dp"
+            android:text="@string/exit" />
+
+    </AbsoluteLayout>
+
+</LinearLayout>
