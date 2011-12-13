@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/menubackground" >
+
+    <AbsoluteLayout
+        android:id="@+id/absoluteLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" >
+
+        <TextView
+            android:id="@+id/Autor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="65dp"
+            android:layout_y="463dp"
+            android:text="@string/autor"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_x="0dp"
+            android:layout_y="190dp"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/nicknameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nickname"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="20dp" />
+
+            <EditText
+                android:id="@+id/nicknameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/soundButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="@string/soundON" />
+
+            <Button
+                android:id="@+id/aboutButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="@string/about" />
+
+            <Button
+                android:id="@+id/backButton"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="@string/back" />
+        </LinearLayout>
+
+    </AbsoluteLayout>
+
+</LinearLayout>
