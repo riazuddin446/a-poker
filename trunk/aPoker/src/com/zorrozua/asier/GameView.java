@@ -1,5 +1,7 @@
 package com.zorrozua.asier;
 
+import com.zorrozua.asier.pruebas.CustomButton;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.Log;
@@ -11,15 +13,11 @@ import android.widget.LinearLayout.LayoutParams;
 
 public class GameView extends CustomButton {
 
-	CustomButton btn1;
-	CustomButton btn2;
-
 	public GameView(Context context) {
 		super(context);
 
 		setBackgroundResource(R.drawable.menubackground);
 
-		
 	}
 
 }

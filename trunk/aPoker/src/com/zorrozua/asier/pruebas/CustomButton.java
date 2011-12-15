@@ -1,4 +1,7 @@
-package com.zorrozua.asier;
+package com.zorrozua.asier.pruebas;
+
+import com.zorrozua.asier.R;
+import com.zorrozua.asier.R.drawable;
 
 import android.content.Context;
 import android.graphics.Bitmap;
