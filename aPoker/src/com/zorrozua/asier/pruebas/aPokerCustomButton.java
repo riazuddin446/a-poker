@@ -1,4 +1,6 @@
-package com.zorrozua.asier;
+package com.zorrozua.asier.pruebas;
+
+import com.zorrozua.asier.GameView;
 
 import android.app.Activity;
 import android.os.Bundle;
