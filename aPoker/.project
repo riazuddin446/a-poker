@@ -30,21 +30,4 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>AndEngineMultiplayerExtension_src</name>
-			<type>2</type>
-			<location>C:/Users/Asier Zorrozua/workspace/AndEngineMultiplayerExtension/src</location>
-		</link>
-		<link>
-			<name>AndEnginePhysicsBox2DExtension_src</name>
-			<type>2</type>
-			<location>C:/Users/Asier Zorrozua/workspace/AndEnginePhysicsBox2DExtension/src</location>
-		</link>
-		<link>
-			<name>AndEngine_src</name>
-			<type>2</type>
-			<location>C:/Users/Asier Zorrozua/workspace/AndEngine/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>
