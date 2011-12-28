@@ -5,6 +5,8 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="10" />
+    
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -81,12 +83,22 @@
         </activity>
         <activity
             android:label="@string/app_name"
-            android:name=".aPoker"
+            android:name=".APoker"
             android:screenOrientation="landscape" >
             <intent-filter >
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.aPoker" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name=".APokerClient"
+            android:screenOrientation="landscape" >
+            <intent-filter >
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="com.zorrozua.asier.APokerClient" />
             </intent-filter>
         </activity>
     </application>

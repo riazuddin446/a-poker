@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class Menu extends Activity {
 
@@ -19,6 +20,8 @@ public class Menu extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.menulayout);
+		
+		Toast.makeText(this, "Kaixo!", Toast.LENGTH_LONG).show();
 
 		final Intent joinorcreate = new Intent(this, JoinOrCreate.class);
 		final Intent options = new Intent(this, Options.class);
