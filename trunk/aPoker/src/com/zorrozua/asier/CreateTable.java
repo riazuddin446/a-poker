@@ -1,6 +1,7 @@
 package com.zorrozua.asier;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +19,17 @@ public class CreateTable extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.createlayout);
+		
+		final Intent aPokerClient = new Intent(this, APokerClient.class);
 
+		Button createButton = (Button) findViewById(R.id.createButton);
+		createButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.i("CreateTable","Create button clicked");
+				startActivity(aPokerClient);
+			}
+		});
+		
 		Button backButton = (Button) findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
