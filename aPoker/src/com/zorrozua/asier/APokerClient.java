@@ -26,27 +26,36 @@ import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import android.util.Log;
+import android.view.Display;
 import android.widget.Toast;
 
 public class APokerClient extends BaseGameActivity{
+
 	// ===========================================================
 	// Constants
 	// ===========================================================
 
-	private static final int CAMERA_WIDTH = 720;
-	private static final int CAMERA_HEIGHT = 480;
+	//	private static final int CAMERA_WIDTH = 720;
+	//	private static final int CAMERA_HEIGHT = 480;
+
+	private static int cameraWidth;
+	private static int cameraHeight;
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
 
 	private Camera mCamera;
-	private BitmapTextureAtlas mCardDeckTexture;
-	private TextureRegion mBackgroundTexture;
+	private Scene mMainScene;
 
-	private Scene mScene;
-
+	private BitmapTextureAtlas mCardDeckTextureAtlas;
 	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
+
+	//Background
+	private BitmapTextureAtlas mBackgroundTextureAtlas;
+	private TextureRegion mBackgroundTexureRegion;
+	Sprite backgroundSpriteSprite;
+	SpriteBackground backgroundSprite;
 
 	// ===========================================================
 	// Constructors
@@ -56,29 +65,35 @@ public class APokerClient extends BaseGameActivity{
 	// Getter & Setter
 	// ===========================================================
 
+	public static void setCameraWidth(int cameraWidth) {
+		APokerClient.cameraWidth = cameraWidth;
+	}
+
+	public static int getCameraWidth() {
+		return cameraWidth;
+	}
+
+	public static void setCameraHeight(int cameraHeight) {
+		APokerClient.cameraHeight = cameraHeight;
+	}
+
+	public static int getCameraHeight() {
+		return cameraHeight;
+	}
+
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
 
 	@Override
 	public Engine onLoadEngine() {
-		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera));
 
-		try {
-			if(MultiTouch.isSupported(this)) {
-				engine.setTouchController(new MultiTouchController());
-				if(MultiTouch.isSupportedDistinct(this)) {
-					Toast.makeText(this, "MultiTouch detected --> Drag multiple Sprites with multiple fingers!", Toast.LENGTH_LONG).show();
-				} else {
-					Toast.makeText(this, "MultiTouch detected --> Drag multiple Sprites with multiple fingers!\n\n(Your device might have problems to distinguish between separate fingers.)", Toast.LENGTH_LONG).show();
-				}
-			} else {
-				Toast.makeText(this, "Sorry your device does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)", Toast.LENGTH_LONG).show();
-			}
-		} catch (final MultiTouchException e) {
-			Toast.makeText(this, "Sorry your Android Version does NOT support MultiTouch!\n\n(Falling back to SingleTouch.)", Toast.LENGTH_LONG).show();
-		}
+		final Display display = getWindowManager().getDefaultDisplay();
+		this.setCameraWidth(display.getWidth());
+		this.setCameraHeight(display.getHeight());
+
+		this.mCamera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
+		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.mCamera));
 
 		Log.i("APokerCLient", "onLoadEngine correcto");
 		return engine;
@@ -86,43 +101,58 @@ public class APokerClient extends BaseGameActivity{
 
 	@Override
 	public void onLoadResources() {
-		this.mCardDeckTexture = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mCardDeckTexture, this, "carddeck_tiled.png", 0, 0);
-
-		this.mCardTotextureRegionMap = new HashMap<Card, TextureRegion>();
 		
-		this.mBackgroundTexture = BitmapTextureAtlasTextureRegionFactory.createFromAsset(new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA), this, "menubackground.png", 0, 0);
+		//Setting the path for graphics
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+		
+		//Load the card deck into a TextureAtlas
+		this.mCardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		
+		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mCardDeckTextureAtlas, this, "carddeck_tiled.png", 0, 0);
+
+		//Load each card texture into a HashMap
+		this.mCardTotextureRegionMap = new HashMap<Card, TextureRegion>();
+
+		this.mBackgroundTexureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA), this, "menubackground.png", 0, 0);
 
 		/* Extract the TextureRegion of each card in the whole deck. */
 		for(final Card card : Card.values()) {
-			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.mCardDeckTexture, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
+			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.mCardDeckTextureAtlas, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
 			this.mCardTotextureRegionMap.put(card, cardTextureRegion);
 		}
 
-		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTexture);
+		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
+
+		mBackgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		mBackgroundTexureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBackgroundTextureAtlas, this,"gamebackground.png", 0, 0);
+		
+		mEngine.getTextureManager().loadTexture(mBackgroundTextureAtlas);
 
 		Log.i("APokerCLient", "onLoadResources correcto");
 	}
 
 	@Override
 	public Scene onLoadScene() {
+		
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 
-		this.mScene = new Scene();
-		this.mScene.setOnAreaTouchTraversalFrontToBack();
+		this.mMainScene = new Scene();
+		this.mMainScene.setOnAreaTouchTraversalFrontToBack();
 
 		this.addCard(Card.CLUB_ACE, 200, 100);
 		this.addCard(Card.HEART_ACE, 200, 260);
 		this.addCard(Card.DIAMOND_ACE, 440, 100);
 		this.addCard(Card.SPADE_ACE, 440, 260);
 
-		this.mScene.setBackground(new SpriteBackground(new Sprite(0, 0, this.CAMERA_WIDTH, this.CAMERA_HEIGHT, mBackgroundTexture)));
+		backgroundSpriteSprite = new Sprite(0, 0, mBackgroundTexureRegion);
+		backgroundSprite = new SpriteBackground(backgroundSpriteSprite);
+		
+		mMainScene.setBackground(backgroundSprite);
 
-		this.mScene.setTouchAreaBindingEnabled(true);
+		this.mMainScene.setTouchAreaBindingEnabled(true);
 
 		Log.i("APokerCLient", "onLoadScene correcto");
-		return this.mScene;
+		return this.mMainScene;
 	}
 
 	@Override
@@ -134,6 +164,9 @@ public class APokerClient extends BaseGameActivity{
 	// Methods
 	// ===========================================================
 
+	/**
+	 * 
+	 */
 	private void addCard(final Card pCard, final int pX, final int pY) {
 		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard)) {
 			boolean mGrabbed = false;
@@ -161,8 +194,8 @@ public class APokerClient extends BaseGameActivity{
 			}
 		};
 
-		this.mScene.attachChild(sprite);
-		this.mScene.registerTouchArea(sprite);
+		this.mMainScene.attachChild(sprite);
+		this.mMainScene.registerTouchArea(sprite);
 	}
 
 	// ===========================================================

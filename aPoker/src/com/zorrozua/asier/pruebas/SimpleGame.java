@@ -17,6 +17,7 @@ import org.anddev.andengine.entity.modifier.MoveXModifier;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
+import org.anddev.andengine.entity.scene.background.SpriteBackground;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.input.touch.TouchEvent;
@@ -45,6 +46,13 @@ IOnSceneTouchListener{
 	private LinkedList projectileLL;
 	private LinkedList projectilesToBeAdded;
 	private TextureRegion mProjectileTextureRegion;
+
+	//Background
+	private BitmapTextureAtlas mBackgroundTextureAtlas;
+	private TextureRegion mBackgroundTexureRegion;
+	Sprite backgroundSpriteSprite;
+	SpriteBackground backgroundSprite;
+
 
 	@Override
 	public Engine onLoadEngine() {
@@ -80,6 +88,14 @@ IOnSceneTouchListener{
 
 		mEngine.getTextureManager().loadTexture(mBitmapTextureAtlas);
 
+		mBackgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		mBackgroundTexureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBackgroundTextureAtlas, this,"gamebackground.png", 0, 0);
+		
+		mEngine.getTextureManager().loadTexture(mBackgroundTextureAtlas);
+		
+		backgroundSpriteSprite = new Sprite(0, 0, mBackgroundTexureRegion);
+		backgroundSprite = new SpriteBackground(backgroundSpriteSprite);
+
 	}
 
 	@Override
@@ -88,7 +104,10 @@ IOnSceneTouchListener{
 		mEngine.registerUpdateHandler(new FPSLogger());
 
 		mMainScene = new Scene();
-		mMainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
+
+		mMainScene.setBackground(backgroundSprite);
+
+		//		mMainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
 
 		final int PlayerX = 0; //this.mPlayerTextureRegion.getWidth() / 2;
 		final int PlayerY = (int) ((mCamera.getHeight() - mPlayerTextureRegion
