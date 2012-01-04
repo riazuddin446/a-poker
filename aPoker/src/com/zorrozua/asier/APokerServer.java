@@ -29,7 +29,7 @@ import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
 
-public class APokerClient extends BaseGameActivity{
+public class APokerServer extends BaseGameActivity{
 
 	// ===========================================================
 	// Constants
@@ -66,7 +66,7 @@ public class APokerClient extends BaseGameActivity{
 	// ===========================================================
 
 	public static void setCameraWidth(int cameraWidth) {
-		APokerClient.cameraWidth = cameraWidth;
+		APokerServer.cameraWidth = cameraWidth;
 	}
 
 	public static int getCameraWidth() {
@@ -74,7 +74,7 @@ public class APokerClient extends BaseGameActivity{
 	}
 
 	public static void setCameraHeight(int cameraHeight) {
-		APokerClient.cameraHeight = cameraHeight;
+		APokerServer.cameraHeight = cameraHeight;
 	}
 
 	public static int getCameraHeight() {
