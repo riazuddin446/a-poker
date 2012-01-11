@@ -8,28 +8,23 @@ import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.scene.Scene;
-import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.scene.background.SpriteBackground;
-import org.anddev.andengine.entity.sprite.AnimatedSprite;
-import org.anddev.andengine.entity.sprite.BaseSprite;
 import org.anddev.andengine.entity.sprite.Sprite;
+import org.anddev.andengine.entity.text.ChangeableText;
 import org.anddev.andengine.entity.util.FPSLogger;
-import org.anddev.andengine.extension.input.touch.controller.MultiTouch;
-import org.anddev.andengine.extension.input.touch.controller.MultiTouchController;
-import org.anddev.andengine.extension.input.touch.exception.MultiTouchException;
 import org.anddev.andengine.input.touch.TouchEvent;
+import org.anddev.andengine.opengl.font.Font;
+import org.anddev.andengine.opengl.texture.Texture;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.anddev.andengine.opengl.texture.region.BaseTextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
-import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
-import android.util.Log;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.Display;
-import android.widget.Toast;
 
 public class APokerServer extends BaseGameActivity{
 
@@ -50,18 +45,31 @@ public class APokerServer extends BaseGameActivity{
 	private Camera mCamera;
 	private Scene mMainScene;
 
-	private BitmapTextureAtlas mCardDeckTextureAtlas;
-	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
-
 	//Background
 	private BitmapTextureAtlas mBackgroundTextureAtlas;
 	private TextureRegion mBackgroundTexureRegion;
 	Sprite backgroundSpriteSprite;
 	SpriteBackground backgroundSprite;
+	
+	//Font
+	private Font mFont;
+	private Texture mFontTexture;
 
 	//Buttons
 	private BitmapTextureAtlas mButtonsTextureAtlas;
 	private HashMap<Button, TextureRegion> mButtonsTextureRegionMap;
+
+	//Card deck
+	private BitmapTextureAtlas mCardDeckTextureAtlas;
+	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
+
+	//Chip counter
+	private int mChipCounter;
+	private ChangeableText mChipCounterText;
+
+	//Player Name
+	private String mPlayerName;
+	private ChangeableText mPlayerNameText;
 
 	// ===========================================================
 	// Constructors
@@ -101,7 +109,6 @@ public class APokerServer extends BaseGameActivity{
 		this.mCamera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
 		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.mCamera));
 
-		Log.i("APokerCLient", "onLoadEngine correcto");
 		return engine;
 	}
 
@@ -146,7 +153,12 @@ public class APokerServer extends BaseGameActivity{
 
 		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
 
-		Log.i("APokerCLient", "onLoadResources correcto");
+		//Load the font for texts
+		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 28, true, Color.WHITE);
+		this.mEngine.getTextureManager().loadTexture(this.mFontTexture);
+		this.mEngine.getFontManager().loadFont(this.mFont);
+
 	}
 
 	@Override
@@ -168,18 +180,25 @@ public class APokerServer extends BaseGameActivity{
 		//		this.addCard(Card.SPADE_ACE, 440, 260);
 
 		this.addButtons();
-
-		mMainScene.setBackground(backgroundSprite);
+		
+		this.mPlayerName = "Asier";
+		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayerName);
+		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
+		mMainScene.attachChild(mPlayerNameText);
+		
+		//Adding the chip counter
+		this.mChipCounter = 4000;
+		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mChipCounter));
+		mMainScene.attachChild(mChipCounterText);
 
 		this.mMainScene.setTouchAreaBindingEnabled(true);
 
-		Log.i("APokerCLient", "onLoadScene correcto");
 		return this.mMainScene;
 	}
 
 	@Override
 	public void onLoadComplete() {
-		Log.i("APokerCLient", "onLoadComplete correcto");
+
 	}
 
 	// ===========================================================
@@ -344,13 +363,17 @@ public class APokerServer extends BaseGameActivity{
 		this.mMainScene.registerTouchArea(sprite);
 	}
 
+	private void addPlayer(final int position){
+
+	}
+
 	private void addButtons() {
 
-		this.addFoldButton(0, cameraWidth - this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth());
-		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight(), cameraWidth - this.mButtonsTextureRegionMap.get(Button.CHECK).getWidth()+10);
-		this.addCallButton( cameraHeight/2 + this.mButtonsTextureRegionMap.get(Button.CALL).getHeight(),cameraWidth - this.mButtonsTextureRegionMap.get(Button.CALL).getWidth());
-		this.addRaiseButton(cameraHeight - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight(), cameraWidth/2 + this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()*2 + 10);
-		this.addExitButton(0, cameraWidth - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth());
+		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
+		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
+		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
+		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
+		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
 
 	}
 
