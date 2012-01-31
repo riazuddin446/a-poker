@@ -32,9 +32,6 @@ public class APokerServer extends BaseGameActivity{
 	// Constants
 	// ===========================================================
 
-	//	private static final int CAMERA_WIDTH = 720;
-	//	private static final int CAMERA_HEIGHT = 480;
-
 	// ===========================================================
 	// Fields
 	// ===========================================================
@@ -50,7 +47,7 @@ public class APokerServer extends BaseGameActivity{
 	private TextureRegion mBackgroundTexureRegion;
 	Sprite backgroundSpriteSprite;
 	SpriteBackground backgroundSprite;
-	
+
 	//Font
 	private Font mFont;
 	private Texture mFontTexture;
@@ -63,13 +60,14 @@ public class APokerServer extends BaseGameActivity{
 	private BitmapTextureAtlas mCardDeckTextureAtlas;
 	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
 
-	//Chip counter
-	private int mChipCounter;
-	private ChangeableText mChipCounterText;
+	//Player
+	public Player mPlayer;
 
 	//Player Name
-	private String mPlayerName;
 	private ChangeableText mPlayerNameText;
+
+	//Chip counter
+	private ChangeableText mChipCounterText;
 
 	// ===========================================================
 	// Constructors
@@ -108,6 +106,8 @@ public class APokerServer extends BaseGameActivity{
 
 		this.mCamera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
 		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.mCamera));
+
+		mPlayer = new Player("Asier", 4000, 1);
 
 		return engine;
 	}
@@ -174,21 +174,20 @@ public class APokerServer extends BaseGameActivity{
 
 		mMainScene.setBackground(backgroundSprite);
 
-		//		this.addCard(Card.CLUB_ACE, 200, 100);
-		//		this.addCard(Card.HEART_ACE, 200, 260);
-		//		this.addCard(Card.DIAMOND_ACE, 440, 100);
-		//		this.addCard(Card.SPADE_ACE, 440, 260);
+		this.addCard(Card.CLUB_ACE, 200, 100);
+		this.addCard(Card.HEART_ACE, 200, 260);
+		this.addCard(Card.DIAMOND_ACE, 440, 100);
+		this.addCard(Card.SPADE_ACE, 440, 260);
 
 		this.addButtons();
-		
-		this.mPlayerName = "Asier";
-		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayerName);
+
+		//Adding the player name to the screen
+		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.name);
 		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
 		mMainScene.attachChild(mPlayerNameText);
-		
+
 		//Adding the chip counter
-		this.mChipCounter = 4000;
-		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mChipCounter));
+		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.chipCounter));
 		mMainScene.attachChild(mChipCounterText);
 
 		this.mMainScene.setTouchAreaBindingEnabled(true);
@@ -206,32 +205,8 @@ public class APokerServer extends BaseGameActivity{
 	// ===========================================================
 
 	private void addCard(final Card pCard, final int pX, final int pY) {
+
 		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
-		//		{
-		//			boolean mGrabbed = false;
-		//
-		//			@Override
-		//			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-		//				switch(pSceneTouchEvent.getAction()) {
-		//				case TouchEvent.ACTION_DOWN:
-		//					this.setScale(1.25f);
-		//					this.mGrabbed = true;
-		//					break;
-		//				case TouchEvent.ACTION_MOVE:
-		//					if(this.mGrabbed) {
-		//						this.setPosition(pSceneTouchEvent.getX() - Card.CARD_WIDTH / 2, pSceneTouchEvent.getY() - Card.CARD_HEIGHT / 2);
-		//					}
-		//					break;
-		//				case TouchEvent.ACTION_UP:
-		//					if(this.mGrabbed) {
-		//						this.mGrabbed = false;
-		//						this.setScale(1.0f);
-		//					}
-		//					break;
-		//				}
-		//				return true;
-		//			}
-		//		};
 
 		this.mMainScene.attachChild(sprite);
 		this.mMainScene.registerTouchArea(sprite);
