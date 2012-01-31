@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
+import org.anddev.andengine.engine.handler.IUpdateHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -168,6 +169,22 @@ public class APokerServer extends BaseGameActivity{
 
 		this.mMainScene = new Scene();
 		this.mMainScene.setOnAreaTouchTraversalFrontToBack();
+
+		//Update handler para manejar los turnos
+		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
+
+			public void onUpdate(float pSecondsElapsed) {
+				// TODO Auto-generated method stub
+				//Your code to run here!
+			}
+
+
+			public void reset() {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
 
 		backgroundSpriteSprite = new Sprite(0, 0, mBackgroundTexureRegion);
 		backgroundSprite = new SpriteBackground(backgroundSpriteSprite);

@@ -12,6 +12,7 @@ public class Player {
 
 	String name;
 	int id, chipCounter;
+	Card card1, card2;
 
 	// ===========================================================
 	// Constructors
@@ -64,6 +65,22 @@ public class Player {
 		this.chipCounter = chipCounter;
 	}
 
+	public Card getCard1() {
+		return card1;
+	}
+
+	public void setCard1(Card card1) {
+		this.card1 = card1;
+	}
+
+	public Card getCard2() {
+		return card2;
+	}
+
+	public void setCard2(Card card2) {
+		this.card2 = card2;
+	}
+
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
@@ -71,6 +88,13 @@ public class Player {
 	// ===========================================================
 	// Methods
 	// ===========================================================
+
+	public void setCards(final Card pCard1, final Card pCard2){
+
+		this.setCard1(pCard1);
+		this.setCard2(pCard2);
+
+	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes

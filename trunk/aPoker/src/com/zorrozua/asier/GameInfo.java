@@ -1,5 +1,7 @@
 package com.zorrozua.asier;
 
+import java.util.HashMap;
+
 public class GameInfo {
 
 	// ===========================================================
@@ -9,6 +11,9 @@ public class GameInfo {
 	// ===========================================================
 	// Fields
 	// ===========================================================
+	
+	int numbPlayers, pot;
+	HashMap<Integer, Player> players;
 
 	// ===========================================================
 	// Constructors
