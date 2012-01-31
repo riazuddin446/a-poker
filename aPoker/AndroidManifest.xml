@@ -13,99 +13,94 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:label="@string/app_name"
             android:name=".Menu"
+            android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.JoinOrCreate" />
             </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.Options" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".Options"
+            android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.Options" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".JoinOrCreate"
+            android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter >
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.JoinTable" />
             </intent-filter>
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.CreateTable" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".JoinTable"
+            android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.JoinTable" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".CreateTable"
+            android:label="@string/app_name"
             android:screenOrientation="portrait" >
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.CreateTable" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".APoker"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.aPoker" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".APokerServer"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
-            <intent-filter >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.APokerClient" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
-            android:name=".pruebas.SimpleGame" >
-            <intent-filter >
+            android:name=".pruebas.SimpleGame"
+            android:label="@string/app_name" >
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.pruebas.SimpleGame" />
