@@ -12,7 +12,7 @@ public class Player {
 
 	String name;
 	int id, chipCounter;
-	Card card1, card2;
+	private Card card1, card2;
 
 	// ===========================================================
 	// Constructors

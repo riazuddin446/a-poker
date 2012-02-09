@@ -127,41 +127,34 @@ public class APokerServer extends BaseGameActivity{
 		mBackgroundTexureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBackgroundTextureAtlas, this,"gamebackground.png", 0, 0);
 		mEngine.getTextureManager().loadTexture(mBackgroundTextureAtlas);
 
-		// Extract the textures of each button
-		this.mButtonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-
-		this.mButtonsTextureRegionMap = new HashMap<Button, TextureRegion>();
-
-		int i = 0;
-
-		for(final Button button : Button.values()){
-			final TextureRegion buttonTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mButtonsTextureAtlas, this, button.name()+".png", i*button.BUTTON_HEIGHT, i*button.BUTTON_WIDTH);
-			this.mButtonsTextureRegionMap.put(button, buttonTextureRegion);
-			i++;
-		}	
-
-		this.mEngine.getTextureManager().loadTexture(this.mButtonsTextureAtlas);
-
-		//Load the card deck into a TextureAtlas
-		this.mCardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mCardDeckTextureAtlas, this, "carddeck_tiled.png", 0, 0);
-
-		//Load each card texture into a HashMap
-		this.mCardTotextureRegionMap = new HashMap<Card, TextureRegion>();
-
-		/* Extract the TextureRegion of each card in the whole deck. */
-		for(final Card card : Card.values()) {
-			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.mCardDeckTextureAtlas, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
-			this.mCardTotextureRegionMap.put(card, cardTextureRegion);
-		}
-
-		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
-
 		//Load the font for texts
 		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 28, true, Color.WHITE);
 		this.mEngine.getTextureManager().loadTexture(this.mFontTexture);
 		this.mEngine.getFontManager().loadFont(this.mFont);
+
+		// Extract and load the textures of each button
+		this.mButtonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mButtonsTextureRegionMap = new HashMap<Button, TextureRegion>();
+		int i = 0;
+		for(final Button button : Button.values()){
+			final TextureRegion buttonTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mButtonsTextureAtlas, this, button.name()+".png", i*button.BUTTON_HEIGHT, i*button.BUTTON_WIDTH);
+			this.mButtonsTextureRegionMap.put(button, buttonTextureRegion);
+			i++;
+		}	
+		this.mEngine.getTextureManager().loadTexture(this.mButtonsTextureAtlas);
+
+		//Extract and load the card deck textures
+		this.mCardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mCardDeckTextureAtlas, this, "carddeck_tiled.png", 0, 0);
+		this.mCardTotextureRegionMap = new HashMap<Card, TextureRegion>();
+		for(final Card card : Card.values()) {
+			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.mCardDeckTextureAtlas, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
+			this.mCardTotextureRegionMap.put(card, cardTextureRegion);
+		}
+		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
+		
+		
 
 	}
 
@@ -203,10 +196,10 @@ public class APokerServer extends BaseGameActivity{
 
 		});
 
-		this.addCard(Card.CLUB_ACE, 200, 100);
-		this.addCard(Card.HEART_ACE, 200, 260);
-		this.addCard(Card.DIAMOND_ACE, 440, 100);
-		this.addCard(Card.SPADE_ACE, 440, 260);
+		this.paintCard(Card.CLUB_ACE, 200, 100);
+		this.paintCard(Card.HEART_ACE, 200, 260);
+		this.paintCard(Card.DIAMOND_ACE, 440, 100);
+		this.paintCard(Card.SPADE_ACE, 440, 260);
 
 		this.addButtons();
 
@@ -224,7 +217,15 @@ public class APokerServer extends BaseGameActivity{
 	// Methods
 	// ===========================================================
 
-	private void addCard(final Card pCard, final int pX, final int pY) {
+	private void paintCard(final Card pCard, final int pX, final int pY) {
+
+		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
+
+		this.mMainScene.attachChild(sprite);
+		this.mMainScene.registerTouchArea(sprite);
+	}
+	
+	private void paintTurnedCard(final Card pCard, final int pX, final int pY) {
 
 		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
 
@@ -362,6 +363,7 @@ public class APokerServer extends BaseGameActivity{
 
 	}
 
+	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
 	private void addButtons() {
 
 		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
