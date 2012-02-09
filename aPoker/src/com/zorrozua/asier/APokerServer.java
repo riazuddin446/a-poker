@@ -70,6 +70,9 @@ public class APokerServer extends BaseGameActivity{
 	//Chip counter
 	private ChangeableText mChipCounterText;
 
+	//Ingame player list
+	HashMap<Integer, Player> players;
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -170,6 +173,20 @@ public class APokerServer extends BaseGameActivity{
 		this.mMainScene = new Scene();
 		this.mMainScene.setOnAreaTouchTraversalFrontToBack();
 
+		//Setting the game background
+		backgroundSpriteSprite = new Sprite(0, 0, mBackgroundTexureRegion);
+		backgroundSprite = new SpriteBackground(backgroundSpriteSprite);
+		mMainScene.setBackground(backgroundSprite);
+
+		//Adding the player name to the screen
+		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.name);
+		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
+		mMainScene.attachChild(mPlayerNameText);
+
+		//Adding the chip counter
+		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.chipCounter));
+		mMainScene.attachChild(mChipCounterText);
+
 		//Update handler para manejar los turnos
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
@@ -186,26 +203,12 @@ public class APokerServer extends BaseGameActivity{
 
 		});
 
-		backgroundSpriteSprite = new Sprite(0, 0, mBackgroundTexureRegion);
-		backgroundSprite = new SpriteBackground(backgroundSpriteSprite);
-
-		mMainScene.setBackground(backgroundSprite);
-
 		this.addCard(Card.CLUB_ACE, 200, 100);
 		this.addCard(Card.HEART_ACE, 200, 260);
 		this.addCard(Card.DIAMOND_ACE, 440, 100);
 		this.addCard(Card.SPADE_ACE, 440, 260);
 
 		this.addButtons();
-
-		//Adding the player name to the screen
-		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.name);
-		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
-		mMainScene.attachChild(mPlayerNameText);
-
-		//Adding the chip counter
-		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.chipCounter));
-		mMainScene.attachChild(mChipCounterText);
 
 		this.mMainScene.setTouchAreaBindingEnabled(true);
 
