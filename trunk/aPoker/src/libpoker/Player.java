@@ -1,4 +1,6 @@
-package com.zorrozua.asier;
+package libpoker;
+
+import com.zorrozua.asier.Card;
 
 public class Player {
 
@@ -11,14 +13,16 @@ public class Player {
 	// ===========================================================
 
 	String name;
-	int id, chipCounter;
+	int id, stake, stake_before;
 	private Card card1, card2;
+	private Action last_action;
+	private SchedAction next_action;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public Player (){
+	public Player (){	
 
 	}
 
@@ -28,12 +32,12 @@ public class Player {
 
 	public Player (String name, int chips){
 		this.name = name;
-		this.chipCounter = chips;
+		this.stake = chips;
 	}
 
 	public Player (String name, int chips, int id){
 		this.name = name;
-		this.chipCounter = chips;
+		this.stake = chips;
 		this.id = id;
 	}
 
@@ -58,11 +62,11 @@ public class Player {
 	}
 
 	public int getChipCounter() {
-		return chipCounter;
+		return stake;
 	}
 
 	public void setChipCounter(int chipCounter) {
-		this.chipCounter = chipCounter;
+		this.stake = chipCounter;
 	}
 
 	public Card getCard1() {
@@ -79,6 +83,22 @@ public class Player {
 
 	public void setCard2(Card card2) {
 		this.card2 = card2;
+	}
+
+	public SchedAction getNext_action() {
+		return next_action;
+	}
+
+	public void setNext_action(SchedAction nextAction) {
+		next_action = nextAction;
+	}
+
+	public Action getLast_action() {
+		return last_action;
+	}
+
+	public void setLast_action(Action lastAction) {
+		last_action = lastAction;
 	}
 
 	// ===========================================================
@@ -100,4 +120,29 @@ public class Player {
 	// Inner and Anonymous Classes
 	// ===========================================================
 
+	enum Action{
+
+		None,
+		ResetAction,
+
+		Fold,
+		Check,
+		Call,
+		Bet,
+		Raise,
+		Allin,
+
+		Show,
+		Muck,
+
+		Sitout,
+		Back;
+
+	}
+
+	class SchedAction{
+		boolean valid;
+		Action action;
+		int amount;
+	}
 }
