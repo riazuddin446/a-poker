@@ -2,6 +2,8 @@ package com.zorrozua.asier;
 
 import java.util.HashMap;
 
+import libpoker.Player;
+
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
