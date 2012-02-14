@@ -61,12 +61,12 @@ public class Player {
 		this.id = playerID;
 	}
 
-	public int getChipCounter() {
+	public int getStake() {
 		return stake;
 	}
 
-	public void setChipCounter(int chipCounter) {
-		this.stake = chipCounter;
+	public void setStake(int stake) {
+		this.stake = stake;
 	}
 
 	public Card getCard1() {
