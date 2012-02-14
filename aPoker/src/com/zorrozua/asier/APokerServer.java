@@ -75,6 +75,7 @@ public class APokerServer extends BaseGameActivity{
 	//Ingame player list
 	HashMap<Integer, Player> players;
 
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -155,8 +156,8 @@ public class APokerServer extends BaseGameActivity{
 			this.mCardTotextureRegionMap.put(card, cardTextureRegion);
 		}
 		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
-		
-		
+
+
 
 	}
 
@@ -174,12 +175,12 @@ public class APokerServer extends BaseGameActivity{
 		mMainScene.setBackground(backgroundSprite);
 
 		//Adding the player name to the screen
-		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.name);
+		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.getPlayerName());
 		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
 		mMainScene.attachChild(mPlayerNameText);
 
 		//Adding the chip counter
-		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.chipCounter));
+		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.getStake()));
 		mMainScene.attachChild(mChipCounterText);
 
 		//Update handler para manejar los turnos
@@ -226,7 +227,7 @@ public class APokerServer extends BaseGameActivity{
 		this.mMainScene.attachChild(sprite);
 		this.mMainScene.registerTouchArea(sprite);
 	}
-	
+
 	private void paintTurnedCard(final Card pCard, final int pX, final int pY) {
 
 		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
