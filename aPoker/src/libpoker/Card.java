@@ -1,4 +1,5 @@
-package com.zorrozua.asier;
+package libpoker;
+
 
 /**
  * (c) 2010 Nicolas Gramlich 
