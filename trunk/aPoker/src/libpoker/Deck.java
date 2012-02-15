@@ -1,44 +1,46 @@
 package libpoker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
-import org.anddev.andengine.opengl.texture.region.TextureRegion;
-
-
-import com.zorrozua.asier.Color;
-import com.zorrozua.asier.Value;
 import com.zorrozua.asier.Card;
 
 public class Deck {
 
 	private ArrayList<Card> cards;
 
+	//Fill the deck with cards and shuffle it
 	void fill(){
 		cards.clear();
 		for(Card c : Card.values()){
 			cards.add(c);
 		}
+		Collections.shuffle(cards);
 	}
 
+	//Clear the deck
 	void empty(){
 		cards.clear();
 	}
 
+	//Return the number of cards that actually are on the deck
 	int count(){
 		return cards.size();
 	}
 
+	//Add a card at the end of the deck
 	boolean push(Card card){
 		cards.add(card);
 		return true;
 	}
 
-	boolean pop(Card card){
+	//Return the last card of the deck and erase it
+	Card pop(){
 		if(count() == 0)
-			return false;
-		cards.remove(card);
-		return true;
+			return null;
+		Card c = cards.get(cards.size()); //Get the last card
+		cards.remove(cards.size()); //Remove it
+		return c;
 	}
 
 }
