@@ -1,6 +1,5 @@
 package libpoker;
 
-import com.zorrozua.asier.Card;
 
 public class Player {
 
@@ -14,7 +13,7 @@ public class Player {
 
 	String name;
 	int id, stake, stake_before;
-	private Card card1, card2;
+	private HoleCards mHoleCards;
 	private Action last_action;
 	private SchedAction next_action;
 
@@ -69,36 +68,25 @@ public class Player {
 		this.stake = stake;
 	}
 
-	public Card getCard1() {
-		return card1;
-	}
 
-	public void setCard1(Card card1) {
-		this.card1 = card1;
-	}
-
-	public Card getCard2() {
-		return card2;
-	}
-
-	public void setCard2(Card card2) {
-		this.card2 = card2;
-	}
-
-	public SchedAction getNext_action() {
+	public SchedAction getNexAction() {
 		return next_action;
 	}
 
-	public void setNext_action(SchedAction nextAction) {
+	public void setNextAction(SchedAction nextAction) {
 		next_action = nextAction;
 	}
 
-	public Action getLast_action() {
+	public Action getLastAction() {
 		return last_action;
 	}
 
-	public void setLast_action(Action lastAction) {
+	public void setLastAction(Action lastAction) {
 		last_action = lastAction;
+	}
+
+	public void resetLastAction(){
+		last_action = Action.None;
 	}
 
 	// ===========================================================
@@ -108,13 +96,6 @@ public class Player {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-
-	public void setCards(final Card pCard1, final Card pCard2){
-
-		this.setCard1(pCard1);
-		this.setCard2(pCard2);
-
-	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes
@@ -133,10 +114,7 @@ public class Player {
 		Allin,
 
 		Show,
-		Muck,
-
-		Sitout,
-		Back;
+		Muck;
 
 	}
 

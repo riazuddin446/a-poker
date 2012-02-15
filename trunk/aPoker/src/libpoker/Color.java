@@ -1,31 +1,21 @@
-package com.zorrozua.asier;
+package libpoker;
 
 /**
  * (c) 2010 Nicolas Gramlich 
  * (c) 2011 Zynga Inc.
  * 
  * @author Nicolas Gramlich
- * @since 18:59:46 - 18.06.2010
+ * @since 18:59:33 - 18.06.2010
  */
-public enum Value {
+public enum Color {
 	// ===========================================================
 	// Elements
 	// ===========================================================
 	
-	ACE,
-	ONE,
-	TWO,
-	THREE,
-	FOUR,
-	FIVE,
-	SIX,
-	SEVEN,
-	EIGHT,
-	NINE,
-	TEN,
-	JACK,
-	QUEEN,
-	KING;
+	CLUB,  // Kreuz
+	DIAMOND,
+	HEART,
+	SPADE; // PIK
 
 	// ===========================================================
 	// Constants

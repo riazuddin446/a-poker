@@ -2,6 +2,7 @@ package com.zorrozua.asier;
 
 import java.util.HashMap;
 
+import libpoker.Card;
 import libpoker.Player;
 
 import org.anddev.andengine.engine.Engine;

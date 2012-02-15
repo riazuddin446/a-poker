@@ -3,7 +3,6 @@ package libpoker;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.zorrozua.asier.Card;
 
 public class Deck {
 
