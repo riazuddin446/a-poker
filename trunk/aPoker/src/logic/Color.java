@@ -11,7 +11,7 @@ public enum Color {
 	// ===========================================================
 	// Elements
 	// ===========================================================
-	
+
 	CLUB,  // Kreuz
 	DIAMOND,
 	HEART,
@@ -40,6 +40,23 @@ public enum Color {
 	// ===========================================================
 	// Methods
 	// ===========================================================
+
+	public String toString()
+	{
+		switch (this)
+		{
+		case CLUB:
+			return "Club";	// \u2663
+		case DIAMOND:
+			return "Diamond";	// \u2666
+		case HEART:
+			return "Heart";	// \u2665
+		case SPADE:
+			return "Spade";	// \u2660
+		default:
+			throw new InternalError();
+		}
+	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes

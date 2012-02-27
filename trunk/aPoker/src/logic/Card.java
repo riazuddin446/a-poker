@@ -1,5 +1,7 @@
 package logic;
 
+import android.util.Log;
+
 
 /**
  * (c) 2010 Nicolas Gramlich 
@@ -14,7 +16,6 @@ public enum Card {
 	// ===========================================================
 
 	CLUB_ACE(Color.CLUB, Value.ACE),
-	CLUB_ONE(Color.CLUB, Value.ONE),
 	CLUB_TWO(Color.CLUB, Value.TWO),
 	CLUB_THREE(Color.CLUB, Value.THREE),
 	CLUB_FOUR(Color.CLUB, Value.FOUR),
@@ -27,9 +28,8 @@ public enum Card {
 	CLUB_JACK(Color.CLUB, Value.JACK),
 	CLUB_QUEEN(Color.CLUB, Value.QUEEN),
 	CLUB_KING(Color.CLUB, Value.KING),
-	
+
 	DIAMOND_ACE(Color.DIAMOND, Value.ACE),
-	DIAMOND_ONE(Color.DIAMOND, Value.ONE),
 	DIAMOND_TWO(Color.DIAMOND, Value.TWO),
 	DIAMOND_THREE(Color.DIAMOND, Value.THREE),
 	DIAMOND_FOUR(Color.DIAMOND, Value.FOUR),
@@ -44,7 +44,6 @@ public enum Card {
 	DIAMOND_KING(Color.DIAMOND, Value.KING),
 
 	HEART_ACE(Color.HEART, Value.ACE),
-	HEART_ONE(Color.HEART, Value.ONE),
 	HEART_TWO(Color.HEART, Value.TWO),
 	HEART_THREE(Color.HEART, Value.THREE),
 	HEART_FOUR(Color.HEART, Value.FOUR),
@@ -57,9 +56,8 @@ public enum Card {
 	HEART_JACK(Color.HEART, Value.JACK),
 	HEART_QUEEN(Color.HEART, Value.QUEEN),
 	HEART_KING(Color.HEART, Value.KING),
-	
+
 	SPADE_ACE(Color.SPADE, Value.ACE),
-	SPADE_ONE(Color.SPADE, Value.ONE),
 	SPADE_TWO(Color.SPADE, Value.TWO),
 	SPADE_THREE(Color.SPADE, Value.THREE),
 	SPADE_FOUR(Color.SPADE, Value.FOUR),
@@ -99,13 +97,21 @@ public enum Card {
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
-	
+
 	public int getTexturePositionX() {
 		return this.mValue.ordinal() * CARD_WIDTH;
 	}
-	
+
 	public int getTexturePositionY() {
 		return this.mColor.ordinal() * CARD_HEIGHT;
+	}
+
+	public Color getColor() {
+		return mColor;
+	}
+
+	public Value getValue() {
+		return mValue;
 	}
 
 	// ===========================================================
@@ -115,6 +121,11 @@ public enum Card {
 	// ===========================================================
 	// Methods
 	// ===========================================================
+
+	public String toString()
+	{
+		return mValue.toString() + mColor.toString();
+	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes

@@ -2,6 +2,7 @@ package logic;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EmptyStackException;
 
 
 public class Deck {
@@ -34,12 +35,22 @@ public class Deck {
 	}
 
 	//Return the last card of the deck and erase it
-	Card pop(){
+	public Card pop(){
 		if(count() == 0)
-			return null;
+			throw new EmptyStackException();
 		Card c = cards.get(cards.size()); //Get the last card
 		cards.remove(cards.size()); //Remove it
 		return c;
 	}
 
+	public ArrayList<Card> pop(int n){
+		if(count() == 0)
+			throw new EmptyStackException();
+		ArrayList<Card> temp = new ArrayList<Card>();
+
+		for (int i = 0; i < n; ++i)
+			temp.add(this.pop());
+
+		return temp;	
+	}
 }
