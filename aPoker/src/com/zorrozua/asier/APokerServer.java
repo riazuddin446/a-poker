@@ -199,11 +199,12 @@ public class APokerServer extends BaseGameActivity{
 			}
 
 		});
-
+		
 		this.paintCard(Card.CLUB_ACE, 200, 100);
 		this.paintCard(Card.HEART_ACE, 200, 260);
 		this.paintCard(Card.DIAMOND_ACE, 440, 100);
 		this.paintCard(Card.SPADE_ACE, 440, 260);
+		
 
 		this.addButtons();
 

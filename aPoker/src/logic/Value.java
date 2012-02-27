@@ -12,8 +12,6 @@ public enum Value {
 	// Elements
 	// ===========================================================
 	
-	ACE,
-	ONE,
 	TWO,
 	THREE,
 	FOUR,
@@ -25,7 +23,8 @@ public enum Value {
 	TEN,
 	JACK,
 	QUEEN,
-	KING;
+	KING,
+	ACE;
 
 	// ===========================================================
 	// Constants
@@ -51,6 +50,43 @@ public enum Value {
 	// Methods
 	// ===========================================================
 
+	/**
+	 * Test if enum's ordinal is exactly one less than the given enum f
+	 * 
+	 * <p>This test is needed for game-logic (e.g. HandEvaluator for determining a straight)
+	 * 
+	 * @param f Value to compare to
+	 * @return true if enum's ordinal is exactly one less than f
+	 */
+	public boolean isOneLessThan(Value f)
+	{
+		return (this.ordinal() + 1 == f.ordinal());
+	}
+	
+	public String toString()
+	{
+		if (this.ordinal() <= TEN.ordinal())
+		{
+			return Integer.toString(this.ordinal() + 2);
+		}
+		else
+		{
+			switch (this)
+			{
+			case JACK:
+				return "J";
+			case QUEEN:
+				return "Q";
+			case KING:
+				return "K";
+			case ACE:
+				return "A";
+			default:
+				throw new InternalError();
+			}
+		}
+	}
+	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================

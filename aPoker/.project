@@ -30,4 +30,31 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>AndEngineMODPlayerExtension_src</name>
+			<type>2</type>
+			<location>/media/DATA/Dropbox/Universidad/PFC/trunk/src/AndEngineMODPlayerExtension/src</location>
+		</link>
+		<link>
+			<name>AndEngineMultiTouchExtension_src</name>
+			<type>2</type>
+			<location>/media/DATA/Dropbox/Universidad/PFC/trunk/src/AndEngineMultiTouchExtension/src</location>
+		</link>
+		<link>
+			<name>AndEngineMultiplayerExtension_src</name>
+			<type>2</type>
+			<location>/media/DATA/Dropbox/Universidad/PFC/trunk/src/AndEngineMultiplayerExtension/src</location>
+		</link>
+		<link>
+			<name>AndEnginePhysicsBox2DExtension_src</name>
+			<type>2</type>
+			<location>/media/DATA/Dropbox/Universidad/PFC/trunk/src/AndEnginePhysicsBox2DExtension/src</location>
+		</link>
+		<link>
+			<name>AndEngine_src</name>
+			<type>2</type>
+			<location>/media/DATA/Dropbox/Universidad/PFC/trunk/src/AndEngine/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

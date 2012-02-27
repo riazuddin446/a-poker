@@ -1,6 +1,5 @@
 package logic;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
 
@@ -18,15 +17,15 @@ import java.util.Vector;
  * FourOfAKind      FourOfAKind card       Remaining 1
  * StraightFlush    Top card               -
  * </pre>
-*/
+ */
 
 public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneable
 {
 	public enum HandRanking
 	{
 		HIGHCARD, ONEPAIR, TWOPAIR, THREEOFAKIND, STRAIGHT,
-			FLUSH, FULLHOUSE, FOUROFAKIND, STRAIGHTFLUSH;
-		
+		FLUSH, FULLHOUSE, FOUROFAKIND, STRAIGHTFLUSH;
+
 		@Override
 		public String toString()
 		{
@@ -55,86 +54,76 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 			}
 		}
 	}
-	
-	
-	
-	HandRanking ranking;
-	
-	final ArrayList<Card> rankCards2 = new ArrayList<Card>();
-	final ArrayList<Card> kickerCards2 = new ArrayList<Card>();
 
-	
+	HandRanking ranking;
+
 	final Vector<Card> rankCards = new Vector<Card>();
-	final Vector<Card> kickerCards = new Vector<Card>();
-	
-	
-	
+	final Vector<Card> kickerCards = new Vector<Card>();	
+
 	public HandRanking getRanking()
 	{
 		return this.ranking;
 	}
-	
+
 	public void setRanking(HandRanking ranking)
 	{
 		this.ranking = ranking;
 	}
-	
+
 	public Vector<Card> getRankCards()
 	{
 		Vector<Card> cRank = new Vector<Card>();
 		for (Card c : this.rankCards)
-			cRank.add(c.clone());
-		
+			cRank.add(c); //Does this destroy c from rankCards?
+
 		return cRank;
 	}
-	
+
 	public Vector<Card> getKickerCards()
 	{
 		Vector<Card> cKicker = new Vector<Card>();
 		for (Card c : this.kickerCards)
-			cKicker.add(c.clone());
-		
+			cKicker.add(c); //Does this destroy c from kickerCards?
+
 		return cKicker;
 	}
-	
+
 
 
 	public int compareTo(PokerHandStrength o)
 	{
-        int cret = this.ranking.compareTo(o.ranking);
+		int cret = this.ranking.compareTo(o.ranking);
 
-        // both hands have the same ranking, compare
-        if (cret == 0)
-        {
-                // compare rank-cards
-                for (int i = 0; i < this.rankCards.size(); ++i)
-                {
-                        AngloAmericanCardFaceComparator cfc = new AngloAmericanCardFaceComparator();
-                        cret = cfc.compare((AngloAmericanCard) this.rankCards.get(0), (AngloAmericanCard) o.rankCards.get(0));
+		// both hands have the same ranking, compare
+		if (cret == 0)
+		{
+			// compare rank-cards value
+			for (int i = 0; i < this.rankCards.size(); ++i)
+			{
+				cret = (this.rankCards.get(0).mValue.compareTo(o.rankCards.get(0).mValue));
 
-                        if (cret != 0)
-                                break;
-                }
+				if (cret != 0)
+					break;
+			}
 
-                // hands have the same rank-cards
-                if (cret == 0)
-                {
-                        // compare kicker-cards
-                        for (int i = 0; i < this.kickerCards.size(); ++i)
-                        {
-                        		AngloAmericanCardFaceComparator cfc = new AngloAmericanCardFaceComparator();
-                                cret = cfc.compare((AngloAmericanCard) this.kickerCards.get(0), (AngloAmericanCard) o.kickerCards.get(0));
+			// hands have the same rank-cards
+			if (cret == 0)
+			{
+				// compare kicker-cards values
+				for (int i = 0; i < this.kickerCards.size(); ++i)
+				{
+					cret = (this.kickerCards.get(0).mValue.compareTo(o.kickerCards.get(0).mValue));
 
-                                if (cret != 0)
-                                        break;
-                        }
-                }
-        }
+					if (cret != 0)
+						break;
+				}
+			}
+		}
 
-        return cret;
+		return cret;
 	}
-	
-	
+
+
 	@Override
 	public String toString()
 	{
