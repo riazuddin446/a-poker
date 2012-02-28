@@ -26,6 +26,8 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import client.Button;
+
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
