@@ -1,4 +1,4 @@
-package com.zorrozua.asier;
+package client;
 
 public enum Button {
 	// ===========================================================
