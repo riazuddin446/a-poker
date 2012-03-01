@@ -89,7 +89,7 @@
         </activity>
         <activity
             android:label="@string/app_name"
-            android:name=".APokerServer"
+            android:name="client.GameController"
             android:screenOrientation="landscape" >
             <intent-filter >
                 <category android:name="android.intent.category.DEFAULT" />

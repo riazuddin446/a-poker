@@ -1,6 +1,5 @@
 package client;
 
-import com.zorrozua.asier.APokerServer;
 import com.zorrozua.asier.R;
 import com.zorrozua.asier.R.id;
 import com.zorrozua.asier.R.layout;
@@ -25,7 +24,7 @@ public class CreateTable extends Activity {
 
 		setContentView(R.layout.createlayout);
 		
-		final Intent aPokerClient = new Intent(this, APokerServer.class);
+		final Intent aPokerClient = new Intent(this, GameController.class);
 
 		Button createButton = (Button) findViewById(R.id.createButton);
 		createButton.setOnClickListener(new View.OnClickListener() {

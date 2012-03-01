@@ -1,4 +1,4 @@
-package com.zorrozua.asier;
+package client;
 
 import java.util.HashMap;
 
@@ -26,13 +26,12 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
-import client.Button;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
 
-public class APokerServer extends BaseGameActivity{
+public class GameController extends BaseGameActivity{
 
 	// ===========================================================
 	// Constants
@@ -88,7 +87,7 @@ public class APokerServer extends BaseGameActivity{
 	// ===========================================================
 
 	public void setCameraWidth(int cameraWidth) {
-		APokerServer.cameraWidth = cameraWidth;
+		GameController.cameraWidth = cameraWidth;
 	}
 
 	public static int getCameraWidth() {
@@ -96,7 +95,7 @@ public class APokerServer extends BaseGameActivity{
 	}
 
 	public void setCameraHeight(int cameraHeight) {
-		APokerServer.cameraHeight = cameraHeight;
+		GameController.cameraHeight = cameraHeight;
 	}
 
 	public static int getCameraHeight() {
