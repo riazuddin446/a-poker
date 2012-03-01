@@ -24,7 +24,7 @@ public class CreateTable extends Activity {
 
 		setContentView(R.layout.createlayout);
 		
-		final Intent aPokerClient = new Intent(this, GameController.class);
+		final Intent aPokerClient = new Intent(this, PGame.class);
 
 		Button createButton = (Button) findViewById(R.id.createButton);
 		createButton.setOnClickListener(new View.OnClickListener() {
