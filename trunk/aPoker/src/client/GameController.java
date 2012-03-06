@@ -17,19 +17,23 @@ public class GameController {
 	// Fields
 	// ===========================================================
 
+	private Table table;
 	private HashMap<Integer, Player> players;
 
 	private int game_id;
-	private int max_players;
-	private int timeout;
-	private int hand_no;
-	private int player_stakes;
 
 	private boolean started;
-	private boolean restart;
-	private boolean ended;
+	private int max_players;
+
+	private int player_stakes;	
+	private int timeout;
 
 	Blind blind;
+
+	private int hand_no;
+
+	private boolean ended;
+	private boolean restart;
 
 	private String name;
 
@@ -47,6 +51,13 @@ public class GameController {
 		restart = false;
 
 		player_stakes = 1500;
+
+		blind.blinds_factor = 2;
+		blind.start = 10;
+
+		hand_no = 0;
+
+		name = "Game";
 
 	}
 
@@ -150,21 +161,46 @@ public class GameController {
 	// Methods
 	// ===========================================================
 
-	public void addPlayer(Player p){
+	boolean addPlayer(Player p) //FIXME Quitar las dos if y la forma de insertar el nuevo jugador
+	{
+		//Is the game already started or full?
+		if(started || players.size() == max_players)
+			return false;
 
+		if(isPlayer(p))
+			return false;
+
+		p.setStake(player_stakes);
+
+		players.put(players.size(), p);
+
+		return true;
 	}
 
-	public void removePlayer(Player p){
-
+	public void removePlayer(Player p)
+	{
+		//Don't allow removing if the game has already been started
+		if(!started)
+		{
+			//TODO Comprobar que el jugador no sea el owner de la partida
+			players.remove(p);
+		}
 	}
 
 	public boolean isPlayer(Player p){
-		return false;
+
+		if(players.containsKey(p))
+			return true;
+		else 
+			return false;
 	}
 
-	public void setPlayerAction(Player p, Action action, int amount){
-
-
+	public void setPlayerAction(Player p, Action action, int amount)
+	{
+		if(true)
+		{
+			p.getNexAction();
+		}
 	}
 
 	public void start(){
@@ -178,10 +214,79 @@ public class GameController {
 	protected void createWinList(Vector<Vector<PokerHandStrength>> winList){
 
 		Vector<PokerHandStrength> wl;
-		
+
 		//int showdown_player = 
 	}
 
+	protected int determineMinimumBet()
+	{
+		return 0;
+	}
+
+	protected void stateNewRound()
+	{
+
+	}
+
+	protected void stateBlinds()
+	{
+
+	}
+
+	protected void stateBetting()
+	{
+
+	}
+
+	protected void stateBettingEnd() //Pseudo-state
+	{
+
+	}
+
+	protected void stateAskShow()
+	{
+
+	}
+
+	protected void stateAllFolded()
+	{
+
+	}
+
+	protected void stateShowdown()
+	{
+
+	}
+
+	protected void stateEndRound()
+	{
+
+	}
+
+	protected void stateDelay() //Pseudo-state for delays
+	{
+
+	}
+
+	protected void dealHole()
+	{
+
+	}
+
+	protected void dealFlop()
+	{
+
+	}
+
+	protected void dealTurn()
+	{
+
+	}
+
+	protected void dealRiver()
+	{
+
+	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes
@@ -189,16 +294,16 @@ public class GameController {
 
 	private class Blind{
 
-		int start_chips;
+		int start;
 		int amount_chips;
 		int blinds_factor;
 
 		public void setBlindsStart(int startChips) {
-			start_chips = startChips;
+			start = startChips;
 		}
 
 		public int getBlindsStart() {
-			return start_chips;
+			return start;
 		}
 
 		public int getBlindsTime() {
