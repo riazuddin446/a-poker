@@ -101,7 +101,7 @@ public class Player {
 	// Inner and Anonymous Classes
 	// ===========================================================
 
-	enum Action{
+	public enum Action{
 
 		None,
 		ResetAction,

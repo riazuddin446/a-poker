@@ -1,5 +1,12 @@
 package client;
 
+import java.util.HashMap;
+import java.util.Vector;
+
+import logic.Player;
+import logic.PokerHandStrength;
+import logic.Player.Action;
+
 public class GameController {
 
 	// ===========================================================
@@ -10,20 +17,19 @@ public class GameController {
 	// Fields
 	// ===========================================================
 
+	private HashMap<Integer, Player> players;
+
 	private int game_id;
+	private int max_players;
+	private int timeout;
+	private int hand_no;
+	private int player_stakes;
 
 	private boolean started;
-	private int max_players;
-
-	private int timeout;
+	private boolean restart;
+	private boolean ended;
 
 	Blind blind;
-
-	private int hand_no;
-
-	private boolean restart;
-
-	private boolean ended;
 
 	private String name;
 
@@ -33,7 +39,14 @@ public class GameController {
 
 	public GameController(){
 
+		game_id = -1;
 
+		started = false;
+		ended = false;
+		max_players = 5;
+		restart = false;
+
+		player_stakes = 1500;
 
 	}
 
@@ -73,6 +86,62 @@ public class GameController {
 		blind.setBlindsTime(blindsTime);
 	}
 
+	public int getPlayerStakes() {
+		return player_stakes;
+	}
+
+	public void setPlayerStakes(int playerStakes) {
+		player_stakes = playerStakes;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getMaxPlayers() {
+		return max_players;
+	}
+
+	public void setMaxPlayers(int maxPlayers) {
+		max_players = maxPlayers;
+	}
+
+	public boolean isRestart() {
+		return restart;
+	}
+
+	public void setRestart(boolean restart) {
+		this.restart = restart;
+	}
+
+	public boolean isStarted() {
+		return started;
+	}
+
+	public void setStarted(boolean started) {
+		this.started = started;
+	}
+
+	public boolean isEnded() {
+		return ended;
+	}
+
+	public void setEnded(boolean ended) {
+		this.ended = ended;
+	}
+
+	public int getPlayerCount(){
+		return players.size();
+	}
+
+	public void getPlayerList(HashMap<Integer, Player> list){
+		list = players;
+	}
+
 	// ===========================================================
 	// Methods from SuperClass/Interfaces
 	// ===========================================================
@@ -81,17 +150,48 @@ public class GameController {
 	// Methods
 	// ===========================================================
 
+	public void addPlayer(Player p){
+
+	}
+
+	public void removePlayer(Player p){
+
+	}
+
+	public boolean isPlayer(Player p){
+		return false;
+	}
+
+	public void setPlayerAction(Player p, Action action, int amount){
+
+
+	}
+
+	public void start(){
+
+	}
+
+	public int tick(){
+		return 0;
+	}
+
+	protected void createWinList(Vector<Vector<PokerHandStrength>> winList){
+
+		Vector<PokerHandStrength> wl;
+		
+		//int showdown_player = 
+	}
+
+
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
-
-
 
 	private class Blind{
 
 		int start_chips;
 		int amount_chips;
-		int blinds_time;
+		int blinds_factor;
 
 		public void setBlindsStart(int startChips) {
 			start_chips = startChips;
@@ -102,11 +202,11 @@ public class GameController {
 		}
 
 		public int getBlindsTime() {
-			return blinds_time;
+			return blinds_factor;
 		}
 
 		public void setBlindsTime(int blindsTime) {
-			blinds_time = blindsTime;
+			blinds_factor = blindsTime;
 		}
 
 	}
