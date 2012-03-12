@@ -10,7 +10,7 @@ public class Deck {
 	private ArrayList<Card> cards;
 
 	//Fill the deck with cards and shuffle it
-	void fill(){
+	public void fill(){
 		cards.clear();
 		for(Card c : Card.values()){
 			cards.add(c);
@@ -19,17 +19,17 @@ public class Deck {
 	}
 
 	//Clear the deck
-	void empty(){
+	public void empty(){
 		cards.clear();
 	}
 
 	//Return the number of cards that actually are on the deck
-	int count(){
+	public int count(){
 		return cards.size();
 	}
 
 	//Add a card at the end of the deck
-	boolean push(Card card){
+	public boolean push(Card card){
 		cards.add(card);
 		return true;
 	}
@@ -43,14 +43,14 @@ public class Deck {
 		return c;
 	}
 
-	public ArrayList<Card> pop(int n){
-		if(count() == 0)
-			throw new EmptyStackException();
-		ArrayList<Card> temp = new ArrayList<Card>();
-
-		for (int i = 0; i < n; ++i)
-			temp.add(this.pop());
-
-		return temp;	
-	}
+//	public ArrayList<Card> pop(int n){
+//		if(count() == 0)
+//			throw new EmptyStackException();
+//		ArrayList<Card> temp = new ArrayList<Card>();
+//
+//		for (int i = 0; i < n; ++i)
+//			temp.add(this.pop());
+//
+//		return temp;	
+//	}
 }

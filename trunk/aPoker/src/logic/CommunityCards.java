@@ -10,7 +10,7 @@ public class CommunityCards {
 
 	}
 
-	boolean setFlop(Card c1, Card c2, Card c3){
+	public boolean setFlop(Card c1, Card c2, Card c3){
 		cards.clear();
 		cards.add(c1);
 		cards.add(c2);
@@ -18,33 +18,33 @@ public class CommunityCards {
 		return true;
 	}
 
-	boolean setTurn(Card c){
+	public boolean setTurn(Card c){
 		if(cards.size() != 3)
 			return false;
 		cards.add(c);
 		return true;
 	}
 
-	boolean setRiver(Card c){
+	public boolean setRiver(Card c){
 		if(cards.size() != 4)
 			return false;
 		cards.add(c);
 		return true;
 	}
 
-	void clear(){
+	public void clear(){
 		cards.clear();
 	}
 
-	ArrayList<Card> copyCards(){
+	public ArrayList<Card> copyCards(){
 		return cards;
 	}
-	
-	int size(){
+
+	public int size(){
 		return cards.size();
 	}
 
-	enum Round{
+	public enum Round{
 		None,
 		Flop,
 		Turn,

@@ -11,11 +11,16 @@ public class Player {
 	// Fields
 	// ===========================================================
 
-	String name;
-	int id, stake, stake_before;
-	private HoleCards mHoleCards;
-	private Action last_action;
-	private SchedAction next_action;
+	public String name;
+	
+	public int id, stake, stake_before;
+	
+	public HoleCards holecards;
+	
+	public Action last_action;
+	public SchedAction next_action;
+	
+	public boolean sitout;
 
 	// ===========================================================
 	// Constructors
@@ -114,13 +119,16 @@ public class Player {
 		Allin,
 
 		Show,
-		Muck;
+		Muck,
+		
+		Sitout,
+		Back;
 
 	}
 
-	class SchedAction{
-		boolean valid;
-		Action action;
-		int amount;
+	public class SchedAction{
+		public boolean valid;
+		public Action action;
+		public int amount;
 	}
 }

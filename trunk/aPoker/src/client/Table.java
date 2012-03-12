@@ -1,5 +1,6 @@
 package client;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -26,9 +27,9 @@ public class Table {
 
 	BettingRound betround;
 
-	LinkedList<Seat> seats;
+	HashMap<Integer, Seat> seats;
 
-	int dealer, smallBlind, bigBlind;
+	int dealer, sb, bb;
 	int currentPlayer;
 	int lastBetPlayer;
 
@@ -75,30 +76,30 @@ public class Table {
 
 	}
 
-	public Player getNextPlayer(int pos){
+	public int getNextPlayer(int i){
 
 		int start, cur;
-		start = pos;
-		cur = pos;
+		start = i;
+		cur = i;
 		boolean found = false;
 
-		do{
+		while (!found)
+		{
 			cur++;
-			if(cur>=5)
+
+			if(cur >= 5) //We have done the full turn
 				cur = 0;
 
-			if(start==cur){
-				return null;
-			}
+			if(cur == start)
+				return -1;
 
-			if(seats.get(cur).occupied)
+			else if(seats.get(cur).occupied)
 				found = true;
-		} while (!found);
-
-		return seats.get(cur).player;
+		}
+		return cur;
 	}
 
-	public Player getNextActivePlayer(int pos){
+	public int getNextActivePlayer(int pos){
 		int start, cur;
 		start = pos;
 		cur = pos;
@@ -110,14 +111,14 @@ public class Table {
 				cur = 0;
 
 			if(start==cur){
-				return null;
+				return -1;
 			}
 
 			if(seats.get(cur).in_round)
 				found = true;
 		} while (!found);
 
-		return seats.get(cur).player;
+		return cur;
 	}
 
 	public int countPlayers(){
@@ -143,7 +144,7 @@ public class Table {
 
 		return count;
 	}
-	
+
 	public boolean isAllin(){
 
 		//All (or except one) players are allin
@@ -172,7 +173,7 @@ public class Table {
 		{
 			if(!seats.get(i).occupied)
 				continue;
-			
+
 			seats.get(i).player.resetLastAction();
 		}
 
@@ -198,24 +199,24 @@ public class Table {
 				else if (seats.get(i).bet > smallest_bet) //Bets are not equal
 					need_sidepot = true; // So there must be a smallest bet
 			}
-			
+
 			//There are no bets, do nothing
 			if(smallest_bet == 0)
 				return;
-			
+
 			//Last pot is current pot
 			Pot cur_pot = pots.lastElement();
-			
+
 			//If current pot is final, create a new one
 			if(cur_pot.final1){
 				Pot pot = new Pot();
 				pot.amount=0;
 				pot.final1=false;
 				pots.add(pot);
-				
+
 				cur_pot = pots.lastElement();
 			}
-			
+
 			//Collect the bet of each player
 			for(int i=0; i<5; i++){
 				//Skip invalid seats
@@ -224,14 +225,14 @@ public class Table {
 				//Skip already handled players
 				if(seats.get(i).bet==0)
 					continue;
-				
+
 				//Collect bet of folded players and skip them
 				if(!seats.get(i).in_round){
 					cur_pot.amount += seats.get(i).bet;
 					seats.get(i).bet = 0;
 					continue;
 				}
-				
+
 				//Collect the bet into pot
 				if(!need_sidepot){
 					cur_pot.amount += seats.get(i).bet;
@@ -241,20 +242,20 @@ public class Table {
 					cur_pot.amount += smallest_bet;
 					seats.get(i).bet -= smallest_bet;
 				}
-				
+
 				//Mark pot as final if at least one player is allin
 				Player p = seats.get(i).player;
 				if(p.getStake() == 0)
 					cur_pot.final1 = true;
-				
+
 				//Set player 'involved in pot'
 				if(!isSeatInvolvedInPot(cur_pot, i))
 					cur_pot.vsteats.add(i);					
 			}
-			
+
 			if(!need_sidepot) //All players bets are the same, end here
 				break;
-			
+
 		} while(true);
 	}
 
@@ -285,7 +286,7 @@ public class Table {
 	}
 
 	public void scheduleState(State schedState, int delay_sec){
-		
+
 		state = schedState;
 		delay = delay_sec;
 		delay_start = null; //FIXME
