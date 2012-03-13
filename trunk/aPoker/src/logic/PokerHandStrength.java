@@ -54,6 +54,8 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 			}
 		}
 	}
+	
+	int id;
 
 	HandRanking ranking;
 
@@ -128,6 +130,10 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 	public String toString()
 	{
 		return "ranking=" + this.ranking + " rank=" + this.rankCards + " kicker=" + this.kickerCards;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 }
