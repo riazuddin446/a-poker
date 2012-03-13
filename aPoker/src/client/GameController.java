@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import client.Table.BettingRound;
 import client.Table.Pot;
+import client.Table.Seat;
 import client.Table.State;
 
 import logic.Card;
@@ -494,27 +495,281 @@ public class GameController {
 			return;
 		}
 
-		//////////////
+		//Is the last player who did the last bet/action? If yes end this betting round
+		if(t.getNextActivePlayer(t.currentPlayer) == t.lastBetPlayer)
+		{
+			//Collect bets into pot
+			t.collectBets();
+
+			//All (or all except one) players are allin
+			if(t.isAllin())
+			{
+				//No further action at table possible
+				t.nomoreaction = true;
+			}
+
+			//Which betting round is next?
+			switch (t.betround)
+			{
+			case Preflop:
+				t.betround = BettingRound.Flop;
+				dealFlop(t);
+				break;
+			case Flop:
+				t.betround = BettingRound.Turn;
+				dealTurn(t);
+				break;
+			case Turn:
+				t.betround = BettingRound.River;
+				dealRiver(t);
+				break;
+			case River:
+				//last_bet_player must show his hand
+				t.seats.get(t.lastBetPlayer).showcards = true;
+
+				//Set the player behind last action as current player
+				t.currentPlayer = t.getNextActivePlayer(t.lastBetPlayer);
+
+				//Initialize the player's timeout
+				//TODO
+
+				//End of hand, do showdonw/ask for show
+				if(t.nomoreaction)
+					t.state = State.Showdown;
+				else
+					t.state = State.AskShow;
+
+				t.resetLastPlayerActions();
+				return;
+			}
+
+			//Reset the highest bet amount
+			t.bet_amount = 0;
+			t.last_bet_amount = 0;
+
+			//Set the current player as SB (or next active behing SB)
+			t.currentPlayer = t.getNextActivePlayer(t.dealer);
+
+			//Reinitialize the player's timeout
+			//TODO
+
+			//First action for next betting round is at this payer
+			t.lastBetPlayer = t.currentPlayer;
+			t.resetLastPlayerActions();
+			t.scheduleState(State.BettingEnd, 2);			
+		}
+		else
+		{
+			//Preflop: if player on whom the last action was folds,
+			//assign 'last action' to next active player
+			if(action == Action.Fold && t.currentPlayer == t.lastBetPlayer)
+				t.lastBetPlayer = t.getNextActivePlayer(t.lastBetPlayer);
+
+			//Find next player
+			t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
+			//t.timeout_start = time(NULL);
+
+			//Reset current player's last action
+			p = t.seats.get(t.currentPlayer).player;
+			p.resetLastAction();
+
+			t.scheduleState(State.Betting, 1);
+			//TODO sendtablesnapshot;
+		}
 	}
 
-	protected void stateBettingEnd() //Pseudo-state
+	protected void stateBettingEnd(Table t) //Pseudo-state
+	{	
+		t.state = State.Betting;
+		//TODO sendTableSnapShot(t);
+	}
+
+	protected void stateAskShow(Table t)
 	{
+		boolean chose_action = false;
+
+		Player p = t.seats.get(t.currentPlayer).player;
+
+		if(p.stake == 0 && t.countActivePlayers() > 1) //Player went allin and has no option to show/muck
+		{
+			t.seats.get(t.currentPlayer).showcards = true;
+			chose_action = true;
+			p.next_action.valid = false;
+		}
+		else if(p.next_action.valid) //Has player set an action?
+		{
+			if(p.next_action.action == Action.Muck)
+			{
+				//Muck cards
+				chose_action = true;
+			}
+			else if (p.next_action.action == Action.Show)
+			{
+				//Show cards
+				t.seats.get(t.currentPlayer).showcards = true;
+
+				chose_action = true;
+			}
+
+			//Reset scheduled action
+			p.next_action.valid = false;
+		}
+		else
+		{
+			//Handle player timeout
+			int timeout = 4;
+
+			if(p.sitout)
+			{
+				// default on showdown is "to show"
+				// Note: client needs to determine if it's hand is
+				//       already lost and needs to fold if wanted
+				if(t.countActivePlayers() > 1)
+					t.seats.get(t.currentPlayer).showcards = true;
+
+				chose_action = true;
+			}
+
+			t.seats.get(t.currentPlayer).showcards = true;
+			chose_action = true;
+		}
+
+		//Return here if no action chosen till now
+		if(!chose_action)
+			return;
+
+		if(t.seats.get(t.currentPlayer).showcards)
+			p.last_action = Action.Show;
+		else
+			p.last_action = Action.Muck;
+
+		//All players, except one, folded or showdown?
+		if(t.countActivePlayers() == 1)
+		{
+			t.state = State.AllFolded;
+
+			//sendTableSnapshot(t);
+		}
+		else
+		{
+			//Player is out if he don't want to show his cards
+			if(t.seats.get(t.currentPlayer).showcards == false)
+				t.seats.get(t.currentPlayer).in_round = false;
+
+			if(t.getNextActivePlayer(t.currentPlayer) == t.lastBetPlayer)
+			{
+				t.state = State.Showdown;
+				return;
+			}
+			else
+			{
+				//Find next player
+				t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
+
+				//t.timeout_start = time(null);
+
+				//Send update snapshot
+				//TODO sendTableSnapshot(t);
+			}
+		}
+	}
+
+	protected void stateAllFolded(Table t)
+	{
+		//Get last remaining player
+		Player p = t.seats.get(t.currentPlayer).player;
+
+		//Send PlayerShow snapshot if cards were shown
+		if(t.seats.get(t.currentPlayer).showcards)
+		{
+			//TODO sendPlayerShowSnapshot(t, p);
+		}
+
+		p.stake += t.pots.get(0).amount;
+		t.seats.get(t.currentPlayer).bet = t.pots.get(0).amount;
+
+		//Send pot-win snapshot
+		//TODO
+
+		t.scheduleState(State.EndRound, 2);
 
 	}
 
-	protected void stateAskShow()
+	protected void stateShowdown(Table t)
 	{
+		//The player who did the last action is first
+		int showdown_player = t.lastBetPlayer;
 
-	}
+		//Determine and send out PlayerShow snapshot
+		//TODO
 
-	protected void stateAllFolded()
-	{
+		//Determine winners
+		Vector<Vector<PokerHandStrength>> winList = null;
+		createWinList(t, winList);
 
-	}
+		//For each winner list:
+		for (int i=0; i < winList.size(); i++)
+		{
+			Vector<PokerHandStrength> tw = winList.get(i);
+			int winner_count = tw.size();
 
-	protected void stateShowdown()
-	{
+			//For each pot:
+			for(int poti=0; poti < t.pots.size(); poti++)
+			{
+				Pot pot = t.pots.get(poti);
+				int involved_count = t.getInvolverInPotCount(pot, tw);
 
+				int win_amount = 0;
+				int odd_chips = 0;
+
+				if(involved_count == 1)
+				{
+					//Pot is divided by the number of players involved in
+					win_amount = pot.amount / involved_count;
+
+					//Odd chips
+					odd_chips = pot.amount - (win_amount * involved_count);
+				}
+
+				int cashout_amount = 0;
+
+				//For each winning player
+				for(int pi=0; pi < winner_count; pi++)
+				{
+					int seat_num = tw.get(pi).getId();
+					Seat seat = t.seats.get(seat_num);
+					Player p = seat.player;
+
+					//Skip pot if player is not involved in it
+					if(!t.isSeatInvolvedInPot(pot, seat_num))
+						continue;
+
+					if(win_amount > 0)
+					{
+						//Transfer winning amount to player
+						p.stake += win_amount;
+
+						//Put winnings to seat (needed for snapshot)
+						seat.bet += win_amount;
+
+						//Count up overall cashed-out
+						cashout_amount += win_amount;
+
+						//TODO Snap
+					}
+
+					//Distribute odd chips
+					if(odd_chips == 1)
+					{
+						//Find the next player behind button which is involved in pot
+						int oddchips_player = t.getNextActivePlayer(t.dealer);
+						//////////////////////////////////////////////////////////
+					}
+
+				}
+
+			}
+		}
 	}
 
 	protected void stateEndRound(Table t)
