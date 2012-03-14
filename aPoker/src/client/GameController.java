@@ -256,9 +256,67 @@ public class GameController {
 			return t.bet_amount + (t.bet_amount - t.last_bet_amount);
 	}
 
-	protected void stateNewRound()
+	protected void stateNewRound(Table t)
 	{
-
+		//Count up current hand number
+		hand_no++;
+		
+		//TODO snap
+		
+		//Fill and shuffle the card deck
+		t.deck.fill();
+		
+		//Reset round related
+		t.communitycards.clear();
+		t.bet_amount = 0;
+		t.last_bet_amount = 0;
+		t.nomoreaction = false;
+		
+		//Clear old pots and create initial main pot
+		t.pots.clear();
+		Pot pot = t.new Pot();
+		pot.amount = 0;
+		pot.final1 = false;
+		t.pots.add(pot);
+		
+		//Reset player related
+		for(int i=0; i<5; i++)
+		{
+			if(t.seats.get(i).occupied)
+			{
+				t.seats.get(i).in_round = true;
+				t.seats.get(i).showcards = false;
+				t.seats.get(i).bet = 0;
+				
+				Player p = t.seats.get(i).player;
+				
+				p.holecards.empty();
+				p.resetLastAction();
+				p.stake_before = p.stake; //Remeber stake before this hand
+			}
+		}
+		
+		//Determine who is SB and BB
+		boolean headsup_rule = (t.countPlayers()==2);
+		
+		if(headsup_rule) //Head-up rule: only 2 players remain so swap blinds
+		{
+			t.bb = t.getNextPlayer(t.dealer);
+			t.sb = t.getNextPlayer(t.bb);
+		}
+		else
+		{
+			t.sb = t.getNextPlayer(t.dealer);
+			t.bb = t.getNextPlayer(t.sb);
+		}
+		
+		//Player under the gun
+		t.currentPlayer = t.getNextPlayer(t.bb);
+		t.lastBetPlayer = t.currentPlayer;
+		
+		//TODO table snapshot
+		
+		t.state = State.Blinds;
 	}
 
 	protected void stateBlinds(Table t)
@@ -757,19 +815,51 @@ public class GameController {
 
 						//TODO Snap
 					}
-
-					//Distribute odd chips
-					if(odd_chips == 1)
-					{
-						//Find the next player behind button which is involved in pot
-						int oddchips_player = t.getNextActivePlayer(t.dealer);
-						//////////////////////////////////////////////////////////
-					}
-
 				}
 
+				//Distribute odd chips
+				if(odd_chips == 1)
+				{
+					//Find the next player behind button which is involved in pot
+					int oddchips_player = t.getNextActivePlayer(t.dealer);
+
+					while(!t.isSeatInvolvedInPot(pot, oddchips_player))
+						oddchips_player = t.getNextActivePlayer(oddchips_player);
+
+					Seat seat2 = t.seats.get(oddchips_player);
+					Player p2 = seat2.player;
+
+					p2.stake += odd_chips;
+					seat2.bet += odd_chips;
+
+					//snap
+
+					cashout_amount += odd_chips;
+				}
+
+				//Reduce pot about the overall cashed-out
+				pot.amount -= cashout_amount;
 			}
 		}
+
+		//Check for fatal error: not all pots were distributed
+		for(int j=0; j < t.pots.size(); j++)
+		{
+			Pot pot2 = t.pots.get(j);
+
+			if(pot2.amount > 0)
+			{
+				//TODO Send erro msg
+			}
+		}
+
+
+		//Reset all pots
+		t.pots.clear();
+
+		//TODO Send table snap shot
+
+		t.scheduleState(State.EndRound, 2);
 	}
 
 	protected void stateEndRound(Table t)
@@ -828,9 +918,9 @@ public class GameController {
 		t.lastBetPlayer = t.currentPlayer;
 	}
 
-	protected void stateDelay() //Pseudo-state for delays
+	protected void stateDelay(Table t) //Pseudo-state for delays
 	{
-
+		//TODO
 	}
 
 	protected void dealHole(Table t)
@@ -880,6 +970,38 @@ public class GameController {
 		r = t.deck.pop();
 
 		t.communitycards.setRiver(r);
+	}
+	
+	protected int handleTable(Table t)
+	{
+		if(t.delay == 1)
+		{
+			stateDelay(t);
+			return 0;
+		}
+		
+		if(t.state == State.NewRound)
+			stateNewRound(t);
+		else if(t.state == State.Blinds)
+			stateBlinds(t);
+		else if(t.state == State.Betting)
+			stateBetting(t);
+		else if(t.state == State.BettingEnd)
+			stateBettingEnd(t);
+		else if(t.state == State.AskShow)
+			stateAskShow(t);
+		else if(t.state == State.AllFolded)
+			stateAllFolded(t);
+		else if(t.state == State.Showdown)
+			stateShowdown(t);
+		else if(t.state == State.EndRound)
+			stateEndRound(t);
+		
+		//If there is one player left, close the table
+		if(t.countPlayers()==1)
+			return -1;
+		
+		return 0;
 	}
 
 	// ===========================================================
