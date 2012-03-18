@@ -1,6 +1,7 @@
 package client;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 
 import client.Table.BettingRound;
@@ -129,7 +130,7 @@ public class GameController {
 		max_players = maxPlayers;
 	}
 
-	public boolean isRestart() {
+	public boolean getRestart() {
 		return restart;
 	}
 
@@ -224,11 +225,92 @@ public class GameController {
 
 	}
 
-	public void start(){
+	public void start()
+	{
+		//At least 2 players needed
+		if(started || players.size() < 2)
+			return;
 
+		started = true;
+
+		int tid = 0;
+		Table t = new Table();
+		t.setTableId(tid);
+
+		t.seats.clear();
+
+		//Place players randomly at table
+		Vector<Player> rndseats = new Vector<Player>();
+		Iterator e = players.entrySet().iterator();
+		//TODO importantisimo, rellenar los asientos
+		for(int i=0; i<5; i++)
+		{
+			if(e.hasNext())
+			{
+				//rndseats.add(e.next());
+			}
+		}
+
+		boolean chose_dealer = false;
+		for(int i=0; i<rndseats.size(); i++)
+		{
+			Seat seat = t.new Seat();
+
+			seat.seat_no = i;
+
+			if(rndseats.get(i) != null) //TODO comprobar
+			{
+				seat.occupied = true;
+				seat.player = rndseats.get(i);
+
+				if(!chose_dealer)
+				{
+					t.dealer = i;
+					chose_dealer = true;
+				}
+			}
+			else
+				seat.occupied = false;
+
+			t.seats.put(i, seat);
+		}
+
+		t.state = State.GameStart;
+		//TODO tables.put(tid, t);
+
+		blind.amount = blind.start;
+		//TODO blind.blind_last_time
+
+		//TODO snap
+
+		t.scheduleState(State.NewRound, 5);
 	}
 
-	public int tick(){
+	public int tick(Table t)
+	{
+		if(!started)
+		{
+			if(getPlayerCount() == max_players) //Start the game if player count reached
+				start();
+			else if(getPlayerCount()==0 && getRestart()) //Delete the game if no player registerd
+				return -1;
+			else //Nothing to do, exit early
+				return 0;
+		}
+		else if(ended)
+		{
+			//TODO Delay before game gets deleted
+			//Remove all players
+			players.clear();
+			return 0;
+		}
+
+		//Handle table
+		if(handleTable(t) < 0) //Is the table closed?
+		{
+			ended = true;
+			//TODO ended_time + snap
+		}
 		return 0;
 	}
 
@@ -260,25 +342,25 @@ public class GameController {
 	{
 		//Count up current hand number
 		hand_no++;
-		
+
 		//TODO snap
-		
+
 		//Fill and shuffle the card deck
 		t.deck.fill();
-		
+
 		//Reset round related
 		t.communitycards.clear();
 		t.bet_amount = 0;
 		t.last_bet_amount = 0;
 		t.nomoreaction = false;
-		
+
 		//Clear old pots and create initial main pot
 		t.pots.clear();
 		Pot pot = t.new Pot();
 		pot.amount = 0;
 		pot.final1 = false;
 		t.pots.add(pot);
-		
+
 		//Reset player related
 		for(int i=0; i<5; i++)
 		{
@@ -287,18 +369,18 @@ public class GameController {
 				t.seats.get(i).in_round = true;
 				t.seats.get(i).showcards = false;
 				t.seats.get(i).bet = 0;
-				
+
 				Player p = t.seats.get(i).player;
-				
+
 				p.holecards.empty();
 				p.resetLastAction();
 				p.stake_before = p.stake; //Remeber stake before this hand
 			}
 		}
-		
+
 		//Determine who is SB and BB
 		boolean headsup_rule = (t.countPlayers()==2);
-		
+
 		if(headsup_rule) //Head-up rule: only 2 players remain so swap blinds
 		{
 			t.bb = t.getNextPlayer(t.dealer);
@@ -309,13 +391,13 @@ public class GameController {
 			t.sb = t.getNextPlayer(t.dealer);
 			t.bb = t.getNextPlayer(t.sb);
 		}
-		
+
 		//Player under the gun
 		t.currentPlayer = t.getNextPlayer(t.bb);
 		t.lastBetPlayer = t.currentPlayer;
-		
+
 		//TODO table snapshot
-		
+
 		t.state = State.Blinds;
 	}
 
@@ -971,7 +1053,7 @@ public class GameController {
 
 		t.communitycards.setRiver(r);
 	}
-	
+
 	protected int handleTable(Table t)
 	{
 		if(t.delay == 1)
@@ -979,7 +1061,7 @@ public class GameController {
 			stateDelay(t);
 			return 0;
 		}
-		
+
 		if(t.state == State.NewRound)
 			stateNewRound(t);
 		else if(t.state == State.Blinds)
@@ -996,11 +1078,11 @@ public class GameController {
 			stateShowdown(t);
 		else if(t.state == State.EndRound)
 			stateEndRound(t);
-		
+
 		//If there is one player left, close the table
 		if(t.countPlayers()==1)
 			return -1;
-		
+
 		return 0;
 	}
 
