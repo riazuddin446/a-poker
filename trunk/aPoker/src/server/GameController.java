@@ -1,20 +1,18 @@
-package client;
+package server;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import client.Table.BettingRound;
-import client.Table.Pot;
-import client.Table.Seat;
-import client.Table.State;
-
 import logic.Card;
 import logic.HoleCards;
 import logic.Player;
-import logic.PokerHandEvaluator;
 import logic.PokerHandStrength;
 import logic.Player.Action;
+import server.Table.BettingRound;
+import server.Table.Pot;
+import server.Table.Seat;
+import server.Table.State;
 
 public class GameController {
 
@@ -26,25 +24,24 @@ public class GameController {
 	// Fields
 	// ===========================================================
 
-	private Table table;
-	private HashMap<Integer, Player> players;
-
 	private int game_id;
+	private String game_name;
 
-	private boolean started;
+	private Table table;
+	private HashMap<Integer, Player> players;	
+
 	private int max_players;
+	private int player_stakes;
 
-	private int player_stakes;	
-	private int timeout;
+	//private int timeout;
 
 	Blind blind;
 
 	private int hand_no;
 
+	private boolean started;
 	private boolean ended;
 	private boolean restart;
-
-	private String name;
 
 	// ===========================================================
 	// Constructors
@@ -66,7 +63,7 @@ public class GameController {
 
 		hand_no = 0;
 
-		name = "Game";
+		game_name = "Game";
 
 	}
 
@@ -82,44 +79,20 @@ public class GameController {
 		game_id = gameId;
 	}
 
-	public int getPlayerTimeout() {
-		return timeout;
-	}
-
-	public void setPlayerTimeout(int timeout) {
-		this.timeout = timeout;
-	}
-
-	public void setBlindsStart(int blinds_start){
-		blind.setBlindsStart(blinds_start);
-	}
-
-	public int getBlindsStart(){
-		return blind.getBlindsStart();
-	}
-
-	public int getBlindsTime() {
-		return blind.getBlindsTime();
-	}
-
-	public void setBlindsTime(int blindsTime) {
-		blind.setBlindsTime(blindsTime);
-	}
-
-	public int getPlayerStakes() {
-		return player_stakes;
-	}
-
-	public void setPlayerStakes(int playerStakes) {
-		player_stakes = playerStakes;
-	}
+	//	public int getPlayerTimeout() {
+	//		return timeout;
+	//	}
+	//
+	//	public void setPlayerTimeout(int timeout) {
+	//		this.timeout = timeout;
+	//	}
 
 	public String getName() {
-		return name;
+		return game_name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.game_name = name;
 	}
 
 	public int getMaxPlayers() {
@@ -130,12 +103,28 @@ public class GameController {
 		max_players = maxPlayers;
 	}
 
-	public boolean getRestart() {
-		return restart;
+	public int getPlayerStakes() {
+		return player_stakes;
 	}
 
-	public void setRestart(boolean restart) {
-		this.restart = restart;
+	public void setPlayerStakes(int playerStakes) {
+		player_stakes = playerStakes;
+	}
+
+	public void setBlindsStart(int blinds_start){
+		blind.setBlindStart(blinds_start);
+	}
+
+	public int getBlindsStart(){
+		return blind.getBlindsStart();
+	}
+
+	public int getBlindsTime() {
+		return blind.getBlindFactor();
+	}
+
+	public void setBlindsTime(int blindsTime) {
+		blind.setBlindFactor(blindsTime);
 	}
 
 	public boolean isStarted() {
@@ -154,6 +143,14 @@ public class GameController {
 		this.ended = ended;
 	}
 
+	public boolean getRestart() {
+		return restart;
+	}
+
+	public void setRestart(boolean restart) {
+		this.restart = restart;
+	}
+
 	public int getPlayerCount(){
 		return players.size();
 	}
@@ -169,6 +166,14 @@ public class GameController {
 	// ===========================================================
 	// Methods
 	// ===========================================================
+
+	public boolean isPlayer(Player p){
+
+		if(players.containsKey(p))
+			return true;
+		else 
+			return false;
+	}
 
 	boolean addPlayer(Player p) //FIXME Quitar las dos if y la forma de insertar el nuevo jugador
 	{
@@ -196,14 +201,6 @@ public class GameController {
 		}
 	}
 
-	public boolean isPlayer(Player p){
-
-		if(players.containsKey(p))
-			return true;
-		else 
-			return false;
-	}
-
 	public void setPlayerAction(Player p, Action action, int amount)
 	{
 		if(action == Action.ResetAction)
@@ -223,95 +220,6 @@ public class GameController {
 		p.next_action.action = action;
 		p.next_action.amount = amount;
 
-	}
-
-	public void start()
-	{
-		//At least 2 players needed
-		if(started || players.size() < 2)
-			return;
-
-		started = true;
-
-		int tid = 0;
-		Table t = new Table();
-		t.setTableId(tid);
-
-		t.seats.clear();
-
-		//Place players randomly at table
-		Vector<Player> rndseats = new Vector<Player>();
-		Iterator e = players.entrySet().iterator();
-		//TODO importantisimo, rellenar los asientos
-		for(int i=0; i<5; i++)
-		{
-			if(e.hasNext())
-			{
-				//rndseats.add(e.next());
-			}
-		}
-
-		boolean chose_dealer = false;
-		for(int i=0; i<rndseats.size(); i++)
-		{
-			Seat seat = t.new Seat();
-
-			seat.seat_no = i;
-
-			if(rndseats.get(i) != null) //TODO comprobar
-			{
-				seat.occupied = true;
-				seat.player = rndseats.get(i);
-
-				if(!chose_dealer)
-				{
-					t.dealer = i;
-					chose_dealer = true;
-				}
-			}
-			else
-				seat.occupied = false;
-
-			t.seats.put(i, seat);
-		}
-
-		t.state = State.GameStart;
-		//TODO tables.put(tid, t);
-
-		blind.amount = blind.start;
-		//TODO blind.blind_last_time
-
-		//TODO snap
-
-		t.scheduleState(State.NewRound, 5);
-	}
-
-	public int tick(Table t)
-	{
-		if(!started)
-		{
-			if(getPlayerCount() == max_players) //Start the game if player count reached
-				start();
-			else if(getPlayerCount()==0 && getRestart()) //Delete the game if no player registerd
-				return -1;
-			else //Nothing to do, exit early
-				return 0;
-		}
-		else if(ended)
-		{
-			//TODO Delay before game gets deleted
-			//Remove all players
-			players.clear();
-			return 0;
-		}
-
-		//Handle table
-		if(handleTable(t) < 0) //Is the table closed?
-		{
-			ended = true;
-			//TODO ended_time + snap
-		}
-		return 0;
 	}
 
 	protected void createWinList(Table t, Vector<Vector<PokerHandStrength>> winList){
@@ -336,6 +244,55 @@ public class GameController {
 			return blind.amount;
 		else
 			return t.bet_amount + (t.bet_amount - t.last_bet_amount);
+	}
+
+	protected void dealHole(Table t)
+	{		
+		//Player in SB gets first cards
+		for(int i=t.sb, c=0; c<t.countPlayers(); i=t.getNextPlayer(i))
+		{
+			if(!t.seats.get(i).occupied)
+			{
+				Player p = t.seats.get(i).player;
+
+				HoleCards h;
+				Card c1, c2;
+
+				c1 = t.deck.pop();
+				c2 = t.deck.pop();
+
+				p.holecards.setCards(c1, c2);
+
+				c++;
+			}
+		}
+	}
+
+	protected void dealFlop(Table t)
+	{
+		Card f1, f2, f3;
+		f1 = t.deck.pop();
+		f2 = t.deck.pop();
+		f3 = t.deck.pop();
+
+		t.communitycards.setFlop(f1, f2, f3);
+	}
+
+
+	protected void dealTurn(Table t)
+	{
+		Card trn;
+		trn = t.deck.pop();
+
+		t.communitycards.setTurn(trn);
+	}
+
+	protected void dealRiver(Table t)
+	{
+		Card r;
+		r = t.deck.pop();
+
+		t.communitycards.setRiver(r);
 	}
 
 	protected void stateNewRound(Table t)
@@ -1005,55 +962,6 @@ public class GameController {
 		//TODO
 	}
 
-	protected void dealHole(Table t)
-	{		
-		//Player in SB gets first cards
-		for(int i=t.sb, c=0; c<t.countPlayers(); i=t.getNextPlayer(i))
-		{
-			if(!t.seats.get(i).occupied)
-			{
-				Player p = t.seats.get(i).player;
-
-				HoleCards h;
-				Card c1, c2;
-
-				c1 = t.deck.pop();
-				c2 = t.deck.pop();
-
-				p.holecards.setCards(c1, c2);
-
-				c++;
-			}
-		}
-	}
-
-	protected void dealFlop(Table t)
-	{
-		Card f1, f2, f3;
-		f1 = t.deck.pop();
-		f2 = t.deck.pop();
-		f3 = t.deck.pop();
-
-		t.communitycards.setFlop(f1, f2, f3);
-	}
-
-
-	protected void dealTurn(Table t)
-	{
-		Card trn;
-		trn = t.deck.pop();
-
-		t.communitycards.setTurn(trn);
-	}
-
-	protected void dealRiver(Table t)
-	{
-		Card r;
-		r = t.deck.pop();
-
-		t.communitycards.setRiver(r);
-	}
-
 	protected int handleTable(Table t)
 	{
 		if(t.delay == 1)
@@ -1086,17 +994,102 @@ public class GameController {
 		return 0;
 	}
 
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
+	public void start()
+	{
+		//At least 2 players needed
+		if(started || players.size() < 2)
+			return;
+
+		started = true;
+
+		int tid = 0;
+		Table t = new Table();
+		t.setTableId(tid);
+
+		t.seats.clear();
+
+		//Place players randomly at table
+		Vector<Player> rndseats = new Vector<Player>();
+		Iterator e = players.entrySet().iterator();
+		//TODO importantisimo, rellenar los asientos
+		for(int i=0; i<5; i++)
+		{
+			if(e.hasNext())
+			{
+				//rndseats.add(e.next());
+			}
+		}
+
+		boolean chose_dealer = false;
+		for(int i=0; i<rndseats.size(); i++)
+		{
+			Seat seat = t.new Seat();
+
+			seat.seat_no = i;
+
+			if(rndseats.get(i) != null) //TODO comprobar
+			{
+				seat.occupied = true;
+				seat.player = rndseats.get(i);
+
+				if(!chose_dealer)
+				{
+					t.dealer = i;
+					chose_dealer = true;
+				}
+			}
+			else
+				seat.occupied = false;
+
+			t.seats.put(i, seat);
+		}
+
+		t.state = State.GameStart;
+		//TODO tables.put(tid, t);
+
+		blind.amount = blind.start;
+		//TODO blind.blind_last_time
+
+		//TODO snap
+
+		t.scheduleState(State.NewRound, 5);
+	}
+
+	public int tick(Table t)
+	{
+		if(!started)
+		{
+			if(getPlayerCount() == max_players) //Start the game if player count reached
+				start();
+			else if(getPlayerCount()==0 && getRestart()) //Delete the game if no player registerd
+				return -1;
+			else //Nothing to do, exit early
+				return 0;
+		}
+		else if(ended)
+		{
+			//TODO Delay before game gets deleted
+			//Remove all players
+			players.clear();
+			return 0;
+		}
+
+		//Handle table
+		if(handleTable(t) < 0) //Is the table closed?
+		{
+			ended = true;
+			//TODO ended_time + snap
+		}
+		return 0;
+	}
 
 	private class Blind{
 
-		int start;
-		int amount;
-		int blinds_factor;
+		int start; //Ciega inicial
+		int amount; //Ciega actual
+		int blinds_factor; //Factor de aumento para la ciega
 
-		public void setBlindsStart(int startChips) {
+		public void setBlindStart(int startChips) {
 			start = startChips;
 		}
 
@@ -1104,12 +1097,12 @@ public class GameController {
 			return start;
 		}
 
-		public int getBlindsTime() {
+		public int getBlindFactor() {
 			return blinds_factor;
 		}
 
-		public void setBlindsTime(int blindsTime) {
-			blinds_factor = blindsTime;
+		public void setBlindFactor(int bFactor) {
+			blinds_factor = bFactor;
 		}
 
 	}
