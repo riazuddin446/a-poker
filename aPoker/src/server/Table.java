@@ -1,4 +1,4 @@
-package client;
+package server;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,41 +38,6 @@ public class Table {
 	int bet_amount;
 	int last_bet_amount;
 	Vector<Pot> pots;
-
-	public enum State {
-		GameStart,
-		ElectDealer,
-		NewRound,
-		Blinds,
-		Betting,
-		BettingEnd, //pseudo-state
-		AskShow,
-		AllFolded,
-		Showdown,
-		EndRound;
-	}
-
-	public enum BettingRound{
-		Preflop,
-		Flop,
-		Turn,
-		River;
-	}
-
-	public class Seat {
-		boolean occupied;
-		int seat_no;
-		Player player;
-		int bet;
-		boolean in_round; //is player involved in current hand?
-		boolean showcards; //does the player want to show cards?
-	}
-
-	public class Pot {
-		int amount;
-		Vector<Integer> vsteats;
-		boolean final1;
-	}
 
 	public Table(){
 		tid = -1;
@@ -307,6 +272,41 @@ public class Table {
 
 	public void tick(){
 
+	}
+
+	public enum State {
+		GameStart,
+		ElectDealer,
+		NewRound,
+		Blinds,
+		Betting,
+		BettingEnd, //pseudo-state
+		AskShow,
+		AllFolded,
+		Showdown,
+		EndRound;
+	}
+
+	public enum BettingRound{
+		Preflop,
+		Flop,
+		Turn,
+		River;
+	}
+
+	public class Seat {
+		boolean occupied;
+		int seat_no;
+		Player player;
+		int bet;
+		boolean in_round; //is player involved in current hand?
+		boolean showcards; //does the player want to show cards?
+	}
+
+	public class Pot {
+		int amount;
+		Vector<Integer> vsteats;
+		boolean final1;
 	}
 
 }
