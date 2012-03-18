@@ -13,6 +13,8 @@ import logic.PokerHandStrength;
 
 public class Table {
 
+	int tid;
+
 	Deck deck;
 	CommunityCards communitycards;
 
@@ -73,7 +75,17 @@ public class Table {
 	}
 
 	public Table(){
+		tid = -1;
+	}
 
+	public int getTableId()
+	{
+		return tid;
+	}
+
+	public void setTableId(int id)
+	{
+		tid = id;
 	}
 
 	public int getNextPlayer(int i){
