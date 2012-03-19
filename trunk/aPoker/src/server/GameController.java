@@ -24,68 +24,52 @@ public class GameController {
 	// Fields
 	// ===========================================================
 
-	private int game_id;
-	private String game_name;
+	private String game_name; //Nombre de la partida
 
-	private Table table;
-	private HashMap<Integer, Player> players;	
+	private Table table; //Mesa donde se jugara la partida
+	private HashMap<Integer, Player> players; //Lista de jugadores en la partida
 
-	private int max_players;
-	private int player_stakes;
+	private int max_players; //Maximo de jugadores
+	private int player_stakes; //Fichas iniciales de cada jugador
 
-	//private int timeout;
+	private int timeout; //Tiempo disponible por los jugadores para cada turno
 
-	Blind blind;
+	Blind blind; //Ciegas
 
-	private int hand_no;
+	private int hand_no; //Numero de mano
 
+	//Booleanos que indican el estado de la partida
 	private boolean started;
 	private boolean ended;
 	private boolean restart;
+
+	//Apuntador hacia el dueño de la partida
+	private int owner;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public GameController(){
+	public GameController()
+	{
+		game_name = "Game";
 
-		game_id = -1;
+		max_players = 5;
+		player_stakes = 1500;
 
 		started = false;
 		ended = false;
-		max_players = 5;
 		restart = false;
 
-		player_stakes = 1500;
-
+		blind.start = 50;
 		blind.blinds_factor = 2;
-		blind.start = 10;
 
 		hand_no = 0;
-
-		game_name = "Game";
-
 	}
 
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
-
-	public int getGameId() {
-		return game_id;
-	}
-
-	public void setGameId(int gameId) {
-		game_id = gameId;
-	}
-
-	//	public int getPlayerTimeout() {
-	//		return timeout;
-	//	}
-	//
-	//	public void setPlayerTimeout(int timeout) {
-	//		this.timeout = timeout;
-	//	}
 
 	public String getName() {
 		return game_name;
@@ -109,6 +93,14 @@ public class GameController {
 
 	public void setPlayerStakes(int playerStakes) {
 		player_stakes = playerStakes;
+	}
+
+	public int getPlayerTimeout() {
+		return timeout;
+	}
+
+	public void setPlayerTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 
 	public void setBlindsStart(int blinds_start){
@@ -149,6 +141,14 @@ public class GameController {
 
 	public void setRestart(boolean restart) {
 		this.restart = restart;
+	}
+
+	public int getOwner() {
+		return owner;
+	}
+
+	public void setOwner(int owner) {
+		this.owner = owner;
 	}
 
 	public int getPlayerCount(){
