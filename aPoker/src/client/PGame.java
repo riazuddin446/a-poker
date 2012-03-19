@@ -3,7 +3,6 @@ package client;
 import java.util.HashMap;
 
 import logic.Card;
-import logic.Player;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
@@ -26,7 +25,7 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
-
+import server.GameController;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
@@ -65,18 +64,13 @@ public class PGame extends BaseGameActivity{
 	private BitmapTextureAtlas mCardDeckTextureAtlas;
 	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
 
-	//Player
-	public Player mPlayer;
-
 	//Player Name
 	private ChangeableText mPlayerNameText;
 
 	//Chip counter
 	private ChangeableText mChipCounterText;
 
-	//Ingame player list
-	HashMap<Integer, Player> players;
-
+	GameController g;
 
 	// ===========================================================
 	// Constructors
@@ -116,7 +110,7 @@ public class PGame extends BaseGameActivity{
 		this.mCamera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
 		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.mCamera));
 
-		mPlayer = new Player("Asier", 4000, 1);
+		initialiceGameController();
 
 		return engine;
 	}
@@ -177,13 +171,13 @@ public class PGame extends BaseGameActivity{
 		mMainScene.setBackground(backgroundSprite);
 
 		//Adding the player name to the screen
-		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.getPlayerName());
-		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
-		mMainScene.attachChild(mPlayerNameText);
+		//		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.getPlayerName());
+		//		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
+		//		mMainScene.attachChild(mPlayerNameText);
 
 		//Adding the chip counter
-		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.getStake()));
-		mMainScene.attachChild(mChipCounterText);
+		//		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.getStake()));
+		//		mMainScene.attachChild(mChipCounterText);
 
 		//Update handler para manejar los turnos
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
@@ -200,12 +194,12 @@ public class PGame extends BaseGameActivity{
 			}
 
 		});
-		
+
 		this.paintCard(Card.CLUB_ACE, 200, 100);
 		this.paintCard(Card.HEART_ACE, 200, 260);
 		this.paintCard(Card.DIAMOND_ACE, 440, 100);
 		this.paintCard(Card.SPADE_ACE, 440, 260);
-		
+
 
 		this.addButtons();
 
@@ -222,6 +216,16 @@ public class PGame extends BaseGameActivity{
 	// ===========================================================
 	// Methods
 	// ===========================================================
+
+	private void initialiceGameController()
+	{
+		g = new GameController();
+		g.setName("Test game");
+		g.setMaxPlayers(5); //Recibir maxplayers desde la activity anterior
+		g.setPlayerStakes(4000); //Recibir playerstakes desde la activity anterior
+		g.setRestart(true);
+		//g.setOwner();
+	}
 
 	private void paintCard(final Card pCard, final int pX, final int pY) {
 
