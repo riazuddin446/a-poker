@@ -225,6 +225,23 @@ public class PGame extends BaseGameActivity{
 		g.setPlayerStakes(4000); //Recibir playerstakes desde la activity anterior
 		g.setRestart(true);
 		//g.setOwner();
+
+		if(g.tick() < 0)
+		{
+			//Replicate game if "restart" is set
+			if(g.getRestart())
+			{
+				GameController newgame = new GameController();
+
+				newgame.setName(g.getName());
+				newgame.setMaxPlayers(g.getMaxPlayers());
+				newgame.setPlayerStakes(g.getPlayerStakes());
+				newgame.setRestart(true);
+				//g.setOwner();
+
+				g = newgame;
+			}
+		}
 	}
 
 	private void paintCard(final Card pCard, final int pX, final int pY) {

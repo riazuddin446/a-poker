@@ -1002,11 +1002,7 @@ public class GameController {
 
 		started = true;
 
-		int tid = 0;
-		Table t = new Table();
-		t.setTableId(tid);
-
-		t.seats.clear();
+		table.seats.clear();
 
 		//Place players randomly at table
 		Vector<Player> rndseats = new Vector<Player>();
@@ -1023,7 +1019,7 @@ public class GameController {
 		boolean chose_dealer = false;
 		for(int i=0; i<rndseats.size(); i++)
 		{
-			Seat seat = t.new Seat();
+			Seat seat = table.new Seat();
 
 			seat.seat_no = i;
 
@@ -1034,17 +1030,17 @@ public class GameController {
 
 				if(!chose_dealer)
 				{
-					t.dealer = i;
+					table.dealer = i;
 					chose_dealer = true;
 				}
 			}
 			else
 				seat.occupied = false;
 
-			t.seats.put(i, seat);
+			table.seats.put(i, seat);
 		}
 
-		t.state = State.GameStart;
+		table.state = State.GameStart;
 		//TODO tables.put(tid, t);
 
 		blind.amount = blind.start;
@@ -1052,16 +1048,16 @@ public class GameController {
 
 		//TODO snap
 
-		t.scheduleState(State.NewRound, 5);
+		table.scheduleState(State.NewRound, 5);
 	}
 
-	public int tick(Table t)
+	public int tick()
 	{
 		if(!started)
 		{
 			if(getPlayerCount() == max_players) //Start the game if player count reached
 				start();
-			else if(getPlayerCount()==0 && getRestart()) //Delete the game if no player registerd
+			else if(getPlayerCount() == 0 && getRestart()) //Delete the game if no player registerd
 				return -1;
 			else //Nothing to do, exit early
 				return 0;
@@ -1075,7 +1071,7 @@ public class GameController {
 		}
 
 		//Handle table
-		if(handleTable(t) < 0) //Is the table closed?
+		if(handleTable(table) < 0) //Is the table closed?
 		{
 			ended = true;
 			//TODO ended_time + snap

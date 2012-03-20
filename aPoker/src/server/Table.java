@@ -13,44 +13,33 @@ import logic.PokerHandStrength;
 
 public class Table {
 
-	int tid;
-
 	Deck deck;
 	CommunityCards communitycards;
 
 	State state;
 
+	HashMap<Integer, Seat> seats;
+	int dealer, sb, bb;
+	int currentPlayer;
+	int lastBetPlayer;
+
+	BettingRound betround;
+	
+	int bet_amount;
+	int last_bet_amount;
+	Vector<Pot> pots;
+	
+	boolean nomoreaction;
+	
 	Time delay_start;
 	int delay;
 
 	Time timeout_start;
 
-	boolean nomoreaction;
-
-	BettingRound betround;
-
-	HashMap<Integer, Seat> seats;
-
-	int dealer, sb, bb;
-	int currentPlayer;
-	int lastBetPlayer;
-
-	int bet_amount;
-	int last_bet_amount;
-	Vector<Pot> pots;
+	
 
 	public Table(){
-		tid = -1;
-	}
 
-	public int getTableId()
-	{
-		return tid;
-	}
-
-	public void setTableId(int id)
-	{
-		tid = id;
 	}
 
 	public int getNextPlayer(int i){
