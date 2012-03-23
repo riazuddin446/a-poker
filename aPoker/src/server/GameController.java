@@ -303,7 +303,7 @@ public class GameController {
 		//TODO snap
 
 		//Fill and shuffle the card deck
-		t.deck.fill();
+		t.deck.clearFillAndShuffle();
 
 		//Reset round related
 		t.communitycards.clear();
@@ -327,11 +327,9 @@ public class GameController {
 				t.seats.get(i).showcards = false;
 				t.seats.get(i).bet = 0;
 
-				Player p = t.seats.get(i).player;
-
-				p.holecards.empty();
-				p.resetLastAction();
-				p.stake_before = p.stake; //Remeber stake before this hand
+				t.seats.get(i).player.holecards.empty();
+				t.seats.get(i).player.resetLastAction();
+				t.seats.get(i).player.stake_before = t.seats.get(i).player.stake; //Remeber stake before this hand
 			}
 		}
 
@@ -352,8 +350,6 @@ public class GameController {
 		//Player under the gun
 		t.currentPlayer = t.getNextPlayer(t.bb);
 		t.lastBetPlayer = t.currentPlayer;
-
-		//TODO table snapshot
 
 		t.state = State.Blinds;
 	}
@@ -906,7 +902,7 @@ public class GameController {
 		//Count up current hand number
 		hand_no++;
 
-		t.deck.fill();
+		t.deck.clearFillAndShuffle();
 		//t.deck.shuffle(); The fill method shuffles the card deck
 
 		//Reset round-related
@@ -957,19 +953,8 @@ public class GameController {
 		t.lastBetPlayer = t.currentPlayer;
 	}
 
-	protected void stateDelay(Table t) //Pseudo-state for delays
-	{
-		//TODO
-	}
-
 	protected int handleTable(Table t)
 	{
-		if(t.delay == 1)
-		{
-			stateDelay(t);
-			return 0;
-		}
-
 		if(t.state == State.NewRound)
 			stateNewRound(t);
 		else if(t.state == State.Blinds)
@@ -996,7 +981,7 @@ public class GameController {
 
 	public void start()
 	{
-		//At least 2 players needed
+		//Game not started or at least 2 players needed
 		if(started || players.size() < 2)
 			return;
 
@@ -1004,29 +989,19 @@ public class GameController {
 
 		table.seats.clear();
 
-		//Place players randomly at table
-		Vector<Player> rndseats = new Vector<Player>();
-		Iterator e = players.entrySet().iterator();
-		//TODO importantisimo, rellenar los asientos
-		for(int i=0; i<5; i++)
-		{
-			if(e.hasNext())
-			{
-				//rndseats.add(e.next());
-			}
-		}
 
+		//Place players on seats
 		boolean chose_dealer = false;
-		for(int i=0; i<rndseats.size(); i++)
+		for(int i=0; i < players.size(); i++)
 		{
 			Seat seat = table.new Seat();
 
 			seat.seat_no = i;
 
-			if(rndseats.get(i) != null) //TODO comprobar
+			if(players.get(i) != null) //TODO comprobar
 			{
 				seat.occupied = true;
-				seat.player = rndseats.get(i);
+				seat.player = players.get(i);
 
 				if(!chose_dealer)
 				{
@@ -1041,33 +1016,28 @@ public class GameController {
 		}
 
 		table.state = State.GameStart;
-		//TODO tables.put(tid, t);
 
 		blind.amount = blind.start;
-		//TODO blind.blind_last_time
-
-		//TODO snap
 
 		table.scheduleState(State.NewRound, 5);
 	}
 
 	public int tick()
 	{
-		if(!started)
+		if(!started) //If the game is not set as started
 		{
 			if(getPlayerCount() == max_players) //Start the game if player count reached
 				start();
-			else if(getPlayerCount() == 0 && getRestart()) //Delete the game if no player registerd
+			else if(getPlayerCount() == 0 && !getRestart()) //Delete the game if no player registered
 				return -1;
 			else //Nothing to do, exit early
 				return 0;
 		}
 		else if(ended)
 		{
-			//TODO Delay before game gets deleted
 			//Remove all players
 			players.clear();
-			return 0;
+			return -1;
 		}
 
 		//Handle table

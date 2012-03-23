@@ -10,11 +10,14 @@ public class Deck {
 	private ArrayList<Card> cards;
 
 	//Fill the deck with cards and shuffle it
-	public void fill(){
+	public void clearFillAndShuffle()
+	{
 		cards.clear();
+
 		for(Card c : Card.values()){
 			cards.add(c);
 		}
+
 		Collections.shuffle(cards);
 	}
 
@@ -43,14 +46,14 @@ public class Deck {
 		return c;
 	}
 
-//	public ArrayList<Card> pop(int n){
-//		if(count() == 0)
-//			throw new EmptyStackException();
-//		ArrayList<Card> temp = new ArrayList<Card>();
-//
-//		for (int i = 0; i < n; ++i)
-//			temp.add(this.pop());
-//
-//		return temp;	
-//	}
+	//	public ArrayList<Card> pop(int n){
+	//		if(count() == 0)
+	//			throw new EmptyStackException();
+	//		ArrayList<Card> temp = new ArrayList<Card>();
+	//
+	//		for (int i = 0; i < n; ++i)
+	//			temp.add(this.pop());
+	//
+	//		return temp;	
+	//	}
 }

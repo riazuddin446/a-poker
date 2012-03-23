@@ -7,6 +7,8 @@ import logic.Card;
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
+import org.anddev.andengine.engine.handler.timer.ITimerCallback;
+import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -49,8 +51,6 @@ public class PGame extends BaseGameActivity{
 	//Background
 	private BitmapTextureAtlas mBackgroundTextureAtlas;
 	private TextureRegion mBackgroundTexureRegion;
-	Sprite backgroundSpriteSprite;
-	SpriteBackground backgroundSprite;
 
 	//Font
 	private Font mFont;
@@ -70,7 +70,7 @@ public class PGame extends BaseGameActivity{
 	//Chip counter
 	private ChangeableText mChipCounterText;
 
-	GameController g;
+	GameController mGameController;
 
 	// ===========================================================
 	// Constructors
@@ -110,8 +110,6 @@ public class PGame extends BaseGameActivity{
 		this.mCamera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
 		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.mCamera));
 
-		initialiceGameController();
-
 		return engine;
 	}
 
@@ -125,12 +123,6 @@ public class PGame extends BaseGameActivity{
 		mBackgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		mBackgroundTexureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBackgroundTextureAtlas, this,"gamebackground.png", 0, 0);
 		mEngine.getTextureManager().loadTexture(mBackgroundTextureAtlas);
-
-		//Load the font for texts
-		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 28, true, Color.WHITE);
-		this.mEngine.getTextureManager().loadTexture(this.mFontTexture);
-		this.mEngine.getFontManager().loadFont(this.mFont);
 
 		// Extract and load the textures of each button
 		this.mButtonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -153,22 +145,26 @@ public class PGame extends BaseGameActivity{
 		}
 		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
 
-
+		//Load the font for texts
+		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 28, true, Color.WHITE);
+		this.mEngine.getTextureManager().loadTexture(this.mFontTexture);
+		this.mEngine.getFontManager().loadFont(this.mFont);
 
 	}
 
 	@Override
-	public Scene onLoadScene() {
-
+	public Scene onLoadScene()
+	{
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 
 		this.mMainScene = new Scene();
 		this.mMainScene.setOnAreaTouchTraversalFrontToBack();
 
 		//Setting the game background
-		backgroundSpriteSprite = new Sprite(0, 0, mBackgroundTexureRegion);
-		backgroundSprite = new SpriteBackground(backgroundSpriteSprite);
-		mMainScene.setBackground(backgroundSprite);
+		Sprite backgroundSprite = new Sprite(0, 0, mBackgroundTexureRegion);
+		SpriteBackground backgroundSpriteBackgroudn = new SpriteBackground(backgroundSprite);
+		this.mMainScene.setBackground(backgroundSpriteBackgroudn);
 
 		//Adding the player name to the screen
 		//		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.getPlayerName());
@@ -179,29 +175,21 @@ public class PGame extends BaseGameActivity{
 		//		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.getStake()));
 		//		mMainScene.attachChild(mChipCounterText);
 
-		//Update handler para manejar los turnos
+		this.addButtons();
+
+		this.updateInterface();
+
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
 			public void onUpdate(float pSecondsElapsed) {
-				// TODO Auto-generated method stub
-				//Your code to run here!
+				updateInterface();
 			}
 
-
+			@Override
 			public void reset() {
-				// TODO Auto-generated method stub
 
 			}
-
 		});
-
-		this.paintCard(Card.CLUB_ACE, 200, 100);
-		this.paintCard(Card.HEART_ACE, 200, 260);
-		this.paintCard(Card.DIAMOND_ACE, 440, 100);
-		this.paintCard(Card.SPADE_ACE, 440, 260);
-
-
-		this.addButtons();
 
 		this.mMainScene.setTouchAreaBindingEnabled(true);
 
@@ -217,29 +205,42 @@ public class PGame extends BaseGameActivity{
 	// Methods
 	// ===========================================================
 
-	private void initialiceGameController()
+	private void updateInterface()
 	{
-		g = new GameController();
-		g.setName("Test game");
-		g.setMaxPlayers(5); //Recibir maxplayers desde la activity anterior
-		g.setPlayerStakes(4000); //Recibir playerstakes desde la activity anterior
-		g.setRestart(true);
-		//g.setOwner();
+		
+	}
 
-		if(g.tick() < 0)
+	private void initializeGame()
+	{
+		mGameController = new GameController();
+	}
+
+	private void gameloop()
+	{
+		GameController g = new GameController();
+		g.setName("Test game");
+		g.setMaxPlayers(5); //FIXME Recibir maxplayers desde la activity anterior
+		g.setPlayerStakes(4000); //FIXME Recibir playerstakes desde la activity anterior
+		g.setRestart(true);
+		g.setOwner(-1);
+
+		mGameController = g;
+
+		//FIXME
+		if(mGameController.tick() < 0)
 		{
 			//Replicate game if "restart" is set
-			if(g.getRestart())
+			if(mGameController.getRestart())
 			{
 				GameController newgame = new GameController();
 
-				newgame.setName(g.getName());
-				newgame.setMaxPlayers(g.getMaxPlayers());
-				newgame.setPlayerStakes(g.getPlayerStakes());
+				newgame.setName(mGameController.getName());
+				newgame.setMaxPlayers(mGameController.getMaxPlayers());
+				newgame.setPlayerStakes(mGameController.getPlayerStakes());
 				newgame.setRestart(true);
-				//g.setOwner();
+				newgame.setOwner(mGameController.getOwner());
 
-				g = newgame;
+				mGameController = newgame;
 			}
 		}
 	}
@@ -384,10 +385,6 @@ public class PGame extends BaseGameActivity{
 		};
 		this.mMainScene.attachChild(sprite);
 		this.mMainScene.registerTouchArea(sprite);
-	}
-
-	private void addPlayer(final int position){
-
 	}
 
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
