@@ -63,12 +63,11 @@ public class PGame extends BaseGameActivity{
 	//Card deck
 	private BitmapTextureAtlas mCardDeckTextureAtlas;
 	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
+	
+	//
 
 	//Player Name
 	private ChangeableText mPlayerNameText;
-
-	//Chip counter
-	private ChangeableText mChipCounterText;
 
 	GameController mGameController;
 
@@ -122,7 +121,6 @@ public class PGame extends BaseGameActivity{
 		//Load the background texture
 		mBackgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		mBackgroundTexureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBackgroundTextureAtlas, this,"gamebackground.png", 0, 0);
-		mEngine.getTextureManager().loadTexture(mBackgroundTextureAtlas);
 
 		// Extract and load the textures of each button
 		this.mButtonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -133,7 +131,6 @@ public class PGame extends BaseGameActivity{
 			this.mButtonsTextureRegionMap.put(button, buttonTextureRegion);
 			i++;
 		}	
-		this.mEngine.getTextureManager().loadTexture(this.mButtonsTextureAtlas);
 
 		//Extract and load the card deck textures
 		this.mCardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -143,8 +140,13 @@ public class PGame extends BaseGameActivity{
 			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.mCardDeckTextureAtlas, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
 			this.mCardTotextureRegionMap.put(card, cardTextureRegion);
 		}
-		this.mEngine.getTextureManager().loadTexture(this.mCardDeckTextureAtlas);
 
+		//Load the textures into the engine
+		mEngine.getTextureManager().loadTextures(mBackgroundTextureAtlas,
+				this.mButtonsTextureAtlas,
+				this.mCardDeckTextureAtlas);
+
+		//FIXME Añadir la mFontTexture junto con las otras texturas
 		//Load the font for texts
 		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 28, true, Color.WHITE);
@@ -183,6 +185,19 @@ public class PGame extends BaseGameActivity{
 
 			public void onUpdate(float pSecondsElapsed) {
 				updateInterface();
+			}
+
+			@Override
+			public void reset() {
+
+			}
+		});
+
+		//FIXME Hacer tick cuando sea necesario
+		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
+
+			public void onUpdate(float pSecondsElapsed) {
+				mGameController.tick();
 			}
 
 			@Override
