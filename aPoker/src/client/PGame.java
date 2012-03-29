@@ -53,10 +53,6 @@ public class PGame extends BaseGameActivity{
 	private BitmapTextureAtlas mBackgroundTextureAtlas;
 	private TextureRegion mBackgroundTextureRegion;
 
-	//Font
-	private Font mFont;
-	private Texture mFontTexture;
-
 	//Buttons
 	private BitmapTextureAtlas mButtonsTextureAtlas;
 	private HashMap<Button, TextureRegion> mButtonsTextureRegionMap;
@@ -69,8 +65,16 @@ public class PGame extends BaseGameActivity{
 	private BitmapTextureAtlas mSeatTextureAtlas;
 	private TextureRegion mSeatTextureRegion;
 
-	//Player Name
+	//Table related
+	private ChangeableText mBettingRoundText;
+
+	//Font
+	private Font mFont;
+	private Texture mFontTexture;
+
+	//Player related
 	private ChangeableText mPlayerNameText;
+	private ChangeableText mPlayerStakeText;
 
 	GameController mGameController;
 
@@ -188,13 +192,11 @@ public class PGame extends BaseGameActivity{
 		this.addButtons();
 		this.addSeats();
 
-		this.addCard(Card.CLUB_ACE, 262, 175);
-		this.addCard(Card.DIAMOND_THREE, 262 + 50+5, 175);
-		this.addCard(Card.CLUB_EIGHT, 262 + (50+5)*2, 175); 
-		this.addCard(Card.CLUB_EIGHT, 262 + (50+5)*3, 175); 
-		this.addCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
-
-		//this.updateInterface();
+		this.addComunnityCard(Card.CLUB_ACE, 262, 175);
+		this.addComunnityCard(Card.DIAMOND_THREE, 262 + 50+5, 175);
+		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*2, 175); 
+		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*3, 175); 
+		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
 
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
@@ -227,8 +229,9 @@ public class PGame extends BaseGameActivity{
 	}
 
 	@Override
-	public void onLoadComplete() {
-
+	public void onLoadComplete()
+	{	
+		this.updateInterface();
 	}
 
 	// ===========================================================
@@ -237,24 +240,23 @@ public class PGame extends BaseGameActivity{
 
 
 
-	private void addCard(final Card pCard, final int pX, final int pY) 
+	private void addComunnityCard(final Card pCard, final int pX, final int pY) 
 	{
 		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
 
 		this.mMainScene.attachChild(sprite);
-		this.mMainScene.registerTouchArea(sprite);
 
 		sprite.setScale(0.7f);
 	}
 
+	//FIXME Cargar la imagen de la carta volteada
 	private void addTurnedCard(final int pX, final int pY)
 	{
-		//final Sprite sprite = new Sprite(pX, pY,);
+		final Sprite sprite = new Sprite(pX, pY, null);
 
-		//this.mMainScene.attachChild(sprite);
-		//this.mMainScene.registerTouchArea(sprite);
-		
-		//sprite.setScale(0.7f);
+		this.mMainScene.attachChild(sprite);
+
+		sprite.setScale(0.7f);
 	}
 
 	private void addSeat(final int pX, final int pY)
@@ -409,11 +411,6 @@ public class PGame extends BaseGameActivity{
 		this.mMainScene.registerTouchArea(sprite);
 	}
 
-	private void updateInterface()
-	{
-
-	}
-
 	private void initializeGame()
 	{
 		mGameController = new GameController();
@@ -447,6 +444,11 @@ public class PGame extends BaseGameActivity{
 				mGameController = newgame;
 			}
 		}
+	}
+
+	private void updateInterface()
+	{
+
 	}
 
 	// ===========================================================
