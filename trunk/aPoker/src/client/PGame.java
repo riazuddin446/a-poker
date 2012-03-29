@@ -195,8 +195,10 @@ public class PGame extends BaseGameActivity{
 		this.addComunnityCard(Card.CLUB_ACE, 262, 175);
 		this.addComunnityCard(Card.DIAMOND_THREE, 262 + 50+5, 175);
 		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*2, 175); 
-		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*3, 175); 
-		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
+		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*3, 175); 
+		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
+
+		this.initializeGame();
 
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
@@ -231,7 +233,7 @@ public class PGame extends BaseGameActivity{
 	@Override
 	public void onLoadComplete()
 	{	
-		this.updateInterface();
+		this.gameLoop();
 	}
 
 	// ===========================================================
@@ -243,16 +245,6 @@ public class PGame extends BaseGameActivity{
 	private void addComunnityCard(final Card pCard, final int pX, final int pY) 
 	{
 		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
-
-		this.mMainScene.attachChild(sprite);
-
-		sprite.setScale(0.7f);
-	}
-
-	//FIXME Cargar la imagen de la carta volteada
-	private void addTurnedCard(final int pX, final int pY)
-	{
-		final Sprite sprite = new Sprite(pX, pY, null);
 
 		this.mMainScene.attachChild(sprite);
 
@@ -414,20 +406,15 @@ public class PGame extends BaseGameActivity{
 	private void initializeGame()
 	{
 		mGameController = new GameController();
+		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
+		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
+		mGameController.setPlayerStakes(4000);
+		mGameController.setRestart(true);
+		mGameController.setOwner(-1);
 	}
 
-	private void gameloop()
+	private void gameLoop()
 	{
-		GameController g = new GameController();
-		g.setName("Test game");
-		g.setMaxPlayers(5); //FIXME Recibir maxplayers desde la activity anterior
-		g.setPlayerStakes(4000); //FIXME Recibir playerstakes desde la activity anterior
-		g.setRestart(true);
-		g.setOwner(-1);
-
-		mGameController = g;
-
-		//FIXME
 		if(mGameController.tick() < 0)
 		{
 			//Replicate game if "restart" is set
