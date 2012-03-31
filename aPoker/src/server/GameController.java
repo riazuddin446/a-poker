@@ -51,9 +51,7 @@ public class GameController {
 	// ===========================================================
 
 	public GameController()
-	{
-		System.out.println("HOLAAAAAAAAAAAAAAAAAAAAAAA");
-		
+	{		
 		//Inicializar las variables
 		table = new Table();
 		players = new HashMap<Integer, Player>();

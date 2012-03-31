@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import logic.Card;
 import logic.Player;
+import logic.Player.Action;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
@@ -153,17 +154,17 @@ public class PGame extends BaseGameActivity{
 		this.mSeatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mSeatTextureAtlas, this,"seat.png", 0, 0);
 
+		//Load the font for texts
+		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 28, true, Color.BLACK);
+
 		//Load the textures into the engine
 		mEngine.getTextureManager().loadTextures(mBackgroundTextureAtlas,
 				this.mButtonsTextureAtlas,
 				this.mCardDeckTextureAtlas,
-				this.mSeatTextureAtlas);
+				this.mSeatTextureAtlas,
+				this.mFontTexture);
 
-		//FIXME Añadir la mFontTexture junto con las otras texturas
-		//Load the font for texts
-		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 28, true, Color.WHITE);
-		this.mEngine.getTextureManager().loadTexture(this.mFontTexture);
 		this.mEngine.getFontManager().loadFont(this.mFont);
 
 	}
@@ -192,14 +193,10 @@ public class PGame extends BaseGameActivity{
 
 		this.initializeGame();
 
+		//Add debug players
 		Player degubPlayer = new Player("Asier", this.mGameController.getPlayerStakes());
 		this.mGameController.players.put(0, degubPlayer);
 		this.mGameController.setOwner(0);
-
-		System.out.println(mGameController.getOwner());
-		System.out.println(mGameController.players.size());
-		System.out.println(mGameController.players.get(0).name);
-		System.out.println(mGameController.players.get(mGameController.getOwner()).name);
 
 		//Adding the player name to the screen
 		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
@@ -446,6 +443,31 @@ public class PGame extends BaseGameActivity{
 	private void updateInterface()
 	{
 
+	}
+
+	/**
+	 * Establece la acción que el jugador ha presionado
+	 * 
+	 * @param pid
+	 * @param action
+	 * @param amount
+	 */
+	private void doSetAction(int pid, Player.Action action, int amount)
+	{
+		Player auxPlayer = this.mGameController.players.get(pid);
+
+		Player.SchedAction auxSchedAction = auxPlayer.new SchedAction();
+		auxSchedAction.valid = true;
+		auxSchedAction.action = action;
+		if(action == Action.Call || action == Action.Raise)
+		{
+			auxSchedAction.amount = amount;
+		} else
+			auxSchedAction.amount = 0;
+		
+		auxPlayer.setNextAction(auxSchedAction);
+		
+		this.mGameController.players.put(pid, auxPlayer);
 	}
 
 	// ===========================================================
