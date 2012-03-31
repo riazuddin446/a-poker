@@ -27,7 +27,7 @@ public class GameController {
 	private String game_name; //Nombre de la partida
 
 	private Table table; //Mesa donde se jugara la partida
-	private HashMap<Integer, Player> players; //Lista de jugadores en la partida
+	public HashMap<Integer, Player> players; //Lista de jugadores en la partida
 
 	private int max_players; //Maximo de jugadores
 	private int player_stakes; //Fichas iniciales de cada jugador
