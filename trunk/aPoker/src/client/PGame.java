@@ -3,6 +3,7 @@ package client;
 import java.util.HashMap;
 
 import logic.Card;
+import logic.Player;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
@@ -180,15 +181,6 @@ public class PGame extends BaseGameActivity{
 		SpriteBackground backgroundSpriteBackgroudn = new SpriteBackground(backgroundSprite);
 		this.mMainScene.setBackground(backgroundSpriteBackgroudn);
 
-		//Adding the player name to the screen
-		//		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, this.mPlayer.getPlayerName());
-		//		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
-		//		mMainScene.attachChild(mPlayerNameText);
-
-		//Adding the chip counter
-		//		this.mChipCounterText = new ChangeableText(10, 10, this.mFont, Integer.toString(this.mPlayer.getStake()));
-		//		mMainScene.attachChild(mChipCounterText);
-
 		this.addButtons();
 		this.addSeats();
 
@@ -199,6 +191,24 @@ public class PGame extends BaseGameActivity{
 		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
 
 		this.initializeGame();
+
+		Player degubPlayer = new Player("Asier", this.mGameController.getPlayerStakes());
+		this.mGameController.players.put(0, degubPlayer);
+		this.mGameController.setOwner(0);
+
+		System.out.println(mGameController.getOwner());
+		System.out.println(mGameController.players.size());
+		System.out.println(mGameController.players.get(0).name);
+		System.out.println(mGameController.players.get(mGameController.getOwner()).name);
+
+		//Adding the player name to the screen
+		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
+		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
+		mMainScene.attachChild(mPlayerNameText);
+
+		//Adding the chip counter
+		this.mPlayerStakeText = new ChangeableText(10, 10, this.mFont, Integer.toString(mGameController.players.get(mGameController.getOwner()).stake));
+		mMainScene.attachChild(mPlayerStakeText);
 
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
