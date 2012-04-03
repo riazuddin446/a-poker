@@ -995,7 +995,6 @@ public class GameController {
 
 		table.seats.clear();
 
-
 		//Place players on seats
 		boolean chose_dealer = false;
 		for(int i=0; i < players.size(); i++)
