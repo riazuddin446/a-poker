@@ -98,20 +98,20 @@ public enum Card {
 	// Getter & Setter
 	// ===========================================================
 
-	public int getTexturePositionX() {
-		return this.mValue.ordinal() * CARD_WIDTH;
-	}
-
-	public int getTexturePositionY() {
-		return this.mColor.ordinal() * CARD_HEIGHT;
-	}
-
 	public Color getColor() {
 		return mColor;
 	}
 
 	public Value getValue() {
 		return mValue;
+	}
+	
+	public int getTexturePositionX() {
+		return this.mValue.ordinal() * CARD_WIDTH;
+	}
+
+	public int getTexturePositionY() {
+		return this.mColor.ordinal() * CARD_HEIGHT;
 	}
 
 	// ===========================================================

@@ -252,7 +252,7 @@ public class PGame extends BaseGameActivity{
 
 	@Override
 	public void onLoadComplete()
-	{	
+	{			
 		//this.gameLoop();
 	}
 
