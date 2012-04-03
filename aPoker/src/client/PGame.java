@@ -193,10 +193,7 @@ public class PGame extends BaseGameActivity{
 
 		this.initializeGame();
 
-		//Add debug players
-		Player degubPlayer = new Player("Asier", this.mGameController.getPlayerStakes());
-		this.mGameController.players.put(0, degubPlayer);
-		this.mGameController.setOwner(0);
+		this.addDebugPlayers();
 
 		//Adding the player name to the screen
 		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
@@ -232,6 +229,22 @@ public class PGame extends BaseGameActivity{
 			}
 		});
 
+		this.mMainScene.registerUpdateHandler(new TimerHandler(5f, true, new ITimerCallback() {
+			@Override
+			public void onTimePassed(final TimerHandler pTimerHandler)
+			{
+				if(mGameController.getOwner() == 4)
+					mGameController.setOwner(0);
+				else
+					mGameController.setOwner(mGameController.getOwner()+1);
+
+				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
+
+				System.out.println("Owner: "+mGameController.getOwner()+" Name: "+mPlayerNameText.getText());
+			}
+
+		}));
+
 		this.mMainScene.setTouchAreaBindingEnabled(true);
 
 		return this.mMainScene;
@@ -240,7 +253,7 @@ public class PGame extends BaseGameActivity{
 	@Override
 	public void onLoadComplete()
 	{	
-		this.gameLoop();
+		//this.gameLoop();
 	}
 
 	// ===========================================================
@@ -448,9 +461,9 @@ public class PGame extends BaseGameActivity{
 	/**
 	 * Establece la acción que el jugador ha presionado
 	 * 
-	 * @param pid
-	 * @param action
-	 * @param amount
+	 * @param pid Id del jugador que realiza la acción (En nuestro caso el jugador actual)
+	 * @param action La acción que desea realizar el jugador
+	 * @param amount En caso necesario, la cantidad de fichas que gasta el jugador
 	 */
 	private void doSetAction(int pid, Player.Action action, int amount)
 	{
@@ -464,13 +477,27 @@ public class PGame extends BaseGameActivity{
 			auxSchedAction.amount = amount;
 		} else
 			auxSchedAction.amount = 0;
-		
+
 		auxPlayer.setNextAction(auxSchedAction);
-		
+
 		this.mGameController.players.put(pid, auxPlayer);
 	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
+
+	private void addDebugPlayers()
+	{
+		for(int i=0; i<5; i++)
+		{
+			//Add debug player
+			Player degubPlayer = new Player("Asier"+i, this.mGameController.getPlayerStakes());
+			this.mGameController.players.put(i, degubPlayer);
+		}
+
+		this.mGameController.setOwner(0);
+		
+		System.out.println("Players.size(): "+this.mGameController.players.size());
+	}
 }
