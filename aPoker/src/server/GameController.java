@@ -333,7 +333,7 @@ public class GameController {
 				t.seats.get(i).showcards = false;
 				t.seats.get(i).bet = 0;
 
-				t.seats.get(i).player.holecards.empty();
+				t.seats.get(i).player.holecards.clear();
 				t.seats.get(i).player.resetLastAction();
 				t.seats.get(i).player.stake_before = t.seats.get(i).player.stake; //Remeber stake before this hand
 			}
@@ -934,7 +934,7 @@ public class GameController {
 				t.seats.get(i).bet = 0;
 
 				Player  p = t.seats.get(i).player;
-				p.holecards.empty();
+				p.holecards.clear();
 				p.resetLastAction();
 				p.stake_before = p.stake; //Remember stake before this hand
 			}
