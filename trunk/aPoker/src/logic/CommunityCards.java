@@ -67,11 +67,6 @@ public class CommunityCards {
 	{
 		return cards.size();
 	}
-
-	public ArrayList<Card> copyCards()
-	{
-		return cards;
-	}
 	
 	// ===========================================================
 	// Inner and Anonymous Classes
