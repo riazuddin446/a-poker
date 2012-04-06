@@ -22,7 +22,7 @@ public class Deck {
 	}
 
 	//Clear the deck
-	public void empty(){
+	public void clear(){
 		cards.clear();
 	}
 
@@ -41,19 +41,9 @@ public class Deck {
 	public Card pop(){
 		if(count() == 0)
 			throw new EmptyStackException();
+		
 		Card c = cards.get(cards.size()); //Get the last card
 		cards.remove(cards.size()); //Remove it
 		return c;
 	}
-
-	//	public ArrayList<Card> pop(int n){
-	//		if(count() == 0)
-	//			throw new EmptyStackException();
-	//		ArrayList<Card> temp = new ArrayList<Card>();
-	//
-	//		for (int i = 0; i < n; ++i)
-	//			temp.add(this.pop());
-	//
-	//		return temp;	
-	//	}
 }

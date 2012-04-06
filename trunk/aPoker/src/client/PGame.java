@@ -252,7 +252,9 @@ public class PGame extends BaseGameActivity{
 
 	@Override
 	public void onLoadComplete()
-	{			
+	{	
+		System.out.println(mGameController.table.deck.pop());
+
 		//this.gameLoop();
 	}
 
@@ -497,7 +499,7 @@ public class PGame extends BaseGameActivity{
 		}
 
 		this.mGameController.setOwner(0);
-		
+
 		System.out.println("Players.size(): "+this.mGameController.players.size());
 	}
 }
