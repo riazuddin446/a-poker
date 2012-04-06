@@ -13,7 +13,7 @@ import logic.PokerHandStrength;
 
 public class Table {
 
-	Deck deck;
+	public Deck deck;
 	CommunityCards communitycards;
 
 	State state;
@@ -174,10 +174,10 @@ public class Table {
 			Pot cur_pot = pots.lastElement();
 
 			//If current pot is final, create a new one
-			if(cur_pot.final1){
+			if(cur_pot.isFinal){
 				Pot pot = new Pot();
 				pot.amount=0;
-				pot.final1=false;
+				pot.isFinal=false;
 				pots.add(pot);
 
 				cur_pot = pots.lastElement();
@@ -212,7 +212,7 @@ public class Table {
 				//Mark pot as final if at least one player is allin
 				Player p = seats.get(i).player;
 				if(p.getStake() == 0)
-					cur_pot.final1 = true;
+					cur_pot.isFinal = true;
 
 				//Set player 'involved in pot'
 				if(!isSeatInvolvedInPot(cur_pot, i))
@@ -284,18 +284,18 @@ public class Table {
 	}
 
 	public class Seat {
-		boolean occupied;
-		int seat_no;
-		Player player;
-		int bet;
-		boolean in_round; //is player involved in current hand?
-		boolean showcards; //does the player want to show cards?
+		public boolean occupied;
+		public int seat_no;
+		public Player player; //FIXME Int apuntando al player en vez de una copia
+		public int bet;
+		public boolean in_round; //is player involved in current hand?
+		public boolean showcards; //does the player want to show cards?
 	}
 
 	public class Pot {
-		int amount;
-		Vector<Integer> vsteats;
-		boolean final1;
+		public int amount;
+		public Vector<Integer> vsteats;
+		public boolean isFinal;
 	}
 
 }

@@ -26,7 +26,7 @@ public class GameController {
 
 	private String game_name; //Nombre de la partida
 
-	private Table table; //Mesa donde se jugara la partida
+	public Table table; //Mesa donde se jugara la partida
 	public HashMap<Integer, Player> players; //Lista de jugadores en la partida
 
 	private int max_players; //Maximo de jugadores
@@ -321,7 +321,7 @@ public class GameController {
 		t.pots.clear();
 		Pot pot = t.new Pot();
 		pot.amount = 0;
-		pot.final1 = false;
+		pot.isFinal = false;
 		t.pots.add(pot);
 
 		//Reset player related
@@ -922,7 +922,7 @@ public class GameController {
 		t.pots.clear();
 		Table.Pot pot = t.new Pot(); //Inner class instantiation
 		pot.amount = 0;
-		pot.final1 = false;
+		pot.isFinal = false;
 		t.pots.add(pot);
 
 		//Reset player-related
