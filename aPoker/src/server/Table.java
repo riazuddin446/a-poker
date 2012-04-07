@@ -125,9 +125,7 @@ public class Table {
 			if(seats.get(i).occupied && seats.get(i).in_round){
 				active_players++;
 
-				Player p = seats.get(i).player;
-
-				if(p.getStake() == 0){
+				if(seats.get(i).player.getStake() == 0){
 					count++;
 				}
 			}
