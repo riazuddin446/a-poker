@@ -42,8 +42,8 @@ public class Table {
 
 	}
 
-	public int getNextPlayer(int i){
-
+	public int getNextPlayer(int i)
+	{
 		int start, cur;
 		start = i;
 		cur = i;
@@ -56,33 +56,36 @@ public class Table {
 			if(cur >= 5) //We have done the full turn
 				cur = 0;
 
-			if(cur == start)
+			if(cur == start) //No next player
 				return -1;
 
 			else if(seats.get(cur).occupied)
 				found = true;
 		}
+		
 		return cur;
 	}
 
-	public int getNextActivePlayer(int pos){
+	public int getNextActivePlayer(int i)
+	{
 		int start, cur;
-		start = pos;
-		cur = pos;
+		start = i;
+		cur = i;
 		boolean found = false;
 
-		do{
+		while (!found)
+		{
 			cur++;
-			if(cur>=5)
+
+			if(cur >= 5) //We have done the full turn
 				cur = 0;
 
-			if(start==cur){
+			if(cur == start) //No active player left
 				return -1;
-			}
 
-			if(seats.get(cur).in_round)
+			else if(seats.get(cur).in_round) //FIXME && seats.get(ur).occupied?
 				found = true;
-		} while (!found);
+		}
 
 		return cur;
 	}
@@ -111,14 +114,14 @@ public class Table {
 		return count;
 	}
 
-	public boolean isAllin(){
-
-		//All (or except one) players are allin
+	public boolean isAllin() //All (or except one) players are allin
+	{
 		int count, active_players;
 		count = 0;
 		active_players = 0;
 
-		for (int i=0; i<5; i++){
+		for (int i=0; i<5; i++)
+		{
 			if(seats.get(i).occupied && seats.get(i).in_round){
 				active_players++;
 
