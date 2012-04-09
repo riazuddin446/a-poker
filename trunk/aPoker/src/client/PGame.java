@@ -32,7 +32,6 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 import server.GameController;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.Display;
 
 public class PGame extends BaseGameActivity{
@@ -253,7 +252,11 @@ public class PGame extends BaseGameActivity{
 	@Override
 	public void onLoadComplete()
 	{	
-		System.out.println(mGameController.table.deck.pop());
+
+		System.out.println(mGameController.players.get(0).name);
+		Player aux = mGameController.players.get(0);
+		aux.name = "Palomo!";
+		System.out.println(mGameController.players.get(0).name);
 
 		//this.gameLoop();
 	}

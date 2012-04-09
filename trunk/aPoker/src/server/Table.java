@@ -1,22 +1,20 @@
 package server;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Vector;
-
-import android.text.format.Time;
 
 import logic.CommunityCards;
 import logic.Deck;
 import logic.Player;
 import logic.PokerHandStrength;
+import android.text.format.Time;
 
 public class Table {
 
 	public Deck deck;
 	CommunityCards communitycards;
 
-	State state;
+	State state; //Estado de la mesa
 
 	HashMap<Integer, Seat> seats;
 	int dealer, sb, bb;
@@ -24,19 +22,19 @@ public class Table {
 	int lastBetPlayer;
 
 	BettingRound betround;
-	
+
 	int bet_amount;
 	int last_bet_amount;
 	Vector<Pot> pots;
-	
+
 	boolean nomoreaction;
-	
-	Time delay_start;
-	int delay;
 
-	Time timeout_start;
+	Time delay_start; //FIXME
+	int delay; //FIXME
 
-	
+	Time timeout_start; //FIXME
+
+
 
 	public Table(){
 
@@ -62,7 +60,7 @@ public class Table {
 			else if(seats.get(cur).occupied)
 				found = true;
 		}
-		
+
 		return cur;
 	}
 
@@ -131,39 +129,68 @@ public class Table {
 			}
 		}
 
-		return count >= active_players;
+		return (count >= active_players-1);
 	}
 
-	public void resetLastPlayerActions(){
-		//Reset last player action
-		for(int i=0; i<5; i++)
-		{
-			if(!seats.get(i).occupied)
-				continue;
-
-			seats.get(i).player.resetLastAction();
+	/**
+	 * Returns true if the seat s is involved in the pot. False if not.
+	 * 
+	 * @param pot
+	 * @param s
+	 * @return
+	 */
+	public boolean isSeatInvolvedInPot(Pot pot, int s)
+	{
+		for (int i=0; i<pot.vsteats.size(); i++){
+			if(pot.vsteats.get(i)==s)
+				return true;
 		}
 
+		return false;
+	}
+
+	public int getInvolvedInPotCount(Pot pot, Vector<PokerHandStrength> wl)
+	{
+		int involved_count = 0;
+
+		for(int i=0; i<pot.vsteats.size(); i++)
+		{
+			int s = pot.vsteats.get(i);
+
+			for(int j=0; j<wl.size(); j++)
+			{
+				if(wl.get(j).getId() == s)
+					involved_count++;
+			}
+		}
+
+		return involved_count;
 	}
 
 	public void collectBets(){
 
-		do{
-			// find smallest bet
+		while(true)
+		{
+			//Find smallest bet
 			int smallest_bet = 0;
 			boolean need_sidepot = false;
+			for(int i=0; i<5; i++)
+			{
+				Seat s = seats.get(i);
 
-			for(int i=0; i<5; i++){
 				//Skip folded and already handled players
-				if(!seats.get(i).occupied || !seats.get(i).in_round || seats.get(i).bet == 0)
+				if(!s.occupied || !s.in_round || s.bet == 0)
 					continue;
-				if(smallest_bet==0) //Set and initial value
-					smallest_bet = seats.get(i).bet;
-				else if (seats.get(i).bet < smallest_bet){ //New smallest bet
-					smallest_bet = seats.get(i).bet;
+
+				//Set and initial value
+				if(smallest_bet==0)
+					smallest_bet = s.bet;
+				else if (s.bet < smallest_bet) //New smallest bet
+				{
+					smallest_bet = s.bet;
 					need_sidepot = true;
 				}
-				else if (seats.get(i).bet > smallest_bet) //Bets are not equal
+				else if (s.bet > smallest_bet) //Bets are not equal
 					need_sidepot = true; // So there must be a smallest bet
 			}
 
@@ -175,89 +202,80 @@ public class Table {
 			Pot cur_pot = pots.lastElement();
 
 			//If current pot is final, create a new one
-			if(cur_pot.isFinal){
+			if(cur_pot.isFinal)
+			{
 				Pot pot = new Pot();
-				pot.amount=0;
-				pot.isFinal=false;
+				pot.amount = 0;
+				pot.isFinal = false;
 				pots.add(pot);
 
 				cur_pot = pots.lastElement();
 			}
 
 			//Collect the bet of each player
-			for(int i=0; i<5; i++){
+			for(int i=0; i<5; i++)
+			{
+				Seat s = seats.get(i);
+
 				//Skip invalid seats
-				if(!seats.get(i).occupied)
+				if(!s.occupied)
 					continue;
 				//Skip already handled players
-				if(seats.get(i).bet==0)
+				if(s.bet==0)
 					continue;
 
 				//Collect bet of folded players and skip them
-				if(!seats.get(i).in_round){
-					cur_pot.amount += seats.get(i).bet;
-					seats.get(i).bet = 0;
+				if(!s.in_round)
+				{
+					cur_pot.amount += s.bet;
+					s.bet = 0;
 					continue;
 				}
 
 				//Collect the bet into pot
-				if(!need_sidepot){
-					cur_pot.amount += seats.get(i).bet;
-					seats.get(i).bet=0;
+				if(!need_sidepot) //We dont need sidepot
+				{
+					cur_pot.amount += s.bet;
+					s.bet=0;
 				}
-				else{
+				else //We need sidepot
+				{
 					cur_pot.amount += smallest_bet;
-					seats.get(i).bet -= smallest_bet;
+					s.bet -= smallest_bet;
 				}
 
 				//Mark pot as final if at least one player is allin
-				Player p = seats.get(i).player;
-				if(p.getStake() == 0)
+				if(s.player.getStake() == 0)
 					cur_pot.isFinal = true;
 
 				//Set player 'involved in pot'
-				if(!isSeatInvolvedInPot(cur_pot, i))
+				if(!isSeatInvolvedInPot(cur_pot, i)) //Check if it is not already involved
 					cur_pot.vsteats.add(i);					
 			}
 
 			if(!need_sidepot) //All players bets are the same, end here
 				break;
-
-		} while(true);
-	}
-
-	public boolean isSeatInvolvedInPot(Pot pot, int s){
-
-		for (int i=0; i<pot.vsteats.size(); i++){
-			if(pot.vsteats.get(i)==s)
-				return true;
 		}
-		return false;
 	}
 
-	public int getInvolverInPotCount(Pot pot, Vector<PokerHandStrength> wl){
+	public void resetLastPlayerActions()
+	{
+		//Reset last player action
+		for(int i=0; i<5; i++)
+		{
+			Seat s = seats.get(i);
 
-		int involved_count = 0;
-
-		for(int i=0; i<pot.vsteats.size(); i++){
-			int s = pot.vsteats.get(i);
-
-			//FIXME
-			for(int j=0; j<wl.size(); j++){
-				//if(wl.get(j).getId() == s)
-				//involved_count++;
-			}
+			if(s.occupied)
+				s.player.resetLastAction();
 		}
 
-		return involved_count;
 	}
 
-	public void scheduleState(State schedState, int delay_sec){
-
+	public void scheduleState(State schedState, int delay_sec)
+	{
 		state = schedState;
-		delay = delay_sec;
+		delay = delay_sec; //FIXME
 		delay_start = null; //FIXME
-
 	}
 
 	public void tick(){
@@ -287,10 +305,10 @@ public class Table {
 	public class Seat {
 		public boolean occupied;
 		public int seat_no;
-		public Player player; //FIXME Int apuntando al player en vez de una copia
+		public Player player;
 		public int bet;
-		public boolean in_round; //is player involved in current hand?
-		public boolean showcards; //does the player want to show cards?
+		public boolean in_round; //Is player involved in current hand?
+		public boolean showcards; //Does the player want to show cards?
 	}
 
 	public class Pot {
