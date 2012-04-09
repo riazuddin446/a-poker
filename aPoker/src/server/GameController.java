@@ -1,7 +1,6 @@
 package server;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Vector;
 
 import logic.Card;
@@ -56,7 +55,7 @@ public class GameController {
 		table = new Table();
 		players = new HashMap<Integer, Player>();
 		blind = new Blind();
-		
+
 		//Asignar valores
 		game_name = "Game";
 
@@ -90,7 +89,8 @@ public class GameController {
 	}
 
 	public void setMaxPlayers(int maxPlayers) {
-		max_players = maxPlayers;
+		if(maxPlayers >=2)
+			max_players = maxPlayers;
 	}
 
 	public int getPlayerStakes() {
@@ -117,11 +117,11 @@ public class GameController {
 		return blind.getBlindsStart();
 	}
 
-	public int getBlindsTime() {
+	public int getBlindsFactor() {
 		return blind.getBlindFactor();
 	}
 
-	public void setBlindsTime(int blindsTime) {
+	public void setBlindsFactor(int blindsTime) {
 		blind.setBlindFactor(blindsTime);
 	}
 
@@ -816,7 +816,7 @@ public class GameController {
 			for(int poti=0; poti < t.pots.size(); poti++)
 			{
 				Pot pot = t.pots.get(poti);
-				int involved_count = t.getInvolverInPotCount(pot, tw);
+				int involved_count = t.getInvolvedInPotCount(pot, tw);
 
 				int win_amount = 0;
 				int odd_chips = 0;
