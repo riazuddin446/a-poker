@@ -1,7 +1,9 @@
 package server;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import logic.Card;
 import logic.HoleCards;
@@ -43,7 +45,7 @@ public class GameController {
 	private boolean restart;
 
 	//Apuntador hacia el dueño de la partida
-	private int owner;
+	private Player owner;
 
 	// ===========================================================
 	// Constructors
@@ -149,11 +151,11 @@ public class GameController {
 		this.restart = restart;
 	}
 
-	public int getOwner() {
+	public Player getOwner() {
 		return owner;
 	}
 
-	public void setOwner(int owner) {
+	public void setOwner(Player owner) {
 		this.owner = owner;
 	}
 
@@ -173,6 +175,11 @@ public class GameController {
 	// Methods
 	// ===========================================================
 
+	/**
+	 * Returns true if the player is already ingame
+	 * 
+	 * @param p Player to be checked
+	 */
 	public boolean isPlayer(Player p){
 
 		if(players.containsKey(p))
@@ -181,32 +188,61 @@ public class GameController {
 			return false;
 	}
 
-	boolean addPlayer(Player p) //FIXME Quitar las dos if y la forma de insertar el nuevo jugador
+	/**
+	 * Adds a player to the game
+	 * 
+	 * @param p Player to be added
+	 */
+	public void addPlayer(Player p)
 	{
-		//Is the game already started or full?
-		if(started || players.size() == max_players)
-			return false;
-
-		if(isPlayer(p))
-			return false;
-
-		p.setStake(player_stakes);
-
-		players.put(players.size(), p);
-
-		return true;
+		//If the game is not started of full and if the player is not already ingame
+		if(!started && players.size() != max_players && !isPlayer(p))
+		{
+			p.setStake(player_stakes);
+			players.put(players.size(), p);
+		}
+		else
+			System.out.println("Can't add the player: " + p.getPlayerName());
 	}
 
+	/**
+	 * Removes a player from the game
+	 * 
+	 * @param p Player to be removed
+	 */
 	public void removePlayer(Player p)
 	{
 		//Don't allow removing if the game has already been started
 		if(!started)
 		{
-			//TODO Comprobar que el jugador no sea el owner de la partida
+			boolean needNewOwner = false;
+			if(p == owner)
+				needNewOwner = true;
+
 			players.remove(p);
+
+			if(needNewOwner)
+				selectNewOwner();
 		}
 	}
 
+	/**
+	 * Finds a new owner of the game
+	 */
+	private void selectNewOwner()
+	{
+		Iterator it = players.entrySet().iterator();
+		if(it.hasNext())
+			owner = (Player)it.next();
+	}
+
+	/**
+	 * Sets the player action
+	 * 
+	 * @param p Player involved
+	 * @param action Action to be set
+	 * @param amount The amount of the bet involved in the action, if needed
+	 */
 	public void setPlayerAction(Player p, Action action, int amount)
 	{
 		if(action == Action.ResetAction)
@@ -228,8 +264,14 @@ public class GameController {
 
 	}
 
-	protected void createWinList(Table t, Vector<Vector<PokerHandStrength>> winList){
-
+	/**
+	 * TODO WARNING!
+	 * 
+	 * @param t Table involved
+	 * @param winList
+	 */
+	protected void createWinList(Table t, Vector< Vector<PokerHandStrength> > winList)
+	{
 		Vector<PokerHandStrength> wl;
 
 		int showdown_player = t.lastBetPlayer;
@@ -238,12 +280,19 @@ public class GameController {
 			Player p = t.seats.get(showdown_player).player;
 
 			PokerHandStrength strength;
+
 			//PokerHandEvaluator evaluator = new PokerHandEvaluator();
 			//TODO evaluator.getStrength();
 
 		}
 	}
 
+	/**
+	 * Determines the minimum bet that a player can do
+	 * 
+	 * @param t Table involved
+	 * @return The minimum bet
+	 */
 	protected int determineMinimumBet(Table t)
 	{
 		if(t.bet_amount == 0)
@@ -252,6 +301,11 @@ public class GameController {
 			return t.bet_amount + (t.bet_amount - t.last_bet_amount);
 	}
 
+	/**
+	 * Deals the hole cards to all the players
+	 * 
+	 * @param t Table involved
+	 */
 	protected void dealHole(Table t)
 	{		
 		//Player in SB gets first cards
@@ -261,7 +315,6 @@ public class GameController {
 			{
 				Player p = t.seats.get(i).player;
 
-				HoleCards h;
 				Card c1, c2;
 
 				c1 = t.deck.pop();
@@ -274,6 +327,11 @@ public class GameController {
 		}
 	}
 
+	/**
+	 * Deals the flop cards
+	 * 
+	 * @param t Table involved
+	 */
 	protected void dealFlop(Table t)
 	{
 		Card f1, f2, f3;
@@ -284,7 +342,11 @@ public class GameController {
 		t.communitycards.setFlop(f1, f2, f3);
 	}
 
-
+	/**
+	 * Deals the turn card
+	 * 
+	 * @param t Table involved
+	 */
 	protected void dealTurn(Table t)
 	{
 		Card trn;
@@ -293,6 +355,11 @@ public class GameController {
 		t.communitycards.setTurn(trn);
 	}
 
+	/**
+	 * Deals the river card
+	 * 
+	 * @param t Table involved
+	 */
 	protected void dealRiver(Table t)
 	{
 		Card r;
@@ -301,12 +368,15 @@ public class GameController {
 		t.communitycards.setRiver(r);
 	}
 
+	/**
+	 * Handle the 'NewRound' state
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateNewRound(Table t)
 	{
 		//Count up current hand number
 		hand_no++;
-
-		//TODO snap
 
 		//Fill and shuffle the card deck
 		t.deck.clearFillAndShuffle();
@@ -327,19 +397,21 @@ public class GameController {
 		//Reset player related
 		for(int i=0; i<5; i++)
 		{
-			if(t.seats.get(i).occupied)
+			Seat aux = t.seats.get(i);
+			if(aux.occupied)
 			{
-				t.seats.get(i).in_round = true;
-				t.seats.get(i).showcards = false;
-				t.seats.get(i).bet = 0;
+				aux.in_round = true;
+				aux.showcards = false;
+				aux.bet = 0;
 
-				t.seats.get(i).player.holecards.clear();
-				t.seats.get(i).player.resetLastAction();
-				t.seats.get(i).player.stake_before = t.seats.get(i).player.stake; //Remeber stake before this hand
+				aux.player.holecards.clear();
+				aux.player.resetLastAction();
+				aux.player.stake_before = aux.player.stake; //Remeber stake before this hand
 			}
 		}
 
 		//Determine who is SB and BB
+		
 		boolean headsup_rule = (t.countPlayers()==2);
 
 		if(headsup_rule) //Head-up rule: only 2 players remain so swap blinds

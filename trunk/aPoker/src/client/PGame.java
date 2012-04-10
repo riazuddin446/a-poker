@@ -497,11 +497,12 @@ public class PGame extends BaseGameActivity{
 		for(int i=0; i<5; i++)
 		{
 			//Add debug player
-			Player degubPlayer = new Player("Asier"+i, this.mGameController.getPlayerStakes());
-			this.mGameController.players.put(i, degubPlayer);
+			Player debugPlayer = new Player("Asier"+i, this.mGameController.getPlayerStakes());
+			this.mGameController.addPlayer(debugPlayer);
+			//this.mGameController.players.put(i, degubPlayer);
 		}
 
-		this.mGameController.setOwner(0);
+		this.mGameController.setOwner(mGameController.players.get(0));
 
 		System.out.println("Players.size(): "+this.mGameController.players.size());
 	}
