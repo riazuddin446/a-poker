@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import android.widget.Toast;
+
 import logic.Card;
 import logic.HoleCards;
 import logic.Player;
@@ -411,7 +413,7 @@ public class GameController {
 		}
 
 		//Determine who is SB and BB
-		
+
 		boolean headsup_rule = (t.countPlayers()==2);
 
 		if(headsup_rule) //Head-up rule: only 2 players remain so swap blinds
@@ -432,6 +434,11 @@ public class GameController {
 		t.state = State.Blinds;
 	}
 
+	/**
+	 * Handle the 'Blinds' state
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateBlinds(Table t)
 	{
 		t.bet_amount = blind.amount;
@@ -457,13 +464,14 @@ public class GameController {
 		t.seats.get(t.bb).bet = amount;
 		pBig.stake -= amount;
 
-		//Initialize the player's timeout
-		//TODO t.timeout_start = Time(null);
+		//TODO Initialize the player's timeout
 
 		//Give out hole-cards
 		dealHole(t);
 
-		//Check if there is any more action possible
+		//TODO Tell the player under the gun that it's his turn
+
+		//Check if there is any more possible action
 		if(t.isAllin())
 		{
 			if((pBig.stake == 0 && pSmall.stake == 0) || //Bot players are allin 
@@ -475,9 +483,15 @@ public class GameController {
 		}
 
 		t.betround = BettingRound.Preflop;
-		t.scheduleState(State.Betting, 3);
+
+		t.scheduleState(State.Betting, 3); //FIXME Delay
 	}
 
+	/**
+	 * Handle the betting round
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateBetting(Table t)
 	{
 		Player p = t.seats.get(t.currentPlayer).player;
@@ -500,25 +514,24 @@ public class GameController {
 		{
 			action = p.next_action.action;
 
-			if (action == Action.Fold)
+			if (action == Action.Fold) //Retirarse
 				allowed_action = true;
-			else if(action == Action.Check)
+			else if(action == Action.Check) //Pasar
 			{
 				//Allowed check?
 				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
 				{
-					//TODO Send message that cannot chet7
+					//FIXME Send message that cannot check
+					Toast toast = Toast.makeText(null, "You can't check dude! Try call ;D", 3);
+					toast.show();
 				}
 				else
 					allowed_action = true;
 			}
-
-			else if(action == Action.Call) //FIXME Menos ifs
+			else if(action == Action.Call) //Igualar apuesta
 			{
-				if(t.bet_amount == 0 || t.bet_amount == t.seats.get(t.currentPlayer).bet)
+				if(t.bet_amount == 0 || t.bet_amount == t.seats.get(t.currentPlayer).bet) //Cannot call, just check or fold
 				{
-					//Cannot call, just check or fold
-
 					//Retry with this action
 					p.next_action.action = Action.Check;
 					return;
@@ -536,13 +549,18 @@ public class GameController {
 				}
 			}
 
-			else if(action == Action.Bet) //FIXME Un solo if
+			else if(action == Action.Bet) //Iniciar apuesta
 			{
 				if(t.bet_amount > 0){
-					//TODO there already was a bet
+					//FIXME there already was a bet
+					Toast toast = Toast.makeText(null, "You can't bet dude! There already was a bet, try raise.", 3);
+					toast.show();
 				}
-				else if(p.next_action.amount < minimun_bet){
-					//Cannont bet this amount because its less than the minimun one
+				else if(p.next_action.amount < minimun_bet)
+				{
+					//FIXME
+					Toast toast = Toast.makeText(null, "You can't bet this amount, the minimun bet is: " + minimun_bet, 3);
+					toast.show();			
 				}
 				else
 				{
@@ -551,11 +569,13 @@ public class GameController {
 				}
 			}
 
-			else if(action == Action.Raise)
+			else if(action == Action.Raise) //Subir apuesta
 			{
 				if(t.bet_amount == 0)
 				{
-					//Cant raise, nothing was bet
+					//FIXME Cant raise, nothing was bet
+					Toast toast = Toast.makeText(null, "You cannot raise, nothing was bet! Try bet.", 3);
+					toast.show();
 
 					//Retry with this action
 					p.next_action.action = Action.Bet;
@@ -563,7 +583,9 @@ public class GameController {
 				}
 				else if(p.next_action.amount < minimun_bet)
 				{
-					//TODO Cant raise less than minimun_bet
+					//FIXME Cant raise less than minimun_bet
+					Toast toast = Toast.makeText(null, "You cannot raise this amount. Minimum bet is: " + minimun_bet, 3);
+					toast.show();				
 				}
 				else
 				{
@@ -581,10 +603,9 @@ public class GameController {
 			//Reset player action
 			p.next_action.valid = false;
 		}
-
-		else //Handle player timeout
+		else //Player didn't set next action, handle his timeout
 		{
-			if(p.sitout) //TODO || (time => timeout)
+			if(p.sitout) //TODO Timeout
 			{
 				//Let player sit out (if he is not already)
 				p.sitout = true;
@@ -604,10 +625,10 @@ public class GameController {
 		if(!allowed_action)
 			return;
 
-		//Remember action for snapshot TODO Snapshot?
+		//Remember action for snapshot
 		p.last_action = action;
 
-		//Perform action
+		//PERFORM ACTION
 		if(action == Action.None)
 		{
 			//Do nothing
@@ -615,11 +636,10 @@ public class GameController {
 		else if(action == Action.Fold)
 		{
 			t.seats.get(t.currentPlayer).in_round = false;
-			//Send snapshot
 		}
 		else if(action == Action.Check)
 		{
-			//Send snapshot
+			//Just continue
 		}
 		else
 		{
@@ -634,8 +654,7 @@ public class GameController {
 			if(action == Action.Bet || action == Action.Raise || action == Action.Allin)
 			{
 				//Only re-open betting round if amount greater than table-bet
-				//FIXME check holdingnuts source
-
+				//FIXME  bug: other players need to do an action even on none-minimum-bet
 				if(t.seats.get(t.currentPlayer).bet > t.bet_amount)
 				{
 					t.lastBetPlayer = t.currentPlayer;
@@ -643,8 +662,6 @@ public class GameController {
 
 					t.bet_amount = t.seats.get(t.currentPlayer).bet;
 				}
-
-				//TODO Send snapshots
 			}
 		}
 
@@ -659,8 +676,7 @@ public class GameController {
 			//Set last remaining player as current player
 			t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
 
-			//Initialize the player's timeout
-			//TODO t.timeout_start = time(null);
+			//TODO Initialize the player's timeout
 
 			t.resetLastPlayerActions();
 			return;
@@ -701,10 +717,9 @@ public class GameController {
 				//Set the player behind last action as current player
 				t.currentPlayer = t.getNextActivePlayer(t.lastBetPlayer);
 
-				//Initialize the player's timeout
-				//TODO
+				//TODO Initialize the player's timeout
 
-				//End of hand, do showdonw/ask for show
+				//End of hand, do showdown/ask for show
 				if(t.nomoreaction)
 					t.state = State.Showdown;
 				else
@@ -721,8 +736,7 @@ public class GameController {
 			//Set the current player as SB (or next active behing SB)
 			t.currentPlayer = t.getNextActivePlayer(t.dealer);
 
-			//Reinitialize the player's timeout
-			//TODO
+			//TODO Reinitialize the player's timeout
 
 			//First action for next betting round is at this payer
 			t.lastBetPlayer = t.currentPlayer;
@@ -745,16 +759,24 @@ public class GameController {
 			p.resetLastAction();
 
 			t.scheduleState(State.Betting, 1);
-			//TODO sendtablesnapshot;
 		}
 	}
 
+	/**
+	 * Pseudo state to make a wait break
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateBettingEnd(Table t) //Pseudo-state
 	{	
 		t.state = State.Betting;
-		//TODO sendTableSnapShot(t);
 	}
 
+	/**
+	 * Ask to every player involved in the ended bet to show his cards
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateAskShow(Table t)
 	{
 		boolean chose_action = false;
@@ -785,12 +807,10 @@ public class GameController {
 			//Reset scheduled action
 			p.next_action.valid = false;
 		}
-		else
+		else //Wait till player set an action
 		{
 			//Handle player timeout
-			int timeout = 4;
-
-			if(p.sitout)
+			if(p.sitout) //TODO
 			{
 				// default on showdown is "to show"
 				// Note: client needs to determine if it's hand is
@@ -800,26 +820,22 @@ public class GameController {
 
 				chose_action = true;
 			}
-
-			t.seats.get(t.currentPlayer).showcards = true;
-			chose_action = true;
 		}
 
 		//Return here if no action chosen till now
 		if(!chose_action)
 			return;
 
+		//Remember action
 		if(t.seats.get(t.currentPlayer).showcards)
 			p.last_action = Action.Show;
 		else
 			p.last_action = Action.Muck;
 
-		//All players, except one, folded or showdown?
+		//All players, except one, folded or showdown
 		if(t.countActivePlayers() == 1)
 		{
 			t.state = State.AllFolded;
-
-			//sendTableSnapshot(t);
 		}
 		else
 		{
@@ -837,42 +853,37 @@ public class GameController {
 				//Find next player
 				t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
 
-				//t.timeout_start = time(null);
-
-				//Send update snapshot
-				//TODO sendTableSnapshot(t);
+				//TODO Start timeout?
 			}
 		}
 	}
 
+	/**
+	 * Handles the case that all player have folded
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateAllFolded(Table t)
 	{
 		//Get last remaining player
 		Player p = t.seats.get(t.currentPlayer).player;
 
-		//Send PlayerShow snapshot if cards were shown
-		if(t.seats.get(t.currentPlayer).showcards)
-		{
-			//TODO sendPlayerShowSnapshot(t, p);
-		}
-
+		//Give the pot to the winner
 		p.stake += t.pots.get(0).amount;
 		t.seats.get(t.currentPlayer).bet = t.pots.get(0).amount;
 
-		//Send pot-win snapshot
-		//TODO
-
 		t.scheduleState(State.EndRound, 2);
-
 	}
 
+	/**
+	 * Handles the showdown
+	 * 
+	 * @param t Table involved
+	 */
 	protected void stateShowdown(Table t)
 	{
-		//The player who did the last action is first
+		//The player who did the last action is first showing
 		int showdown_player = t.lastBetPlayer;
-
-		//Determine and send out PlayerShow snapshot
-		//TODO
 
 		//Determine winners
 		Vector<Vector<PokerHandStrength>> winList = null;
