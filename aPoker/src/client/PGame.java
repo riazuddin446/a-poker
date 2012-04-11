@@ -252,7 +252,6 @@ public class PGame extends BaseGameActivity{
 	@Override
 	public void onLoadComplete()
 	{	
-
 		System.out.println(mGameController.players.get(0).name);
 		Player aux = mGameController.players.get(0);
 		aux.name = "Palomo!";
