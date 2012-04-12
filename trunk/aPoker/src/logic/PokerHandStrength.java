@@ -54,13 +54,21 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 			}
 		}
 	}
-	
+
 	int id;
 
 	HandRanking ranking;
 
 	final Vector<Card> rankCards = new Vector<Card>();
 	final Vector<Card> kickerCards = new Vector<Card>();	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 
 	public HandRanking getRanking()
 	{
@@ -131,9 +139,4 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 	{
 		return "ranking=" + this.ranking + " rank=" + this.rankCards + " kicker=" + this.kickerCards;
 	}
-
-	public int getId() {
-		return id;
-	}
-
 }

@@ -3,12 +3,9 @@ package server;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.Map.Entry;
-
-import android.widget.Toast;
 
 import logic.Card;
-import logic.HoleCards;
+import logic.HoldemHandEvaluator;
 import logic.Player;
 import logic.PokerHandStrength;
 import logic.Player.Action;
@@ -16,6 +13,7 @@ import server.Table.BettingRound;
 import server.Table.Pot;
 import server.Table.Seat;
 import server.Table.State;
+import android.widget.Toast;
 
 public class GameController {
 
@@ -267,25 +265,29 @@ public class GameController {
 	}
 
 	/**
-	 * TODO WARNING!
+	 * Create the list of the winner's hand strengths and their id
 	 * 
 	 * @param t Table involved
 	 * @param winList
 	 */
 	protected void createWinList(Table t, Vector< Vector<PokerHandStrength> > winList)
 	{
-		Vector<PokerHandStrength> wl;
+		Vector<PokerHandStrength> wl = new Vector<PokerHandStrength>(); //Vector where we are going to add
 
 		int showdown_player = t.lastBetPlayer;
+
 		for(int i=0; i<t.countActivePlayers(); i++)
 		{
 			Player p = t.seats.get(showdown_player).player;
 
-			PokerHandStrength strength;
+			PokerHandStrength strength; // = new PokerHandStrength(); FIXME
+			HoldemHandEvaluator evaluator = new HoldemHandEvaluator(p.holecards.cards, table.communitycards.cards);
+			strength = evaluator.getStrength();
+			strength.setId(showdown_player); //Save the id of the player to link with his hand strength
 
-			//PokerHandEvaluator evaluator = new PokerHandEvaluator();
-			//TODO evaluator.getStrength();
+			wl.add(strength); //Add to the list
 
+			showdown_player = t.getNextActivePlayer(showdown_player); //Find next showdown player
 		}
 	}
 
@@ -882,11 +884,10 @@ public class GameController {
 	 */
 	protected void stateShowdown(Table t)
 	{
-		//The player who did the last action is first showing
-		int showdown_player = t.lastBetPlayer;
+		//TODO Start showing the cards on the screen. The player who did the last action is first showing
 
 		//Determine winners
-		Vector<Vector<PokerHandStrength>> winList = null;
+		Vector< Vector<PokerHandStrength> > winList = new Vector< Vector<PokerHandStrength> >();
 		createWinList(t, winList);
 
 		//For each winner list:

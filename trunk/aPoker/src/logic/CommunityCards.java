@@ -16,7 +16,7 @@ public class CommunityCards {
 	// Fields
 	// ===========================================================
 
-	ArrayList<Card> cards;
+	public ArrayList<Card> cards;
 	
 	// ===========================================================
 	// Constructors

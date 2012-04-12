@@ -1,6 +1,7 @@
 package logic;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -47,8 +48,6 @@ public abstract class PokerHandEvaluator
 			strength.ranking = HandRanking.HIGHCARD;
 		}
 	}
-
-
 
 	protected boolean evalFlush()
 	{
@@ -129,7 +128,6 @@ public abstract class PokerHandEvaluator
 		return isFullHouse;
 	}
 
-
 	protected void evalHighCard()
 	{
 		// set first card as rank card
@@ -139,7 +137,6 @@ public abstract class PokerHandEvaluator
 		for (int i = 1; i < this.all_cards.size() && i < 5; ++i)
 			strength.kickerCards.add(this.all_cards.firstElement());
 	}
-
 
 	protected boolean evalStraight(Color respectSuit)
 	{
@@ -227,7 +224,6 @@ public abstract class PokerHandEvaluator
 
 		return isStraightFlush;
 	}
-
 
 	protected boolean evalTwoPair()
 	{
@@ -339,6 +335,41 @@ public abstract class PokerHandEvaluator
 		return isXOfAKind;
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param hands
+	 * @param winList
+	 */
+	protected void getWinList(Vector<PokerHandStrength> hands, Vector< Vector<PokerHandStrength> > winList)
+	{
+		winList.clear();
+		winList.add(hands);
 
+		int index = 0;
+		while(true)
+		{
+			Vector<PokerHandStrength> tw = winList.get(index);
+			Vector<PokerHandStrength> tmp = new Vector<PokerHandStrength>();
 
+			//Sort tw in descending order
+			Comparator comparator = Collections.reverseOrder();
+			Collections.sort(tw, comparator);
+
+			for(int i = tw.size()-1; i > 0; i--)
+			{
+				if(tw.get(i).compareTo(tw.get(0)) < 0) //FIXME
+				{
+					tmp.add(tw.get(i));
+					tw.remove(tw.size());
+				}
+			}
+			
+			if(tmp.size() == 0)
+				break;
+			
+			winList.add(tmp);
+			index++;
+		}
+	}
 }

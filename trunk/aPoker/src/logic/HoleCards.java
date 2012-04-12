@@ -16,7 +16,7 @@ public class HoleCards {
 	// Fields
 	// ===========================================================
 
-	ArrayList<Card> cards;
+	public ArrayList<Card> cards;
 
 	// ===========================================================
 	// Constructors
