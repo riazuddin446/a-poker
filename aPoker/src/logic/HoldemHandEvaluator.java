@@ -1,29 +1,27 @@
 package logic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HoldemHandEvaluator extends PokerHandEvaluator{
 
-	final protected ArrayList<Card> all_cards = new ArrayList<Card>();
-	protected PokerHandStrength strength = null;
-
-	public void getStrength(HoleCards holeCards, CommunityCards communityCards)
+	public HoldemHandEvaluator(List<Card> hole_cards, List<Card> community_cards)
 	{
+		super();
 
-		if (holeCards.size() > 2 || communityCards.size() > 5)
+		if (hole_cards.size() > 2 || community_cards.size() > 5)
 			throw new IllegalArgumentException();
 
 		//Copy all hole cards
-		for (Card c : holeCards.cards)
+		for (Card c : hole_cards)
 			this.all_cards.add((Card) c);
 
 		//Copy all community cards
-		for (Card c : communityCards.cards)
+		for (Card c : community_cards)
 			this.all_cards.add((Card) c);
 
-		//Get the strength of the hole cards with community cards
+		//For Texas Hold'em we can use every card from hole and community
 		this.strength = new PokerHandStrength();
 		evaluate();
 	}
-
 }
