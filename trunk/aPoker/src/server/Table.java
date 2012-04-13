@@ -149,6 +149,13 @@ public class Table {
 		return false;
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param pot
+	 * @param wl
+	 * @return
+	 */
 	public int getInvolvedInPotCount(Pot pot, Vector<PokerHandStrength> wl)
 	{
 		int involved_count = 0;
