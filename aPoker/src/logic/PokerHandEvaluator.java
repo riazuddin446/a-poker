@@ -341,7 +341,7 @@ public abstract class PokerHandEvaluator
 	 * @param hands
 	 * @param winList
 	 */
-	protected void getWinList(Vector<PokerHandStrength> hands, Vector< Vector<PokerHandStrength> > winList)
+	public void getWinList(Vector<PokerHandStrength> hands, Vector< Vector<PokerHandStrength> > winList)
 	{
 		winList.clear();
 		winList.add(hands);

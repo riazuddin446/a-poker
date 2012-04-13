@@ -7,6 +7,7 @@ import java.util.Vector;
 import logic.Card;
 import logic.HoldemHandEvaluator;
 import logic.Player;
+import logic.PokerHandEvaluator;
 import logic.PokerHandStrength;
 import logic.Player.Action;
 import server.Table.BettingRound;
@@ -289,6 +290,9 @@ public class GameController {
 
 			showdown_player = t.getNextActivePlayer(showdown_player); //Find next showdown player
 		}
+		
+		HoldemHandEvaluator tmp = new HoldemHandEvaluator(null, null);
+		tmp.getWinList(wl, winList);
 	}
 
 	/**
@@ -893,19 +897,19 @@ public class GameController {
 		//For each winner list:
 		for (int i=0; i < winList.size(); i++)
 		{
-			Vector<PokerHandStrength> tw = winList.get(i);
-			int winner_count = tw.size();
+			Vector<PokerHandStrength> tw = winList.get(i); //Take one winner list
+			int winner_count = tw.size(); //Count of players of the winner list
 
 			//For each pot:
 			for(int poti=0; poti < t.pots.size(); poti++)
 			{
-				Pot pot = t.pots.get(poti);
-				int involved_count = t.getInvolvedInPotCount(pot, tw);
+				Pot pot = t.pots.get(poti); //Get the pot
+				int involved_count = t.getInvolvedInPotCount(pot, tw); //Get the count of players of the win list involved in this pot
 
-				int win_amount = 0;
+				int win_amount = 0; 
 				int odd_chips = 0;
 
-				if(involved_count == 1)
+				if(involved_count > 0)
 				{
 					//Pot is divided by the number of players involved in
 					win_amount = pot.amount / involved_count;
@@ -932,13 +936,12 @@ public class GameController {
 						//Transfer winning amount to player
 						p.stake += win_amount;
 
-						//Put winnings to seat (needed for snapshot)
-						seat.bet += win_amount;
+						//FIXME Put winnings to seat (needed for snapshot)
+						//seat.bet += win_amount;
 
 						//Count up overall cashed-out
 						cashout_amount += win_amount;
 
-						//TODO Snap
 					}
 				}
 
@@ -951,13 +954,11 @@ public class GameController {
 					while(!t.isSeatInvolvedInPot(pot, oddchips_player))
 						oddchips_player = t.getNextActivePlayer(oddchips_player);
 
-					Seat seat2 = t.seats.get(oddchips_player);
-					Player p2 = seat2.player;
+					Seat seat = t.seats.get(oddchips_player);
+					Player p = seat.player;
 
-					p2.stake += odd_chips;
-					seat2.bet += odd_chips;
-
-					//snap
+					p.stake += odd_chips;
+					//FIXME seat.bet += odd_chips;
 
 					cashout_amount += odd_chips;
 				}
@@ -970,19 +971,16 @@ public class GameController {
 		//Check for fatal error: not all pots were distributed
 		for(int j=0; j < t.pots.size(); j++)
 		{
-			Pot pot2 = t.pots.get(j);
+			Pot pot = t.pots.get(j);
 
-			if(pot2.amount > 0)
+			if(pot.amount > 0)
 			{
-				//TODO Send erro msg
+				System.out.println("WinList -> Error remaining chips in pot: " + pot.amount);
 			}
 		}
 
-
 		//Reset all pots
 		t.pots.clear();
-
-		//TODO Send table snap shot
 
 		t.scheduleState(State.EndRound, 2);
 	}
