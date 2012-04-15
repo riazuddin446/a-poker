@@ -285,10 +285,6 @@ public class Table {
 		delay_start = null; //FIXME
 	}
 
-	public void tick(){
-
-	}
-
 	public enum State {
 		GameStart,
 		ElectDealer,
