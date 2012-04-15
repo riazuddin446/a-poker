@@ -501,7 +501,7 @@ public class PGame extends BaseGameActivity{
 			//this.mGameController.players.put(i, degubPlayer);
 		}
 
-		this.mGameController.setOwner(mGameController.players.get(0));
+		this.mGameController.setOwner(0);
 
 		System.out.println("Players.size(): "+this.mGameController.players.size());
 	}

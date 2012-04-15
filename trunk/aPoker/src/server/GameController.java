@@ -7,7 +7,6 @@ import java.util.Vector;
 import logic.Card;
 import logic.HoldemHandEvaluator;
 import logic.Player;
-import logic.PokerHandEvaluator;
 import logic.PokerHandStrength;
 import logic.Player.Action;
 import server.Table.BettingRound;
@@ -46,7 +45,7 @@ public class GameController {
 	private boolean restart;
 
 	//Apuntador hacia el dueño de la partida
-	private Player owner;
+	private int owner;
 
 	// ===========================================================
 	// Constructors
@@ -152,11 +151,11 @@ public class GameController {
 		this.restart = restart;
 	}
 
-	public Player getOwner() {
+	public int getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Player owner) {
+	public void setOwner(int owner) {
 		this.owner = owner;
 	}
 
@@ -217,7 +216,7 @@ public class GameController {
 		if(!started)
 		{
 			boolean needNewOwner = false;
-			if(p == owner)
+			if(p == players.get(owner))
 				needNewOwner = true;
 
 			players.remove(p);
@@ -234,7 +233,11 @@ public class GameController {
 	{
 		Iterator it = players.entrySet().iterator();
 		if(it.hasNext())
-			owner = (Player)it.next();
+		{
+			//FIXME Buscar el int que apunte al jugador correctamente en la lista de players
+			Player tmp = (Player)it.next();
+			owner = tmp.id;
+		}
 	}
 
 	/**
@@ -987,58 +990,37 @@ public class GameController {
 
 	protected void stateEndRound(Table t)
 	{
-		//Count up current hand number
-		hand_no++;
-
-		t.deck.clearFillAndShuffle();
-		//t.deck.shuffle(); The fill method shuffles the card deck
-
-		//Reset round-related
-		t.communitycards.clear();
-
-		t.bet_amount = 0;
-		t.last_bet_amount = 0;
-		t.nomoreaction = false;
-
-		//Clear old pots and create initial main pot
-		t.pots.clear();
-		Table.Pot pot = t.new Pot(); //Inner class instantiation
-		pot.amount = 0;
-		pot.isFinal = false;
-		t.pots.add(pot);
-
-		//Reset player-related
-		for(int i=0; i<5; i++){
-			if(t.seats.get(i).occupied)
-			{
-				t.seats.get(i).in_round = true;
-				t.seats.get(i).showcards = false;
-				t.seats.get(i).bet = 0;
-
-				Player  p = t.seats.get(i).player;
-				p.holecards.clear();
-				p.resetLastAction();
-				p.stake_before = p.stake; //Remember stake before this hand
-			}
-		}
-
-		//Determine who is the next SB and next BB
-		boolean headsup_rule = (t.countPlayers() == 2);
-
-		if(headsup_rule)
+		HashMap<Integer, Integer> broken_players = new HashMap<Integer, Integer>();
+		
+		//Lets look for broken players
+		for(int i=0; i<5; i++)
 		{
-			t.bb = t.getNextPlayer(t.dealer);
-			t.sb = t.getNextPlayer(t.bb);
+			if(!t.seats.get(i).occupied) //Skip not occupied seats
+				continue;
+			
+			Player p = t.seats.get(i).player;
+			
+			//Check if player has no stake left
+			if(p.stake == 0)
+				broken_players.put(p.stake_before, i);
 		}
-		else
+		
+		//Remove player in rigth order (sorted by stake_before)
+		for(int i=0; i<broken_players.size(); i++)
 		{
-			t.sb = t.getNextPlayer(t.dealer);
-			t.bb = t.getNextPlayer(t.sb);
+			int seat_num = broken_players.get(i);
+			
+			Player p = t.seats.get(seat_num).player;
+			
+			//TODO Tell player that he is out
+			
+			t.seats.get(seat_num).occupied = false;
 		}
-
-		//Player under the gun
-		t.currentPlayer = t.getNextPlayer(t.bb);
-		t.lastBetPlayer = t.currentPlayer;
+		
+		//Determine next dealer
+		t.dealer = t.getNextPlayer(t.dealer);
+		
+		t.scheduleState(State.NewRound, 2);
 	}
 
 	protected int handleTable(Table t)
