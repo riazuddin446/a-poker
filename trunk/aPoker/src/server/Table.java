@@ -36,7 +36,8 @@ public class Table {
 
 
 
-	public Table(){
+	public Table()
+	{
 
 	}
 
