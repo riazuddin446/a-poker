@@ -16,7 +16,7 @@ public class Table {
 
 	State state; //Estado de la mesa
 
-	HashMap<Integer, Seat> seats;
+	public HashMap<Integer, Seat> seats;
 	int dealer, sb, bb;
 	int currentPlayer;
 	int lastBetPlayer;
