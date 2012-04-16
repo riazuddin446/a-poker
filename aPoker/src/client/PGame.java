@@ -1,5 +1,6 @@
 package client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import logic.Card;
@@ -73,7 +74,15 @@ public class PGame extends BaseGameActivity{
 	private Font mFont;
 	private Texture mFontTexture;
 
+	//Game related
+	private ChangeableText mTableStateText;
+	private ChangeableText mTableBettingRoundText;
+
 	//Player related
+	private ArrayList<ChangeableText> mPlayerNamesText;
+	private ArrayList<ChangeableText> mPlayerStakesText;
+	private ArrayList<ChangeableText> mSeatBetText;
+
 	private ChangeableText mPlayerNameText;
 	private ChangeableText mPlayerStakeText;
 
@@ -184,20 +193,44 @@ public class PGame extends BaseGameActivity{
 		this.addButtons();
 		this.addSeats();
 
-		this.addComunnityCard(Card.CLUB_ACE, 262, 175);
-		this.addComunnityCard(Card.DIAMOND_THREE, 262 + 50+5, 175);
-		this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*2, 175); 
+		//this.addComunnityCard(Card.CLUB_ACE, 262, 175);
+		//this.addComunnityCard(Card.DIAMOND_THREE, 262 + 50+5, 175);
+		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*2, 175); 
 		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*3, 175); 
 		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
 
-		this.initializeGame();
+		this.initializeGameController();
 
 		this.addDebugPlayers();
 
+		this.mPlayerNamesText = new ArrayList<ChangeableText>();
+		for(int i=0; i<this.mGameController.table.seats.size(); i++)
+		{
+			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, this.mGameController.table.seats.get(i).player.name);
+			this.mPlayerNamesText.add(aux);
+			mMainScene.attachChild(aux);
+		}
+
+		this.mPlayerStakesText = new ArrayList<ChangeableText>();
+		for(int i=0; i<this.mGameController.table.seats.size(); i++)
+		{
+			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).player.stake));
+			this.mPlayerStakesText.add(aux);
+			mMainScene.attachChild(aux);
+		}
+
+		this.mSeatBetText = new ArrayList<ChangeableText>();
+		for(int i=0; i<this.mGameController.table.seats.size(); i++)
+		{
+			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).bet));
+			this.mSeatBetText.add(aux);
+			mMainScene.attachChild(aux);
+		}
+
 		//Adding the player name to the screen
-		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
-		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
-		mMainScene.attachChild(mPlayerNameText);
+		//this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
+		//this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
+		//mMainScene.attachChild(mPlayerNameText);
 
 		//Adding the chip counter
 		this.mPlayerStakeText = new ChangeableText(10, 10, this.mFont, Integer.toString(mGameController.players.get(mGameController.getOwner()).stake));
@@ -232,10 +265,10 @@ public class PGame extends BaseGameActivity{
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler)
 			{
-				if(mGameController.getOwner() == 4)
+				if(mGameController.getOwner() == 5)
 					mGameController.setOwner(0);
 				else
-					mGameController.setOwner(mGameController.getOwner()+1);
+					mGameController.setOwner(mGameController.getOwner());
 
 				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
 
@@ -252,10 +285,10 @@ public class PGame extends BaseGameActivity{
 	@Override
 	public void onLoadComplete()
 	{	
-		System.out.println(mGameController.players.get(0).name);
-		Player aux = mGameController.players.get(0);
-		aux.name = "Palomo!";
-		System.out.println(mGameController.players.get(0).name);
+//		System.out.println(mGameController.players.get(0).name);
+//		Player aux = mGameController.players.get(0);
+//		aux.name = "Palomo!";
+//		System.out.println(mGameController.players.get(0).name);
 
 		//this.gameLoop();
 	}
@@ -427,7 +460,7 @@ public class PGame extends BaseGameActivity{
 		this.mMainScene.registerTouchArea(sprite);
 	}
 
-	private void initializeGame()
+	private void initializeGameController()
 	{
 		mGameController = new GameController();
 		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
@@ -504,5 +537,10 @@ public class PGame extends BaseGameActivity{
 		this.mGameController.setOwner(0);
 
 		System.out.println("Players.size(): "+this.mGameController.players.size());
+	}
+
+	private void addPlayerRelated()
+	{
+
 	}
 }
