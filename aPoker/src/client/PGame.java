@@ -18,6 +18,7 @@ import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolic
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.background.SpriteBackground;
 import org.anddev.andengine.entity.sprite.Sprite;
+import org.anddev.andengine.entity.sprite.TiledSprite;
 import org.anddev.andengine.entity.text.ChangeableText;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.input.touch.TouchEvent;
@@ -28,6 +29,7 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
+import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import server.GameController;
@@ -63,13 +65,9 @@ public class PGame extends BaseGameActivity{
 	private BitmapTextureAtlas mCardDeckTextureAtlas;
 	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
 
-	//Seat
-	private BitmapTextureAtlas mSeatTextureAtlas;
-	private TextureRegion mSeatTextureRegion;
-	
-	//Current Seat
-	private BitmapTextureAtlas mCurrentSeatTextureAtlas;
-	private TextureRegion mCurrentSeatTextureRegion;
+	//Seat related
+	private BitmapTextureAtlas mSeatsTextureAtlas;
+	private TiledTextureRegion mSeatTextureRegion;
 
 	//Table related
 	private ChangeableText mBettingRoundText;
@@ -163,11 +161,9 @@ public class PGame extends BaseGameActivity{
 		}
 
 		//Load the texture of seats
-		this.mSeatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.mSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mSeatTextureAtlas, this,"seat.png", 0, 0);
+		this.mSeatsTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mSeatsTextureAtlas, this,"seat.png", 0, 0, 1, 2);
 		
-		this.mCurrentSeatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.mCurrentSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mSeatTextureAtlas, this,"current_seat_variation.png", 0, 0);
 
 		//Load the font for texts
 		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -177,7 +173,7 @@ public class PGame extends BaseGameActivity{
 		mEngine.getTextureManager().loadTextures(mBackgroundTextureAtlas,
 				this.mButtonsTextureAtlas,
 				this.mCardDeckTextureAtlas,
-				this.mSeatTextureAtlas,
+				this.mSeatsTextureAtlas,
 				this.mFontTexture);
 
 		this.mEngine.getFontManager().loadFont(this.mFont);
@@ -278,7 +274,7 @@ public class PGame extends BaseGameActivity{
 					mGameController.setOwner(mGameController.getOwner()+1);
 
 				System.out.println(mGameController.getOwner());
-				
+
 				System.out.println(mGameController.players.get(mGameController.getOwner()).name);
 
 				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
@@ -310,14 +306,7 @@ public class PGame extends BaseGameActivity{
 
 	private void addSeat(final int pX, final int pY)
 	{
-		final Sprite sprite = new Sprite(pX, pY, this.mSeatTextureRegion);
-
-		this.mMainScene.attachChild(sprite);
-	}
-	
-	private void addCurrentSeat(final int pX, final int pY)
-	{
-		final Sprite sprite = new Sprite(pX, pY, this.mCurrentSeatTextureRegion);
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.mSeatTextureRegion);
 
 		this.mMainScene.attachChild(sprite);
 	}
@@ -328,7 +317,7 @@ public class PGame extends BaseGameActivity{
 		this.addSeat(15, 120 + 150); //Bottom left
 		this.addSeat(getCameraWidth()-15-150, 120); //Top rigth
 		this.addSeat(getCameraWidth()-15-150, 120 + 150); //Bottom rigth
-		this.addCurrentSeat(getCameraWidth()/2-75, getCameraHeight()-85);
+		this.addSeat(getCameraWidth()/2-75, getCameraHeight()-85);
 	}
 
 	// ===========================================================
@@ -349,7 +338,7 @@ public class PGame extends BaseGameActivity{
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	
+
 	private void addDebugPlayers()
 	{
 		for(int i=0; i<5; i++)
@@ -358,9 +347,9 @@ public class PGame extends BaseGameActivity{
 			Player debugPlayer = new Player("Asier"+i, i);
 			this.mGameController.addPlayer(i, debugPlayer);
 		}
-	
+
 		this.mGameController.setOwner(0);
-	
+
 		System.out.println("Players.size(): "+this.mGameController.players.size());
 	}
 
