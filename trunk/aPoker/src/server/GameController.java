@@ -193,13 +193,15 @@ public class GameController {
 	 * 
 	 * @param p Player to be added
 	 */
-	public void addPlayer(Player p)
+	public void addPlayer(int i, Player p)
 	{
 		//If the game is not started of full and if the player is not already ingame
 		if(!started && players.size() != max_players && !isPlayer(p))
 		{
 			p.setStake(player_stakes);
-			players.put(players.size(), p);
+			players.put(i, p);
+			
+			table.addPlayerToSeat(p);
 		}
 		else
 			System.out.println("Can't add the player: " + p.getPlayerName());

@@ -12,33 +12,35 @@ import android.text.format.Time;
 public class Table {
 
 	public Deck deck;
-	CommunityCards communitycards;
+	public CommunityCards communitycards;
 
-	State state; //Estado de la mesa
+	public State state; //Estado de la mesa
 
 	public HashMap<Integer, Seat> seats;
-	int dealer, sb, bb;
-	int currentPlayer;
-	int lastBetPlayer;
+	public int dealer, sb, bb;
+	public int currentPlayer;
+	public int lastBetPlayer;
 
-	BettingRound betround;
+	public BettingRound betround;
 
-	int bet_amount;
-	int last_bet_amount;
-	Vector<Pot> pots;
+	public int bet_amount;
+	public int last_bet_amount;
+	
+	public Vector<Pot> pots;
 
-	boolean nomoreaction;
+	public boolean nomoreaction;
 
 	Time delay_start; //FIXME
 	int delay; //FIXME
 
 	Time timeout_start; //FIXME
 
-
-
 	public Table()
 	{
-
+		deck = new Deck();
+		communitycards = new CommunityCards();
+		seats = new HashMap<Integer, Seat>();
+		pots = new Vector<Pot>();
 	}
 
 	public int getNextPlayer(int i)
@@ -306,7 +308,8 @@ public class Table {
 		River;
 	}
 
-	public class Seat {
+	public class Seat
+	{
 		public boolean occupied;
 		public int seat_no;
 		public Player player;
@@ -315,10 +318,24 @@ public class Table {
 		public boolean showcards; //Does the player want to show cards?
 	}
 
-	public class Pot {
+	public class Pot
+	{
 		public int amount;
 		public Vector<Integer> vsteats;
 		public boolean isFinal;
+	}
+
+	public void addPlayerToSeat(Player p)
+	{
+		Seat newSeat = new Seat();
+		newSeat.occupied = true;
+		newSeat.seat_no = seats.size()-1;
+		newSeat.player = p;
+		newSeat.bet = 0;
+		newSeat.in_round = false;
+		newSeat.showcards = false;
+		
+		seats.put(p.id, newSeat);
 	}
 
 }

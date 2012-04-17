@@ -66,6 +66,10 @@ public class PGame extends BaseGameActivity{
 	//Seat
 	private BitmapTextureAtlas mSeatTextureAtlas;
 	private TextureRegion mSeatTextureRegion;
+	
+	//Current Seat
+	private BitmapTextureAtlas mCurrentSeatTextureAtlas;
+	private TextureRegion mCurrentSeatTextureRegion;
 
 	//Table related
 	private ChangeableText mBettingRoundText;
@@ -139,7 +143,7 @@ public class PGame extends BaseGameActivity{
 		this.mBackgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mBackgroundTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBackgroundTextureAtlas, this,"game_table_background.png", 0, 0);
 
-		// Extract and load the textures of each button
+		//Extract and load the textures of each button
 		this.mButtonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mButtonsTextureRegionMap = new HashMap<Button, TextureRegion>();
 		int i = 0;
@@ -161,6 +165,9 @@ public class PGame extends BaseGameActivity{
 		//Load the texture of seats
 		this.mSeatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mSeatTextureAtlas, this,"seat.png", 0, 0);
+		
+		this.mCurrentSeatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mCurrentSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mSeatTextureAtlas, this,"current_seat_variation.png", 0, 0);
 
 		//Load the font for texts
 		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -228,9 +235,9 @@ public class PGame extends BaseGameActivity{
 		}
 
 		//Adding the player name to the screen
-		//this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
-		//this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
-		//mMainScene.attachChild(mPlayerNameText);
+		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
+		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
+		mMainScene.attachChild(mPlayerNameText);
 
 		//Adding the chip counter
 		this.mPlayerStakeText = new ChangeableText(10, 10, this.mFont, Integer.toString(mGameController.players.get(mGameController.getOwner()).stake));
@@ -265,10 +272,14 @@ public class PGame extends BaseGameActivity{
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler)
 			{
-				if(mGameController.getOwner() == 5)
+				if(mGameController.getOwner() == 4)
 					mGameController.setOwner(0);
 				else
-					mGameController.setOwner(mGameController.getOwner());
+					mGameController.setOwner(mGameController.getOwner()+1);
+
+				System.out.println(mGameController.getOwner());
+				
+				System.out.println(mGameController.players.get(mGameController.getOwner()).name);
 
 				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
 
@@ -285,12 +296,39 @@ public class PGame extends BaseGameActivity{
 	@Override
 	public void onLoadComplete()
 	{	
-//		System.out.println(mGameController.players.get(0).name);
-//		Player aux = mGameController.players.get(0);
-//		aux.name = "Palomo!";
-//		System.out.println(mGameController.players.get(0).name);
+		//		System.out.println(mGameController.players.get(0).name);
+		//		Player aux = mGameController.players.get(0);
+		//		aux.name = "Palomo!";
+		//		System.out.println(mGameController.players.get(0).name);
 
 		//this.gameLoop();
+	}
+
+	// ===========================================================
+	// Methods
+	// ===========================================================
+
+	private void addSeat(final int pX, final int pY)
+	{
+		final Sprite sprite = new Sprite(pX, pY, this.mSeatTextureRegion);
+
+		this.mMainScene.attachChild(sprite);
+	}
+	
+	private void addCurrentSeat(final int pX, final int pY)
+	{
+		final Sprite sprite = new Sprite(pX, pY, this.mCurrentSeatTextureRegion);
+
+		this.mMainScene.attachChild(sprite);
+	}
+
+	private void addSeats()
+	{
+		this.addSeat(15, 120); //Top left
+		this.addSeat(15, 120 + 150); //Bottom left
+		this.addSeat(getCameraWidth()-15-150, 120); //Top rigth
+		this.addSeat(getCameraWidth()-15-150, 120 + 150); //Bottom rigth
+		this.addCurrentSeat(getCameraWidth()/2-75, getCameraHeight()-85);
 	}
 
 	// ===========================================================
@@ -308,19 +346,22 @@ public class PGame extends BaseGameActivity{
 		sprite.setScale(0.7f);
 	}
 
-	private void addSeat(final int pX, final int pY)
+	// ===========================================================
+	// Methods
+	// ===========================================================
+	
+	private void addDebugPlayers()
 	{
-		final Sprite sprite = new Sprite(pX, pY, this.mSeatTextureRegion);
-
-		this.mMainScene.attachChild(sprite);
-	}
-
-	private void addSeats()
-	{
-		this.addSeat(15, 120);
-		this.addSeat(15, 120 + 150);
-		this.addSeat(getCameraWidth()-15-150, 120);
-		this.addSeat(getCameraWidth()-15-150, 120 + 150);
+		for(int i=0; i<5; i++)
+		{
+			//Add debug player
+			Player debugPlayer = new Player("Asier"+i, i);
+			this.mGameController.addPlayer(i, debugPlayer);
+		}
+	
+		this.mGameController.setOwner(0);
+	
+		System.out.println("Players.size(): "+this.mGameController.players.size());
 	}
 
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
@@ -518,29 +559,5 @@ public class PGame extends BaseGameActivity{
 		auxPlayer.setNextAction(auxSchedAction);
 
 		this.mGameController.players.put(pid, auxPlayer);
-	}
-
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
-
-	private void addDebugPlayers()
-	{
-		for(int i=0; i<5; i++)
-		{
-			//Add debug player
-			Player debugPlayer = new Player("Asier"+i, this.mGameController.getPlayerStakes());
-			this.mGameController.addPlayer(debugPlayer);
-			//this.mGameController.players.put(i, degubPlayer);
-		}
-
-		this.mGameController.setOwner(0);
-
-		System.out.println("Players.size(): "+this.mGameController.players.size());
-	}
-
-	private void addPlayerRelated()
-	{
-
 	}
 }
