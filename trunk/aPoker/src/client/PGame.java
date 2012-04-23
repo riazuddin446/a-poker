@@ -143,17 +143,17 @@ public class PGame extends BaseGameActivity
 		seats_pX.put(1, 15);
 		seats_pY.put(1, 270);
 
+		//Center
+		seats_pX.put(2, getCameraWidth()/2-75);
+		seats_pY.put(2, getCameraHeight()-85);
+
 		//Top rigth
-		seats_pX.put(2, getCameraWidth()-165);
-		seats_pY.put(2, 120);
+		seats_pX.put(3, getCameraWidth()-165);
+		seats_pY.put(3, 120);
 
 		//Bottom rigth
-		seats_pX.put(3, getCameraWidth()-165);
-		seats_pY.put(3, 270);
-
-		//Center
-		seats_pX.put(4, getCameraWidth()/2-75);
-		seats_pY.put(4, getCameraHeight()-85);
+		seats_pX.put(4, getCameraWidth()-165);
+		seats_pY.put(4, 270);
 
 		return engine;
 	}
@@ -193,7 +193,7 @@ public class PGame extends BaseGameActivity
 
 		//Load the font for texts
 		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 28, true, Color.BLACK);
+		this.mFont = new Font(this.mFontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
 
 		//Load the textures into the engine
 		mEngine.getTextureManager().loadTextures(mBackgroundTextureAtlas,
@@ -228,7 +228,7 @@ public class PGame extends BaseGameActivity
 		this.mPlayerNamesText = new HashMap<Integer, ChangeableText>();
 		for(int i=0; i<this.mGameController.table.seats.size(); i++)
 		{
-			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, this.mGameController.table.seats.get(i).player.name);
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, this.mFont, this.mGameController.table.seats.get(i).player.name);
 			this.mPlayerNamesText.put(i, aux);
 			mMainScene.attachChild(aux);
 		}
@@ -236,7 +236,7 @@ public class PGame extends BaseGameActivity
 		this.mPlayerStakesText = new HashMap<Integer, ChangeableText>();
 		for(int i=0; i<this.mGameController.table.seats.size(); i++)
 		{
-			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).player.stake));
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).player.stake));
 			this.mPlayerStakesText.put(i, aux);
 			mMainScene.attachChild(aux);
 		}
@@ -244,19 +244,10 @@ public class PGame extends BaseGameActivity
 		this.mSeatBetText = new HashMap<Integer, ChangeableText>();
 		for(int i=0; i<this.mGameController.table.seats.size(); i++)
 		{
-			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).bet));
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).bet));
 			this.mSeatBetText.put(i, aux);
 			mMainScene.attachChild(aux);
 		}
-
-		//Adding the player name to the screen
-		this.mPlayerNameText =  new ChangeableText(0, 0, this.mFont, mGameController.players.get(mGameController.getOwner()).name);
-		this.mPlayerNameText.setPosition(getCameraWidth()/2 - mPlayerNameText.getWidth()/2, getCameraHeight() - mPlayerNameText.getHeight());
-		mMainScene.attachChild(mPlayerNameText);
-
-		//Adding the chip counter
-		this.mPlayerStakeText = new ChangeableText(10, 10, this.mFont, Integer.toString(mGameController.players.get(mGameController.getOwner()).stake));
-		mMainScene.attachChild(mPlayerStakeText);
 
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
@@ -339,8 +330,8 @@ public class PGame extends BaseGameActivity
 	}
 
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
-	private void addButtons() {
-
+	private void addButtons()
+	{
 		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
 		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
 		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
@@ -371,6 +362,7 @@ public class PGame extends BaseGameActivity
 		this.mGameController.setOwner(0);
 
 		System.out.println("Players.size(): "+this.mGameController.players.size());
+		System.out.println("Seats.size(): "+this.mGameController.table.seats.size());
 	}
 
 	private void addSeat(final int pX, final int pY, final int pos)

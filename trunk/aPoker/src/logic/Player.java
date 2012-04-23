@@ -34,14 +34,8 @@ public class Player {
 		this.name = name;
 	}
 
-	public Player (String name, int chips){
+	public Player (String name, int id){
 		this.name = name;
-		this.stake = chips;
-	}
-
-	public Player (String name, int chips, int id){
-		this.name = name;
-		this.stake = chips;
 		this.id = id;
 	}
 
