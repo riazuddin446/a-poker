@@ -2,6 +2,7 @@ package client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 import logic.Card;
 import logic.Player;
@@ -37,11 +38,14 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
 
-public class PGame extends BaseGameActivity{
-
+public class PGame extends BaseGameActivity
+{
 	// ===========================================================
 	// Constants
 	// ===========================================================
+
+	private HashMap<Integer, Integer> seats_pX = new HashMap<Integer, Integer>();
+	private HashMap<Integer, Integer> seats_pY = new HashMap<Integer, Integer>();
 
 	// ===========================================================
 	// Fields
@@ -66,8 +70,9 @@ public class PGame extends BaseGameActivity{
 	private HashMap<Card, TextureRegion> mCardTotextureRegionMap;
 
 	//Seat related
-	private BitmapTextureAtlas mSeatsTextureAtlas;
+	private BitmapTextureAtlas mSeatTextureAtlas;
 	private TiledTextureRegion mSeatTextureRegion;
+	private HashMap<Integer, TiledSprite> mSeatSprites;
 
 	//Table related
 	private ChangeableText mBettingRoundText;
@@ -81,9 +86,9 @@ public class PGame extends BaseGameActivity{
 	private ChangeableText mTableBettingRoundText;
 
 	//Player related
-	private ArrayList<ChangeableText> mPlayerNamesText;
-	private ArrayList<ChangeableText> mPlayerStakesText;
-	private ArrayList<ChangeableText> mSeatBetText;
+	private HashMap<Integer, ChangeableText> mPlayerNamesText;
+	private HashMap<Integer, ChangeableText> mPlayerStakesText;
+	private HashMap<Integer, ChangeableText> mSeatBetText;
 
 	private ChangeableText mPlayerNameText;
 	private ChangeableText mPlayerStakeText;
@@ -119,8 +124,8 @@ public class PGame extends BaseGameActivity{
 	// ===========================================================
 
 	@Override
-	public Engine onLoadEngine() {
-
+	public Engine onLoadEngine()
+	{
 		final Display display = getWindowManager().getDefaultDisplay();
 		this.setCameraWidth(display.getWidth());
 		this.setCameraHeight(display.getHeight());
@@ -128,12 +133,33 @@ public class PGame extends BaseGameActivity{
 		this.mCamera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
 		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.mCamera));
 
+		//Set the reference position of the Seats in the view
+
+		//Top left
+		seats_pX.put(0, 15);
+		seats_pY.put(0, 120);
+
+		//Bottom left
+		seats_pX.put(1, 15);
+		seats_pY.put(1, 270);
+
+		//Top rigth
+		seats_pX.put(2, getCameraWidth()-165);
+		seats_pY.put(2, 120);
+
+		//Bottom rigth
+		seats_pX.put(3, getCameraWidth()-165);
+		seats_pY.put(3, 270);
+
+		//Center
+		seats_pX.put(4, getCameraWidth()/2-75);
+		seats_pY.put(4, getCameraHeight()-85);
+
 		return engine;
 	}
 
-	@Override
-	public void onLoadResources() {
-
+	public void onLoadResources()
+	{
 		//Set the path for graphics
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
@@ -160,10 +186,10 @@ public class PGame extends BaseGameActivity{
 			this.mCardTotextureRegionMap.put(card, cardTextureRegion);
 		}
 
-		//Load the texture of seats
-		this.mSeatsTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.mSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mSeatsTextureAtlas, this,"seat.png", 0, 0, 1, 2);
-		
+		//Load the texture for seats
+		this.mSeatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mSeatTextureAtlas, this,"seat.png", 0, 0, 1, 2);
+
 
 		//Load the font for texts
 		this.mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -173,14 +199,12 @@ public class PGame extends BaseGameActivity{
 		mEngine.getTextureManager().loadTextures(mBackgroundTextureAtlas,
 				this.mButtonsTextureAtlas,
 				this.mCardDeckTextureAtlas,
-				this.mSeatsTextureAtlas,
+				this.mSeatTextureAtlas,
 				this.mFontTexture);
 
 		this.mEngine.getFontManager().loadFont(this.mFont);
-
 	}
 
-	@Override
 	public Scene onLoadScene()
 	{
 		this.mEngine.registerUpdateHandler(new FPSLogger());
@@ -194,39 +218,34 @@ public class PGame extends BaseGameActivity{
 		this.mMainScene.setBackground(backgroundSpriteBackgroudn);
 
 		this.addButtons();
-		this.addSeats();
 
-		//this.addComunnityCard(Card.CLUB_ACE, 262, 175);
-		//this.addComunnityCard(Card.DIAMOND_THREE, 262 + 50+5, 175);
-		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*2, 175); 
-		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*3, 175); 
-		//this.addComunnityCard(Card.CLUB_EIGHT, 262 + (50+5)*4, 175); 
+		this.addSeats();
 
 		this.initializeGameController();
 
 		this.addDebugPlayers();
 
-		this.mPlayerNamesText = new ArrayList<ChangeableText>();
+		this.mPlayerNamesText = new HashMap<Integer, ChangeableText>();
 		for(int i=0; i<this.mGameController.table.seats.size(); i++)
 		{
 			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, this.mGameController.table.seats.get(i).player.name);
-			this.mPlayerNamesText.add(aux);
+			this.mPlayerNamesText.put(i, aux);
 			mMainScene.attachChild(aux);
 		}
 
-		this.mPlayerStakesText = new ArrayList<ChangeableText>();
+		this.mPlayerStakesText = new HashMap<Integer, ChangeableText>();
 		for(int i=0; i<this.mGameController.table.seats.size(); i++)
 		{
 			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).player.stake));
-			this.mPlayerStakesText.add(aux);
+			this.mPlayerStakesText.put(i, aux);
 			mMainScene.attachChild(aux);
 		}
 
-		this.mSeatBetText = new ArrayList<ChangeableText>();
+		this.mSeatBetText = new HashMap<Integer, ChangeableText>();
 		for(int i=0; i<this.mGameController.table.seats.size(); i++)
 		{
 			ChangeableText aux = new ChangeableText(i*10, i*10, this.mFont, Integer.toString(this.mGameController.table.seats.get(i).bet));
-			this.mSeatBetText.add(aux);
+			this.mSeatBetText.put(i, aux);
 			mMainScene.attachChild(aux);
 		}
 
@@ -264,25 +283,30 @@ public class PGame extends BaseGameActivity{
 			}
 		});
 
-		this.mMainScene.registerUpdateHandler(new TimerHandler(5f, true, new ITimerCallback() {
-			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler)
-			{
-				if(mGameController.getOwner() == 4)
-					mGameController.setOwner(0);
-				else
-					mGameController.setOwner(mGameController.getOwner()+1);
-
-				System.out.println(mGameController.getOwner());
-
-				System.out.println(mGameController.players.get(mGameController.getOwner()).name);
-
-				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
-
-				System.out.println("Owner: "+mGameController.getOwner()+" Name: "+mPlayerNameText.getText());
-			}
-
-		}));
+		//		this.mMainScene.registerUpdateHandler(new TimerHandler(5f, true, new ITimerCallback() {
+		//			@Override
+		//			public void onTimePassed(final TimerHandler pTimerHandler)
+		//			{
+		//				if(mGameController.getOwner() == 4)
+		//					mGameController.setOwner(0);
+		//				else
+		//					mGameController.setOwner(mGameController.getOwner()+1);
+		//
+		//				System.out.println(mGameController.getOwner());
+		//
+		//				System.out.println(mGameController.players.get(mGameController.getOwner()).name);
+		//
+		//				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
+		//
+		//				System.out.println("Owner: "+mGameController.getOwner()+" Name: "+mPlayerNameText.getText());
+		//
+		//				for(int i=0; i<mSeatSprites.size(); i++)
+		//				{
+		//					mSeatSprites.get(i).nextTile();
+		//				}
+		//			}
+		//
+		//		}));
 
 		this.mMainScene.setTouchAreaBindingEnabled(true);
 
@@ -304,40 +328,36 @@ public class PGame extends BaseGameActivity{
 	// Methods
 	// ===========================================================
 
-	private void addSeat(final int pX, final int pY)
+	private void initializeGameController()
 	{
-		final TiledSprite sprite = new TiledSprite(pX, pY, this.mSeatTextureRegion);
+		mGameController = new GameController();
+		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
+		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
+		mGameController.setPlayerStakes(4000);
+		mGameController.setRestart(true);
+		mGameController.setOwner(-1);
+	}
 
-		this.mMainScene.attachChild(sprite);
+	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
+	private void addButtons() {
+
+		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
+		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
+		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
+		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
+		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
+
 	}
 
 	private void addSeats()
 	{
-		this.addSeat(15, 120); //Top left
-		this.addSeat(15, 120 + 150); //Bottom left
-		this.addSeat(getCameraWidth()-15-150, 120); //Top rigth
-		this.addSeat(getCameraWidth()-15-150, 120 + 150); //Bottom rigth
-		this.addSeat(getCameraWidth()/2-75, getCameraHeight()-85);
+		mSeatSprites = new HashMap<Integer, TiledSprite>();
+
+		for(int i=0; i<5; i++)
+		{
+			this.addSeat(seats_pX.get(i), seats_pY.get(i), i);
+		}
 	}
-
-	// ===========================================================
-	// Methods
-	// ===========================================================
-
-
-
-	private void addComunnityCard(final Card pCard, final int pX, final int pY) 
-	{
-		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
-
-		this.mMainScene.attachChild(sprite);
-
-		sprite.setScale(0.7f);
-	}
-
-	// ===========================================================
-	// Methods
-	// ===========================================================
 
 	private void addDebugPlayers()
 	{
@@ -353,15 +373,13 @@ public class PGame extends BaseGameActivity{
 		System.out.println("Players.size(): "+this.mGameController.players.size());
 	}
 
-	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
-	private void addButtons() {
+	private void addSeat(final int pX, final int pY, final int pos)
+	{
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.mSeatTextureRegion);
 
-		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
-		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
-		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
-		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
-		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
+		this.mMainScene.attachChild(sprite);
 
+		mSeatSprites.put(pos, sprite);
 	}
 
 	private void addFoldButton(final int pX, final int pY){
@@ -490,14 +508,13 @@ public class PGame extends BaseGameActivity{
 		this.mMainScene.registerTouchArea(sprite);
 	}
 
-	private void initializeGameController()
+	private void addComunnityCard(final Card pCard, final int pX, final int pY) 
 	{
-		mGameController = new GameController();
-		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
-		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
-		mGameController.setPlayerStakes(4000);
-		mGameController.setRestart(true);
-		mGameController.setOwner(-1);
+		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
+
+		this.mMainScene.attachChild(sprite);
+
+		sprite.setScale(0.7f);
 	}
 
 	private void gameLoop()
@@ -549,4 +566,7 @@ public class PGame extends BaseGameActivity{
 
 		this.mGameController.players.put(pid, auxPlayer);
 	}
+
+
+
 }
