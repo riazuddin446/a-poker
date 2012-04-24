@@ -222,7 +222,12 @@ public class PGame extends BaseGameActivity
 
 		this.initializeGameController();
 
-		mSeatSprites = new HashMap<Integer, TiledSprite>();
+		mCommunityCards = new HashMap<Integer, Sprite>();
+		for(int i=0; i<5; i++)
+		{
+			Sprite aux = null;
+			mCommunityCards.put(i, aux);
+		}
 
 		this.mBettingRoundText = new ChangeableText(0, 30, this.mFont, "Betting round: " + this.mGameController.table.betround.name());
 		mMainScene.attachChild(mBettingRoundText);
@@ -267,6 +272,31 @@ public class PGame extends BaseGameActivity
 
 			}
 		});
+
+		this.mMainScene.registerUpdateHandler(new TimerHandler(5f, true, new ITimerCallback() {
+
+			boolean flag = true;
+
+			@Override
+			public void onTimePassed(final TimerHandler pTimerHandler)
+			{
+				if(flag)
+				{
+					if(mGameController.table.communitycards.size() == 0)
+					{
+						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
+					}
+
+					flag = false;
+				}
+				else
+				{
+					mGameController.table.communitycards.clear();
+					flag = true;
+				}
+			}
+
+		}));
 
 		//FIXME Hacer tick cuando sea necesario
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
@@ -330,6 +360,8 @@ public class PGame extends BaseGameActivity
 		{
 			this.addSeat(seats_pX.get(i), seats_pY.get(i), i);
 		}
+
+		System.out.println("SEATSPRITES.SIZE(): "+mSeatSprites.size());
 	}
 
 	private void addDebugPlayers()
@@ -538,9 +570,10 @@ public class PGame extends BaseGameActivity
 		}
 
 		//Draw current player indicator (seat)
-		for(int i=0; i<5; i++)
+		for(int i=0; i<mSeatSprites.size(); i++)
 		{
 			int owner = mGameController.getOwner();
+
 			if(i == owner)
 				mSeatSprites.get(i).setCurrentTileIndex(1);
 			else 
@@ -554,11 +587,15 @@ public class PGame extends BaseGameActivity
 		{
 			if(i<cmsize)
 			{
+				System.out.println("cmsize" + cmsize);
+				System.out.println("i" + i);
+
 				Sprite aux = mCommunityCards.get(i);
 				aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
+				aux.setScale(0.7f);
 				mMainScene.attachChild(aux);
 			}
-			else
+			else if(cmsize == 0)
 				mMainScene.detachChild(mCommunityCards.get(i));
 		}
 	}
