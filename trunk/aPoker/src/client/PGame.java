@@ -57,6 +57,10 @@ public class PGame extends BaseGameActivity
 	private Camera mCamera;
 	private Scene mMainScene;
 
+	//Font
+	private Font mFont;
+	private Texture mFontTexture;
+
 	//Background
 	private BitmapTextureAtlas mBackgroundTextureAtlas;
 	private TextureRegion mBackgroundTextureRegion;
@@ -77,21 +81,16 @@ public class PGame extends BaseGameActivity
 	//Table related
 	private ChangeableText mBettingRoundText;
 
-	//Font
-	private Font mFont;
-	private Texture mFontTexture;
-
 	//Game related
 	private ChangeableText mTableStateText;
-	private ChangeableText mTableBettingRoundText;
+
+	//Community Cards
+	private HashMap<Integer, Sprite> mCommunityCards;
 
 	//Player related
 	private HashMap<Integer, ChangeableText> mPlayerNamesText;
 	private HashMap<Integer, ChangeableText> mPlayerStakesText;
 	private HashMap<Integer, ChangeableText> mSeatBetText;
-
-	private ChangeableText mPlayerNameText;
-	private ChangeableText mPlayerStakeText;
 
 	GameController mGameController;
 
@@ -223,6 +222,14 @@ public class PGame extends BaseGameActivity
 
 		this.initializeGameController();
 
+		mSeatSprites = new HashMap<Integer, TiledSprite>();
+
+		this.mBettingRoundText = new ChangeableText(0, 30, this.mFont, "Betting round: " + this.mGameController.table.betround.name());
+		mMainScene.attachChild(mBettingRoundText);
+
+		this.mTableStateText = new ChangeableText(0, 0, this.mFont, "Table state: " + this.mGameController.table.state.name());
+		mMainScene.attachChild(mTableStateText);
+
 		this.addDebugPlayers();
 
 		this.mPlayerNamesText = new HashMap<Integer, ChangeableText>();
@@ -252,7 +259,7 @@ public class PGame extends BaseGameActivity
 		this.mMainScene.registerUpdateHandler(new IUpdateHandler() {
 
 			public void onUpdate(float pSecondsElapsed) {
-				//updateInterface();
+				updateInterface();
 			}
 
 			@Override
@@ -273,31 +280,6 @@ public class PGame extends BaseGameActivity
 
 			}
 		});
-
-		//		this.mMainScene.registerUpdateHandler(new TimerHandler(5f, true, new ITimerCallback() {
-		//			@Override
-		//			public void onTimePassed(final TimerHandler pTimerHandler)
-		//			{
-		//				if(mGameController.getOwner() == 4)
-		//					mGameController.setOwner(0);
-		//				else
-		//					mGameController.setOwner(mGameController.getOwner()+1);
-		//
-		//				System.out.println(mGameController.getOwner());
-		//
-		//				System.out.println(mGameController.players.get(mGameController.getOwner()).name);
-		//
-		//				mPlayerNameText.setText(mGameController.players.get(mGameController.getOwner()).name);
-		//
-		//				System.out.println("Owner: "+mGameController.getOwner()+" Name: "+mPlayerNameText.getText());
-		//
-		//				for(int i=0; i<mSeatSprites.size(); i++)
-		//				{
-		//					mSeatSprites.get(i).nextTile();
-		//				}
-		//			}
-		//
-		//		}));
 
 		this.mMainScene.setTouchAreaBindingEnabled(true);
 
@@ -531,7 +513,54 @@ public class PGame extends BaseGameActivity
 
 	private void updateInterface()
 	{
+		//Draw current game state
+		mTableStateText.setText(mGameController.table.state.name());
 
+		//Draw current game betting round
+		mBettingRoundText.setText(mGameController.table.betround.name());
+
+		//Draw player names
+		for(int i=0; i<mGameController.players.size(); i++)
+		{
+			mPlayerNamesText.get(i).setText(mGameController.players.get(i).getPlayerName());
+		}
+
+		//Draw player stakes
+		for(int i=0; i<mGameController.players.size(); i++)
+		{
+			mPlayerStakesText.get(i).setText(String.valueOf(mGameController.players.get(i).getStake()));
+		}
+
+		//Draw seat bet
+		for(int i=0; i<mGameController.players.size(); i++)
+		{
+			mSeatBetText.get(i).setText(String.valueOf(mGameController.table.seats.get(i).bet));
+		}
+
+		//Draw current player indicator (seat)
+		for(int i=0; i<5; i++)
+		{
+			int owner = mGameController.getOwner();
+			if(i == owner)
+				mSeatSprites.get(i).setCurrentTileIndex(1);
+			else 
+				mSeatSprites.get(i).setCurrentTileIndex(0);
+		}
+
+		//Draw Community cards
+		ArrayList<Card> cmcards = mGameController.table.communitycards.cards;
+		int cmsize = mGameController.table.communitycards.size();
+		for(int i=0; i<5;i++)
+		{
+			if(i<cmsize)
+			{
+				Sprite aux = mCommunityCards.get(i);
+				aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
+				mMainScene.attachChild(aux);
+			}
+			else
+				mMainScene.detachChild(mCommunityCards.get(i));
+		}
 	}
 
 	/**

@@ -35,7 +35,7 @@ public class GameController {
 
 	private int timeout; //Tiempo disponible por los jugadores para cada turno
 
-	private Blind blind; //Ciegas
+	public Blind blind; //Ciegas
 
 	private int hand_no; //Numero de mano
 
