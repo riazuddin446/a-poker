@@ -25,7 +25,7 @@ public class Table {
 
 	public int bet_amount;
 	public int last_bet_amount;
-	
+
 	public Vector<Pot> pots;
 
 	public boolean nomoreaction;
@@ -41,6 +41,9 @@ public class Table {
 		communitycards = new CommunityCards();
 		seats = new HashMap<Integer, Seat>();
 		pots = new Vector<Pot>();
+
+		state = State.GameStart;
+		betround = BettingRound.Preflop;
 	}
 
 	public int getNextPlayer(int i)
@@ -334,7 +337,7 @@ public class Table {
 		newSeat.bet = 0;
 		newSeat.in_round = false;
 		newSeat.showcards = false;
-		
+
 		seats.put(p.id, newSeat);
 	}
 
