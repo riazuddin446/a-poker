@@ -392,21 +392,30 @@ public class PGame extends BaseGameActivity
 			{
 				System.out.println("ADD SPRITE at pos: " + i);
 
-				Sprite aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
-				aux.setScale(0.7f);
-				mCommunityCards.add(i, aux);
+				System.out.println(mCommunityCards.get(i));
 
-				System.out.println("CARD TO BE ADDED: " + aux);
-				mMainScene.attachChild(mCommunityCards.get(i));
+				if(mCommunityCards.get(i) == null) //If the sprite is not created and attached yet
+				{
+					//Create new Sprite with the needed card texture
+					Sprite aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
+					aux.setScale(0.7f);
+
+					//Add it to the Array who saves the sprites of the Community Cards
+					mCommunityCards.add(i, aux);
+
+					//Attach it to the scene
+					System.out.println("CARD TO BE ATTACHED: " + aux);
+					mMainScene.attachChild(mCommunityCards.get(i));
+				}
 			}
 			else //Delete sprite
 			{
-				System.out.println("DELTE SPRITE at pos: " + i);
+				System.out.println("DELETE SPRITE at pos: " + i + " | Sprite: " + mCommunityCards.get(i));
 
-				Sprite aux = mCommunityCards.get(i);
-				System.out.println("CARD TO BE DELETED: " + aux);
+				Sprite aux2 = mCommunityCards.get(i);
+				System.out.println("CARD TO BE DETATTCHED: " + aux2);
 
-				if(aux != null)
+				if(aux2 != null)
 				{
 					System.out.println("Delete? " + mMainScene.detachChild(mCommunityCards.get(i)));
 					mCommunityCards.add(i, null);
