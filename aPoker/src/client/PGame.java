@@ -88,7 +88,7 @@ public class PGame extends BaseGameActivity
 	private ChangeableText mTableStateText;
 
 	//Community Cards
-	private ArrayList<Sprite> mCommunityCards;
+	private HashMap<Integer, Sprite> mCommunityCardsSprites;
 
 	//Player related
 	private HashMap<Integer, ChangeableText> mPlayerNamesText;
@@ -225,11 +225,11 @@ public class PGame extends BaseGameActivity
 
 		this.initializeGameController();
 
-		mCommunityCards = new ArrayList<Sprite>();
+		mCommunityCardsSprites = new HashMap<Integer, Sprite>();
 		for(int i=0; i<5; i++)
 		{
 			Sprite aux = null;
-			mCommunityCards.add(i, aux);
+			mCommunityCardsSprites.put(i, aux);
 		}
 
 		this.mBettingRoundText = new ChangeableText(0, 30, this.mFont, "Betting round: " + this.mGameController.table.betround.name());
@@ -392,33 +392,33 @@ public class PGame extends BaseGameActivity
 			{
 				System.out.println("ADD SPRITE at pos: " + i);
 
-				System.out.println(mCommunityCards.get(i));
+				System.out.println(mCommunityCardsSprites.get(i));
 
-				if(mCommunityCards.get(i) == null) //If the sprite is not created and attached yet
+				if(mCommunityCardsSprites.get(i) == null) //If the sprite is not created and attached yet
 				{
 					//Create new Sprite with the needed card texture
 					Sprite aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
 					aux.setScale(0.7f);
 
 					//Add it to the Array who saves the sprites of the Community Cards
-					mCommunityCards.add(i, aux);
+					mCommunityCardsSprites.put(i, aux);
 
 					//Attach it to the scene
 					System.out.println("CARD TO BE ATTACHED: " + aux);
-					mMainScene.attachChild(mCommunityCards.get(i));
+					mMainScene.attachChild(mCommunityCardsSprites.get(i));
 				}
 			}
 			else //Delete sprite
 			{
-				System.out.println("DELETE SPRITE at pos: " + i + " | Sprite: " + mCommunityCards.get(i));
+				System.out.println("DELETE SPRITE at pos: " + i + " | Sprite: " + mCommunityCardsSprites.get(i));
 
-				Sprite aux2 = mCommunityCards.get(i);
+				Sprite aux2 = mCommunityCardsSprites.get(i);
 				System.out.println("CARD TO BE DETATTCHED: " + aux2);
 
 				if(aux2 != null)
 				{
-					System.out.println("Delete? " + mMainScene.detachChild(mCommunityCards.get(i)));
-					mCommunityCards.add(i, null);
+					System.out.println("Delete? " + mMainScene.detachChild(mCommunityCardsSprites.get(i)));
+					mCommunityCardsSprites.put(i, null);
 				}
 			}
 		}
