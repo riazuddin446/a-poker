@@ -40,6 +40,9 @@ import android.view.Display;
 
 public class PGame extends BaseGameActivity
 {
+	boolean debugFlag = true;
+	Sprite debugSprite = null;
+
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -85,7 +88,7 @@ public class PGame extends BaseGameActivity
 	private ChangeableText mTableStateText;
 
 	//Community Cards
-	private HashMap<Integer, Sprite> mCommunityCards;
+	private ArrayList<Sprite> mCommunityCards;
 
 	//Player related
 	private HashMap<Integer, ChangeableText> mPlayerNamesText;
@@ -222,11 +225,11 @@ public class PGame extends BaseGameActivity
 
 		this.initializeGameController();
 
-		mCommunityCards = new HashMap<Integer, Sprite>();
+		mCommunityCards = new ArrayList<Sprite>();
 		for(int i=0; i<5; i++)
 		{
 			Sprite aux = null;
-			mCommunityCards.put(i, aux);
+			mCommunityCards.add(i, aux);
 		}
 
 		this.mBettingRoundText = new ChangeableText(0, 30, this.mFont, "Betting round: " + this.mGameController.table.betround.name());
@@ -280,8 +283,10 @@ public class PGame extends BaseGameActivity
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler)
 			{
+
 				if(flag)
 				{
+					System.out.println("SET FLOP");
 					if(mGameController.table.communitycards.size() == 0)
 					{
 						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
@@ -290,7 +295,8 @@ public class PGame extends BaseGameActivity
 					flag = false;
 				}
 				else
-				{
+				{					
+					System.out.println("CLEAR CARDS");
 					mGameController.table.communitycards.clear();
 					flag = true;
 				}
@@ -319,11 +325,6 @@ public class PGame extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		//		System.out.println(mGameController.players.get(0).name);
-		//		Player aux = mGameController.players.get(0);
-		//		aux.name = "Palomo!";
-		//		System.out.println(mGameController.players.get(0).name);
-
 		//this.gameLoop();
 	}
 
@@ -341,14 +342,78 @@ public class PGame extends BaseGameActivity
 		mGameController.setOwner(-1);
 	}
 
-	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
-	private void addButtons()
+	private void updateInterface()
 	{
-		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
-		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
-		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
-		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
-		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
+		//Draw current game state
+		mTableStateText.setText(mGameController.table.state.name());
+
+		//Draw current game betting round
+		mBettingRoundText.setText(mGameController.table.betround.name());
+
+		//Draw player names
+		for(int i=0; i<mGameController.players.size(); i++)
+		{
+			mPlayerNamesText.get(i).setText(mGameController.players.get(i).getPlayerName());
+		}
+
+		//Draw player stakes
+		for(int i=0; i<mGameController.players.size(); i++)
+		{
+			mPlayerStakesText.get(i).setText(String.valueOf(mGameController.players.get(i).getStake()));
+		}
+
+		//Draw seat bet
+		for(int i=0; i<mGameController.players.size(); i++)
+		{
+			mSeatBetText.get(i).setText(String.valueOf(mGameController.table.seats.get(i).bet));
+		}
+
+		//Draw current player indicator (seat)
+		for(int i=0; i<mSeatSprites.size(); i++)
+		{
+			int owner = mGameController.getOwner();
+
+			if(i == owner)
+				mSeatSprites.get(i).setCurrentTileIndex(1);
+			else 
+				mSeatSprites.get(i).setCurrentTileIndex(0);
+		}
+
+		//Draw/Undraw Community cards
+		ArrayList<Card> cmcards = mGameController.table.communitycards.cards; //Get community cards
+		int cmsize = mGameController.table.communitycards.size(); //Get the number of cards
+
+		System.out.println("CMSIZE: " + cmsize);
+
+
+		for(int i=0; i<5;i++)
+		{
+			if(i<cmsize) //Add sprite
+			{
+				System.out.println("ADD SPRITE at pos: " + i);
+
+				Sprite aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
+				aux.setScale(0.7f);
+				mCommunityCards.add(i, aux);
+
+				System.out.println("CARD TO BE ADDED: " + aux);
+				mMainScene.attachChild(mCommunityCards.get(i));
+			}
+			else //Delete sprite
+			{
+				System.out.println("DELTE SPRITE at pos: " + i);
+
+				Sprite aux = mCommunityCards.get(i);
+				System.out.println("CARD TO BE DELETED: " + aux);
+
+				if(aux != null)
+				{
+					System.out.println("Delete? " + mMainScene.detachChild(mCommunityCards.get(i)));
+					mCommunityCards.add(i, null);
+				}
+			}
+		}
+
 
 	}
 
@@ -386,6 +451,71 @@ public class PGame extends BaseGameActivity
 		this.mMainScene.attachChild(sprite);
 
 		mSeatSprites.put(pos, sprite);
+	}
+
+	private void addComunnityCard(final Card pCard, final int pX, final int pY) 
+	{
+		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
+
+		this.mMainScene.attachChild(sprite);
+
+		sprite.setScale(0.7f);
+	}
+
+	/**
+	 * Establece la acción que el jugador ha presionado
+	 * 
+	 * @param pid Id del jugador que realiza la acción (En nuestro caso el jugador actual)
+	 * @param action La acción que desea realizar el jugador
+	 * @param amount En caso necesario, la cantidad de fichas que gasta el jugador
+	 */
+	private void doSetAction(int pid, Player.Action action, int amount)
+	{
+		Player auxPlayer = this.mGameController.players.get(pid);
+
+		Player.SchedAction auxSchedAction = auxPlayer.new SchedAction();
+		auxSchedAction.valid = true;
+		auxSchedAction.action = action;
+		if(action == Action.Call || action == Action.Raise)
+		{
+			auxSchedAction.amount = amount;
+		} else
+			auxSchedAction.amount = 0;
+
+		auxPlayer.setNextAction(auxSchedAction);
+
+		this.mGameController.players.put(pid, auxPlayer);
+	}
+
+	private void gameLoop()
+	{
+		if(mGameController.tick() < 0)
+		{
+			//Replicate game if "restart" is set
+			if(mGameController.getRestart())
+			{
+				GameController newgame = new GameController();
+
+				newgame.setName(mGameController.getName());
+				newgame.setMaxPlayers(mGameController.getMaxPlayers());
+				newgame.setPlayerStakes(mGameController.getPlayerStakes());
+				newgame.setRestart(true);
+				newgame.setOwner(mGameController.getOwner());
+
+				mGameController = newgame;
+			}
+		}
+	}
+
+	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
+	private void addButtons()
+	{
+		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
+		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
+		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
+		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
+		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
+
 	}
 
 	private void addFoldButton(final int pX, final int pY){
@@ -512,117 +642,6 @@ public class PGame extends BaseGameActivity
 		};
 		this.mMainScene.attachChild(sprite);
 		this.mMainScene.registerTouchArea(sprite);
-	}
-
-	private void addComunnityCard(final Card pCard, final int pX, final int pY) 
-	{
-		final Sprite sprite = new Sprite(pX, pY, this.mCardTotextureRegionMap.get(pCard));
-
-		this.mMainScene.attachChild(sprite);
-
-		sprite.setScale(0.7f);
-	}
-
-	private void gameLoop()
-	{
-		if(mGameController.tick() < 0)
-		{
-			//Replicate game if "restart" is set
-			if(mGameController.getRestart())
-			{
-				GameController newgame = new GameController();
-
-				newgame.setName(mGameController.getName());
-				newgame.setMaxPlayers(mGameController.getMaxPlayers());
-				newgame.setPlayerStakes(mGameController.getPlayerStakes());
-				newgame.setRestart(true);
-				newgame.setOwner(mGameController.getOwner());
-
-				mGameController = newgame;
-			}
-		}
-	}
-
-	private void updateInterface()
-	{
-		//Draw current game state
-		mTableStateText.setText(mGameController.table.state.name());
-
-		//Draw current game betting round
-		mBettingRoundText.setText(mGameController.table.betround.name());
-
-		//Draw player names
-		for(int i=0; i<mGameController.players.size(); i++)
-		{
-			mPlayerNamesText.get(i).setText(mGameController.players.get(i).getPlayerName());
-		}
-
-		//Draw player stakes
-		for(int i=0; i<mGameController.players.size(); i++)
-		{
-			mPlayerStakesText.get(i).setText(String.valueOf(mGameController.players.get(i).getStake()));
-		}
-
-		//Draw seat bet
-		for(int i=0; i<mGameController.players.size(); i++)
-		{
-			mSeatBetText.get(i).setText(String.valueOf(mGameController.table.seats.get(i).bet));
-		}
-
-		//Draw current player indicator (seat)
-		for(int i=0; i<mSeatSprites.size(); i++)
-		{
-			int owner = mGameController.getOwner();
-
-			if(i == owner)
-				mSeatSprites.get(i).setCurrentTileIndex(1);
-			else 
-				mSeatSprites.get(i).setCurrentTileIndex(0);
-		}
-
-		//Draw Community cards
-		ArrayList<Card> cmcards = mGameController.table.communitycards.cards;
-		int cmsize = mGameController.table.communitycards.size();
-		for(int i=0; i<5;i++)
-		{
-			if(i<cmsize)
-			{
-				System.out.println("cmsize" + cmsize);
-				System.out.println("i" + i);
-
-				Sprite aux = mCommunityCards.get(i);
-				aux = new Sprite(262+55*i, 175, mCardTotextureRegionMap.get(cmcards.get(i)));
-				aux.setScale(0.7f);
-				mMainScene.attachChild(aux);
-			}
-			else if(cmsize == 0)
-				mMainScene.detachChild(mCommunityCards.get(i));
-		}
-	}
-
-	/**
-	 * Establece la acción que el jugador ha presionado
-	 * 
-	 * @param pid Id del jugador que realiza la acción (En nuestro caso el jugador actual)
-	 * @param action La acción que desea realizar el jugador
-	 * @param amount En caso necesario, la cantidad de fichas que gasta el jugador
-	 */
-	private void doSetAction(int pid, Player.Action action, int amount)
-	{
-		Player auxPlayer = this.mGameController.players.get(pid);
-
-		Player.SchedAction auxSchedAction = auxPlayer.new SchedAction();
-		auxSchedAction.valid = true;
-		auxSchedAction.action = action;
-		if(action == Action.Call || action == Action.Raise)
-		{
-			auxSchedAction.amount = amount;
-		} else
-			auxSchedAction.amount = 0;
-
-		auxPlayer.setNextAction(auxSchedAction);
-
-		this.mGameController.players.put(pid, auxPlayer);
 	}
 
 
