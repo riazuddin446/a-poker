@@ -276,15 +276,15 @@ public class PGame extends BaseGameActivity
 			}
 		});
 
-		this.mMainScene.registerUpdateHandler(new TimerHandler(5f, true, new ITimerCallback() {
+		this.mMainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
 
-			boolean flag = true;
+			int flag = 0;
 
 			@Override
 			public void onTimePassed(final TimerHandler pTimerHandler)
 			{
 
-				if(flag)
+				if(flag==0)
 				{
 					System.out.println("SET FLOP");
 					if(mGameController.table.communitycards.size() == 0)
@@ -292,13 +292,29 @@ public class PGame extends BaseGameActivity
 						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
 					}
 
-					flag = false;
+					flag = 1;
 				}
-				else
+				else if(flag==1)
+				{
+					System.out.println("SET TURN");
+
+					mGameController.table.communitycards.setTurn(Card.CLUB_ACE);
+
+					flag = 2;
+				}
+				else if(flag==2)
+				{
+					System.out.println("SET RIVER");
+
+					mGameController.table.communitycards.setRiver(Card.CLUB_ACE);
+
+					flag = 3;
+				}
+				else if(flag==3)
 				{					
 					System.out.println("CLEAR CARDS");
 					mGameController.table.communitycards.clear();
-					flag = true;
+					flag = 0;
 				}
 			}
 
@@ -373,26 +389,26 @@ public class PGame extends BaseGameActivity
 		{
 			int owner = mGameController.getOwner();
 
-			if(i == owner)
+			if(i == owner){
+				System.out.println("THE OWNER: " + i);
 				mSeatSprites.get(i).setCurrentTileIndex(1);
-			else 
+			}
+			else {
 				mSeatSprites.get(i).setCurrentTileIndex(0);
+			}
 		}
 
 		//Draw/Undraw Community cards
 		ArrayList<Card> cmcards = mGameController.table.communitycards.cards; //Get community cards
 		int cmsize = mGameController.table.communitycards.size(); //Get the number of cards
 
-		System.out.println("CMSIZE: " + cmsize);
-
-
 		for(int i=0; i<5;i++)
 		{
 			if(i<cmsize) //Add sprite
 			{
-				System.out.println("ADD SPRITE at pos: " + i);
+				//System.out.println("ADD SPRITE at pos: " + i);
 
-				System.out.println(mCommunityCardsSprites.get(i));
+				//System.out.println(mCommunityCardsSprites.get(i));
 
 				if(mCommunityCardsSprites.get(i) == null) //If the sprite is not created and attached yet
 				{
@@ -404,18 +420,15 @@ public class PGame extends BaseGameActivity
 					mCommunityCardsSprites.put(i, aux);
 
 					//Attach it to the scene
-					System.out.println("CARD TO BE ATTACHED: " + aux);
+					//System.out.println("CARD TO BE ATTACHED: " + aux);
 					mMainScene.attachChild(mCommunityCardsSprites.get(i));
 				}
 			}
 			else //Delete sprite
 			{
-				System.out.println("DELETE SPRITE at pos: " + i + " | Sprite: " + mCommunityCardsSprites.get(i));
+				//System.out.println("DELETE SPRITE at pos: " + i + " | Sprite: " + mCommunityCardsSprites.get(i));
 
-				Sprite aux2 = mCommunityCardsSprites.get(i);
-				System.out.println("CARD TO BE DETATTCHED: " + aux2);
-
-				if(aux2 != null)
+				if(mCommunityCardsSprites.get(i) != null)
 				{
 					System.out.println("Delete? " + mMainScene.detachChild(mCommunityCardsSprites.get(i)));
 					mCommunityCardsSprites.put(i, null);
@@ -447,7 +460,7 @@ public class PGame extends BaseGameActivity
 			this.mGameController.addPlayer(i, debugPlayer);
 		}
 
-		this.mGameController.setOwner(0);
+		this.mGameController.setOwner(3);
 
 		System.out.println("Players.size(): "+this.mGameController.players.size());
 		System.out.println("Seats.size(): "+this.mGameController.table.seats.size());
@@ -496,37 +509,6 @@ public class PGame extends BaseGameActivity
 		this.mGameController.players.put(pid, auxPlayer);
 	}
 
-	private void gameLoop()
-	{
-		if(mGameController.tick() < 0)
-		{
-			//Replicate game if "restart" is set
-			if(mGameController.getRestart())
-			{
-				GameController newgame = new GameController();
-
-				newgame.setName(mGameController.getName());
-				newgame.setMaxPlayers(mGameController.getMaxPlayers());
-				newgame.setPlayerStakes(mGameController.getPlayerStakes());
-				newgame.setRestart(true);
-				newgame.setOwner(mGameController.getOwner());
-
-				mGameController = newgame;
-			}
-		}
-	}
-
-	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
-	private void addButtons()
-	{
-		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
-		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
-		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
-		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
-		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
-
-	}
-
 	private void addFoldButton(final int pX, final int pY){
 		final Sprite sprite = new Sprite(pX, pY, this.mButtonsTextureRegionMap.get(Button.FOLD)){
 			boolean mGrabbed = false;
@@ -537,6 +519,9 @@ public class PGame extends BaseGameActivity
 				case TouchEvent.ACTION_DOWN:
 					this.setScale(1.25f);
 					this.mGrabbed = true;
+
+					doSetAction(mGameController.getOwner(), Player.Action.Fold, 0);
+
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
@@ -562,6 +547,9 @@ public class PGame extends BaseGameActivity
 				case TouchEvent.ACTION_DOWN:
 					this.setScale(1.25f);
 					this.mGrabbed = true;
+
+					doSetAction(mGameController.getOwner(), Player.Action.Check, 0);
+
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
@@ -587,6 +575,9 @@ public class PGame extends BaseGameActivity
 				case TouchEvent.ACTION_DOWN:
 					this.setScale(1.25f);
 					this.mGrabbed = true;
+
+					doSetAction(mGameController.getOwner(), Player.Action.Call, 0);
+
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
@@ -612,6 +603,9 @@ public class PGame extends BaseGameActivity
 				case TouchEvent.ACTION_DOWN:
 					this.setScale(1.25f);
 					this.mGrabbed = true;
+
+					doSetAction(mGameController.getOwner(), Player.Action.Raise, 0);
+
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
@@ -651,6 +645,37 @@ public class PGame extends BaseGameActivity
 		};
 		this.mMainScene.attachChild(sprite);
 		this.mMainScene.registerTouchArea(sprite);
+	}
+
+	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
+	private void addButtons()
+	{
+		this.addFoldButton(0, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.FOLD).getHeight());
+		this.addCheckButton(this.mButtonsTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CHECK).getHeight());
+		this.addCallButton(getCameraWidth() - 2*(this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.CALL).getHeight());
+		this.addRaiseButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.mButtonsTextureRegionMap.get(Button.RAISE).getHeight());
+		this.addExitButton(getCameraWidth() - this.mButtonsTextureRegionMap.get(Button.EXIT).getWidth(), 0);
+
+	}
+
+	private void gameLoop()
+	{
+		if(mGameController.tick() < 0)
+		{
+			//Replicate game if "restart" is set
+			if(mGameController.getRestart())
+			{
+				GameController newgame = new GameController();
+
+				newgame.setName(mGameController.getName());
+				newgame.setMaxPlayers(mGameController.getMaxPlayers());
+				newgame.setPlayerStakes(mGameController.getPlayerStakes());
+				newgame.setRestart(true);
+				newgame.setOwner(mGameController.getOwner());
+
+				mGameController = newgame;
+			}
+		}
 	}
 
 
