@@ -26,15 +26,19 @@ public class Player {
 	// Constructors
 	// ===========================================================
 
-	public Player (){	
+//	public Player (){	
+//
+//	}
+//
+//	public Player (String name){
+//		this.name = name;
+//	}
 
-	}
-
-	public Player (String name){
-		this.name = name;
-	}
-
-	public Player (String name, int id){
+	public Player (String name, int id)
+	{
+		holecards = new HoleCards();
+		next_action = new SchedAction();
+		
 		this.name = name;
 		this.id = id;
 	}

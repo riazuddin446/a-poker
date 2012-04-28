@@ -22,8 +22,9 @@ public class HoleCards {
 	// Constructors
 	// ===========================================================
 
-	public HoleCards(){
-
+	public HoleCards()
+	{
+		cards = new ArrayList<Card>();
 	}
 
 	// ===========================================================

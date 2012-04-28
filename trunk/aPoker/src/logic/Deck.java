@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EmptyStackException;
 
-
 public class Deck {
 
 	private ArrayList<Card> cards;
+
+	public Deck()
+	{
+		cards = new ArrayList<Card>();
+	}
 
 	//Fill the deck with cards and shuffle it
 	public void clearFillAndShuffle()
@@ -41,7 +45,7 @@ public class Deck {
 	public Card pop(){
 		if(count() == 0)
 			throw new EmptyStackException();
-		
+
 		Card c = cards.get(cards.size()); //Get the last card
 		cards.remove(cards.size()); //Remove it
 		return c;
