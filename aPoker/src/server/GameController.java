@@ -200,7 +200,7 @@ public class GameController {
 		{
 			p.setStake(player_stakes);
 			players.put(i, p);
-			
+
 			table.addPlayerToSeat(p);
 		}
 		else
@@ -295,7 +295,7 @@ public class GameController {
 
 			showdown_player = t.getNextActivePlayer(showdown_player); //Find next showdown player
 		}
-		
+
 		HoldemHandEvaluator tmp = new HoldemHandEvaluator(null, null);
 		tmp.getWinList(wl, winList);
 	}
@@ -993,35 +993,35 @@ public class GameController {
 	protected void stateEndRound(Table t)
 	{
 		HashMap<Integer, Integer> broken_players = new HashMap<Integer, Integer>();
-		
+
 		//Lets look for broken players
 		for(int i=0; i<5; i++)
 		{
 			if(!t.seats.get(i).occupied) //Skip not occupied seats
 				continue;
-			
+
 			Player p = t.seats.get(i).player;
-			
+
 			//Check if player has no stake left
 			if(p.stake == 0)
 				broken_players.put(p.stake_before, i);
 		}
-		
+
 		//Remove player in rigth order (sorted by stake_before)
 		for(int i=0; i<broken_players.size(); i++)
 		{
 			int seat_num = broken_players.get(i);
-			
+
 			Player p = t.seats.get(seat_num).player;
-			
+
 			//TODO Tell player that he is out
-			
+
 			t.seats.get(seat_num).occupied = false;
 		}
-		
+
 		//Determine next dealer
 		t.dealer = t.getNextPlayer(t.dealer);
-		
+
 		t.scheduleState(State.NewRound, 2);
 	}
 
@@ -1101,10 +1101,10 @@ public class GameController {
 				start();
 			else if(getPlayerCount() == 0 && !getRestart()) //Delete the game if no player registered
 				return -1;
-			else //Nothing to do, exit early
+			else //Nothing to do, early exit
 				return 0;
 		}
-		else if(ended)
+		else if(ended) //If the game is set as ended
 		{
 			//Remove all players
 			players.clear();
