@@ -38,7 +38,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
 
-public class PGame extends BaseGameActivity
+public class PServer extends BaseGameActivity
 {
 	boolean debugFlag = true;
 	Sprite debugSprite = null;
@@ -106,7 +106,7 @@ public class PGame extends BaseGameActivity
 	// ===========================================================
 
 	public void setCameraWidth(int cameraWidth) {
-		PGame.cameraWidth = cameraWidth;
+		PServer.cameraWidth = cameraWidth;
 	}
 
 	public static int getCameraWidth() {
@@ -114,7 +114,7 @@ public class PGame extends BaseGameActivity
 	}
 
 	public void setCameraHeight(int cameraHeight) {
-		PGame.cameraHeight = cameraHeight;
+		PServer.cameraHeight = cameraHeight;
 	}
 
 	public static int getCameraHeight() {
