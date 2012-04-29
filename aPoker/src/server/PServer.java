@@ -1,4 +1,4 @@
-package client;
+package server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,8 @@ import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
-import server.GameController;
+import client.Button;
+
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;

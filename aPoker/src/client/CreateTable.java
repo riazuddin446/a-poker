@@ -1,5 +1,7 @@
 package client;
 
+import server.PServer;
+
 import com.zorrozua.asier.R;
 import com.zorrozua.asier.R.id;
 import com.zorrozua.asier.R.layout;
