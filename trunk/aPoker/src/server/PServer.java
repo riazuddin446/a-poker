@@ -277,19 +277,6 @@ public class PServer extends BaseGameActivity
 			}
 		});
 
-		//FIXME Hacer tick cuando sea necesario
-		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
-
-			public void onUpdate(float pSecondsElapsed) {
-				//mGameController.tick();
-			}
-
-			@Override
-			public void reset() {
-
-			}
-		});
-
 		//		this.mMainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
 		//
 		//			int flag = 0;
@@ -342,7 +329,7 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		gameLoop();
+		mainLoop();
 	}
 
 	// ===========================================================
@@ -357,6 +344,14 @@ public class PServer extends BaseGameActivity
 		mGameController.setPlayerStakes(4000);
 		mGameController.setRestart(true);
 		mGameController.setOwner(-1);
+	}
+
+	private void mainLoop()
+	{
+		while(true)
+		{
+			gameLoop();
+		}
 	}
 
 	private void gameLoop()
