@@ -143,10 +143,8 @@ public class PServer extends BaseGameActivity
 
 	private void mainLoop()
 	{
-		while(true)
-		{
-			gameLoop();
-		}
+		//for(;;)
+		gameLoop();
 	}
 
 	private void gameLoop()
@@ -311,81 +309,11 @@ public class PServer extends BaseGameActivity
 					}
 					else 
 						seatSprites.get(i).setCurrentTileIndex(1);
-
-					System.out.println("Sprite pos: " + i + " Tile index: " + seatSprites.get(i).getCurrentTileIndex());
 				}
 			}	
 		};
 
 		mainScene.registerUpdateHandler(currentIndicatorUpdater);
-	}
-
-	/**
-	 * Encargado de crear los sprites de las community cards que aun no esten creadas
-	 */
-	private void createCommunityCardAddTimeHandler()
-	{
-		IUpdateHandler communityCardAdder = new IUpdateHandler() {
-			@Override
-			public void reset() {		
-			}
-
-			@Override
-			public void onUpdate(float pSecondsElapsed) {
-
-				ArrayList<Card> cmcards = mGameController.table.communitycards.cards; //Get community cards
-				int cmsize = cmcards.size(); //Get the number of cards
-				int cmspritesize = communityCardSprites.size();
-
-				for(int i=0; i<5;i++)
-				{
-					if(i<cmsize && i>=cmspritesize) //Add sprite
-					{
-						//Create new Sprite with the needed card texture
-						Sprite aux = new Sprite(262+55*i, 175, cardTotextureRegionMap.get(cmcards.get(i)));
-						aux.setScale(0.7f);
-
-						//Add it to the Array who saves the sprites of the Community Cards
-						communityCardSprites.add(i, aux);
-
-						//Attach it to the scene
-						mainScene.attachChild(communityCardSprites.get(i));
-					}
-				}
-			}	
-		};
-
-		mainScene.registerUpdateHandler(communityCardAdder);
-	}
-
-	/**
-	 * Encargado de eliminar los sprites de las community cards que ya no existen
-	 */
-	private void createCommunityCardRemoveTimeHandler()
-	{
-		IUpdateHandler communityCardRemover = new IUpdateHandler() {
-			@Override
-			public void reset() {		
-			}
-
-			@Override
-			public void onUpdate(float pSecondsElapsed) {
-
-				Iterator<Sprite> cards = communityCardSprites.iterator();
-				Sprite _card;		 
-
-				while (cards.hasNext()) {
-					_card = cards.next();
-					int pos = communityCardSprites.indexOf(_card);
-
-					if (pos+1 > mGameController.table.communitycards.size()) {
-						removeSprite(_card, cards);		
-					}	
-				}
-			}	
-		};
-
-		mainScene.registerUpdateHandler(communityCardRemover);
 	}
 
 	/**
@@ -590,6 +518,74 @@ public class PServer extends BaseGameActivity
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
 
+	/**
+	 * Encargado de crear los sprites de las community cards que aun no esten creadas
+	 */
+	private void createCommunityCardAddTimeHandler()
+	{
+		IUpdateHandler communityCardAdder = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				ArrayList<Card> cmcards = mGameController.table.communitycards.cards; //Get community cards
+				int cmsize = cmcards.size(); //Get the number of cards
+				int cmspritesize = communityCardSprites.size();
+
+				for(int i=0; i<5;i++)
+				{
+					if(i<cmsize && i>=cmspritesize) //Add sprite
+					{
+						//Create new Sprite with the needed card texture
+						Sprite aux = new Sprite(262+55*i, 175, cardTotextureRegionMap.get(cmcards.get(i)));
+						aux.setScale(0.7f);
+
+						//Add it to the Array who saves the sprites of the Community Cards
+						communityCardSprites.add(i, aux);
+
+						//Attach it to the scene
+						mainScene.attachChild(communityCardSprites.get(i));
+					}
+				}
+			}	
+		};
+
+		mainScene.registerUpdateHandler(communityCardAdder);
+	}
+
+	/**
+	 * Encargado de eliminar los sprites de las community cards que ya no existen
+	 */
+	private void createCommunityCardRemoveTimeHandler()
+	{
+		IUpdateHandler communityCardRemover = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				Iterator<Sprite> cards = communityCardSprites.iterator();
+				Sprite _card;		 
+
+				while (cards.hasNext()) {
+					_card = cards.next();
+					int pos = communityCardSprites.indexOf(_card);
+
+					if (pos+1 > mGameController.table.communitycards.size()) {
+						removeSprite(_card, cards);		
+					}	
+				}
+			}	
+		};
+
+		mainScene.registerUpdateHandler(communityCardRemover);
+	}
+
 	@Override
 	public Engine onLoadEngine()
 	{
@@ -697,49 +693,49 @@ public class PServer extends BaseGameActivity
 		createCommunityCardAddTimeHandler();
 		createCommunityCardRemoveTimeHandler();
 
-		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
-
-			int flag = 0;
-
-			@Override
-			public void onTimePassed(final TimerHandler pTimerHandler)
-			{
-
-				if(flag==0)
-				{
-					System.out.println("SET FLOP");
-					if(mGameController.table.communitycards.size() == 0)
-					{
-						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
-					}
-
-					flag = 1;
-				}
-				else if(flag==1)
-				{
-					System.out.println("SET TURN");
-
-					mGameController.table.communitycards.setTurn(Card.CLUB_ACE);
-
-					flag = 2;
-				}
-				else if(flag==2)
-				{
-					System.out.println("SET RIVER");
-
-					mGameController.table.communitycards.setRiver(Card.CLUB_ACE);
-
-					flag = 3;
-				}
-				else if(flag==3)
-				{                                       
-					System.out.println("CLEAR CARDS");
-					mGameController.table.communitycards.clear();
-					flag = 0;
-				}
-			}
-
-		}));
+		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
+		//
+		//			int flag = 0;
+		//
+		//			@Override
+		//			public void onTimePassed(final TimerHandler pTimerHandler)
+		//			{
+		//
+		//				if(flag==0)
+		//				{
+		//					System.out.println("SET FLOP");
+		//					if(mGameController.table.communitycards.size() == 0)
+		//					{
+		//						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
+		//					}
+		//
+		//					flag = 1;
+		//				}
+		//				else if(flag==1)
+		//				{
+		//					System.out.println("SET TURN");
+		//
+		//					mGameController.table.communitycards.setTurn(Card.CLUB_ACE);
+		//
+		//					flag = 2;
+		//				}
+		//				else if(flag==2)
+		//				{
+		//					System.out.println("SET RIVER");
+		//
+		//					mGameController.table.communitycards.setRiver(Card.CLUB_ACE);
+		//
+		//					flag = 3;
+		//				}
+		//				else if(flag==3)
+		//				{                                       
+		//					System.out.println("CLEAR CARDS");
+		//					mGameController.table.communitycards.clear();
+		//					flag = 0;
+		//				}
+		//			}
+		//
+		//		}));
 
 		this.mainScene.setTouchAreaBindingEnabled(true);
 
@@ -749,7 +745,7 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		//mainLoop();
+		mainLoop();
 	}
 
 	/**
