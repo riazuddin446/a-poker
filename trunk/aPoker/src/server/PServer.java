@@ -79,6 +79,11 @@ public class PServer extends BaseGameActivity
 	private TiledTextureRegion seatTiledTextureRegion;
 	private ArrayList<TiledSprite> seatSprites;
 
+	//Dealer and blind buttons
+	private BitmapTextureAtlas dealerAndBlindTextureAtlas;
+	private ArrayList<TextureRegion> dealerAndBlindToTextureRegionList;
+	private ArrayList<Sprite> dealerAndBlindButtons;
+
 	//Game related
 	private ChangeableText tableStateText;
 
@@ -122,6 +127,175 @@ public class PServer extends BaseGameActivity
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
+
+	@Override
+	public Engine onLoadEngine()
+	{
+		final Display display = getWindowManager().getDefaultDisplay();
+		this.setCameraWidth(display.getWidth());
+		this.setCameraHeight(display.getHeight());
+
+		this.camera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
+		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.camera));
+
+		return engine;
+	}
+
+	public void onLoadResources()
+	{
+		//Set the path for graphics
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+
+		//Load the background texture
+		this.backgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.backgroundTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.backgroundTextureAtlas, this,"game_table_background.png", 0, 0);
+
+		//Extract and load the textures of each button
+		this.buttonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.buttonToTextureRegionMap = new HashMap<Button, TextureRegion>();
+		int i = 0;
+		for(final Button button : Button.values()){
+			final TextureRegion buttonTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.buttonsTextureAtlas, this, button.name()+".png", i*button.BUTTON_HEIGHT, i*button.BUTTON_WIDTH);
+			this.buttonToTextureRegionMap.put(button, buttonTextureRegion);
+			i++;
+		}	
+
+		//Extract and load the card deck textures
+		this.cardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.cardDeckTextureAtlas, this, "carddeck_tiled.png", 0, 0);
+		this.cardTotextureRegionMap = new HashMap<Card, TextureRegion>();
+		for(final Card card : Card.values()) {
+			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.cardDeckTextureAtlas, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
+			this.cardTotextureRegionMap.put(card, cardTextureRegion);
+		}
+
+		//Load the texture for seats
+		this.seatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.seatTiledTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.seatTextureAtlas, this,"seat.png", 0, 0, 1, 2);
+
+		//Load the textures for the dealer and blinds buttons
+		dealerAndBlindTextureAtlas = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		dealerAndBlindToTextureRegionList = new ArrayList<TextureRegion>();
+		for(int j=0; i<3; j++){
+			TextureRegion buttonTextureRegion = TextureRegionFactory.extractFromTexture(dealerAndBlindTextureAtlas, 0, i*25, 25, 25, true);
+			dealerAndBlindToTextureRegionList.add(i, buttonTextureRegion);
+		}
+
+		//Load the font for texts
+		this.fontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.font = new Font(this.fontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
+
+		//Load the textures into the engine
+		mEngine.getTextureManager().loadTextures(backgroundTextureAtlas,
+				this.buttonsTextureAtlas,
+				this.cardDeckTextureAtlas,
+				this.seatTextureAtlas,
+				this.fontTexture);
+		//Load the fonts into the engine
+		this.mEngine.getFontManager().loadFont(this.font);
+	}
+
+	public Scene onLoadScene()
+	{
+		this.mEngine.registerUpdateHandler(new FPSLogger());
+
+		this.mainScene = new Scene();
+		this.mainScene.setOnAreaTouchTraversalFrontToBack();
+
+		//Setting the game background
+		Sprite backgroundSprite = new Sprite(0, 0, backgroundTextureRegion);
+		SpriteBackground backgroundSpriteBackgroudn = new SpriteBackground(backgroundSprite);
+		this.mainScene.setBackground(backgroundSpriteBackgroudn);
+
+		this.addButtons();
+
+		this.addSeats();
+
+		this.initializeGameController();
+
+		this.addDebugPlayers();
+
+		initializeSpriteContainers();
+
+		//Crear el texto donde se mostrará el estado de la mesa
+		this.bettingRoundText = new ChangeableText(0, 30, this.font, "Betting round: " + this.mGameController.table.betround.name());
+		mainScene.attachChild(bettingRoundText);
+
+		//Crear el texto donde se mostrará la ronda de apuestas de la mesa
+		this.tableStateText = new ChangeableText(0, 0, this.font, "Table state: " + this.mGameController.table.state.name());
+		mainScene.attachChild(tableStateText);
+
+		createStateTimeHandler();
+		createBettingRoundTimerHandler();
+
+		createCurrentPlayerIndicatorTimerHandler();
+
+		createPlayerNameAddTimeHandler();
+		createPlayerNameRemoveTimeHandler();
+
+		createPlayerStakeAddTimeHandler();
+		createPlayerStakeRemoveTimeHandler();
+
+		createSeatBetAddTimeHandler();
+		createSeatBetRemoveTimeHandler();
+
+		createCommunityCardAddTimeHandler();
+		createCommunityCardRemoveTimeHandler();
+
+		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
+		//
+		//			int flag = 0;
+		//
+		//			@Override
+		//			public void onTimePassed(final TimerHandler pTimerHandler)
+		//			{
+		//
+		//				if(flag==0)
+		//				{
+		//					System.out.println("SET FLOP");
+		//					if(mGameController.table.communitycards.size() == 0)
+		//					{
+		//						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
+		//					}
+		//
+		//					flag = 1;
+		//				}
+		//				else if(flag==1)
+		//				{
+		//					System.out.println("SET TURN");
+		//
+		//					mGameController.table.communitycards.setTurn(Card.CLUB_ACE);
+		//
+		//					flag = 2;
+		//				}
+		//				else if(flag==2)
+		//				{
+		//					System.out.println("SET RIVER");
+		//
+		//					mGameController.table.communitycards.setRiver(Card.CLUB_ACE);
+		//
+		//					flag = 3;
+		//				}
+		//				else if(flag==3)
+		//				{                                       
+		//					System.out.println("CLEAR CARDS");
+		//					mGameController.table.communitycards.clear();
+		//					flag = 0;
+		//				}
+		//			}
+		//
+		//		}));
+
+		this.mainScene.setTouchAreaBindingEnabled(true);
+
+		return this.mainScene;
+	}
+
+	@Override
+	public void onLoadComplete()
+	{	
+		mainLoop();
+	}
 
 	private void initializeGameController()
 	{
@@ -226,6 +400,11 @@ public class PServer extends BaseGameActivity
 		this.mainScene.attachChild(sprite);
 
 		seatSprites.add(pos, sprite);
+	}
+
+	private void addDealerAndBlindButtons()
+	{
+
 	}
 
 	private void removeSprite(final Sprite _sprite, Iterator it) {
@@ -584,168 +763,6 @@ public class PServer extends BaseGameActivity
 		};
 
 		mainScene.registerUpdateHandler(communityCardRemover);
-	}
-
-	@Override
-	public Engine onLoadEngine()
-	{
-		final Display display = getWindowManager().getDefaultDisplay();
-		this.setCameraWidth(display.getWidth());
-		this.setCameraHeight(display.getHeight());
-
-		this.camera = new Camera(0, 0, getCameraWidth(), getCameraHeight());
-		final Engine engine = new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(getCameraWidth(), getCameraHeight()), this.camera));
-
-		return engine;
-	}
-
-	public void onLoadResources()
-	{
-		//Set the path for graphics
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-
-		//Load the background texture
-		this.backgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.backgroundTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.backgroundTextureAtlas, this,"game_table_background.png", 0, 0);
-
-		//Extract and load the textures of each button
-		this.buttonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.buttonToTextureRegionMap = new HashMap<Button, TextureRegion>();
-		int i = 0;
-		for(final Button button : Button.values()){
-			final TextureRegion buttonTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.buttonsTextureAtlas, this, button.name()+".png", i*button.BUTTON_HEIGHT, i*button.BUTTON_WIDTH);
-			this.buttonToTextureRegionMap.put(button, buttonTextureRegion);
-			i++;
-		}	
-
-		//Extract and load the card deck textures
-		this.cardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.cardDeckTextureAtlas, this, "carddeck_tiled.png", 0, 0);
-		this.cardTotextureRegionMap = new HashMap<Card, TextureRegion>();
-		for(final Card card : Card.values()) {
-			final TextureRegion cardTextureRegion = TextureRegionFactory.extractFromTexture(this.cardDeckTextureAtlas, card.getTexturePositionX(), card.getTexturePositionY(), Card.CARD_WIDTH, Card.CARD_HEIGHT, true);
-			this.cardTotextureRegionMap.put(card, cardTextureRegion);
-		}
-
-		//Load the texture for seats
-		this.seatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.seatTiledTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.seatTextureAtlas, this,"seat.png", 0, 0, 1, 2);
-
-
-		//Load the font for texts
-		this.fontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.font = new Font(this.fontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
-
-		//Load the textures into the engine
-		mEngine.getTextureManager().loadTextures(backgroundTextureAtlas,
-				this.buttonsTextureAtlas,
-				this.cardDeckTextureAtlas,
-				this.seatTextureAtlas,
-				this.fontTexture);
-		//Load the fonts into the engine
-		this.mEngine.getFontManager().loadFont(this.font);
-	}
-
-	public Scene onLoadScene()
-	{
-		this.mEngine.registerUpdateHandler(new FPSLogger());
-
-		this.mainScene = new Scene();
-		this.mainScene.setOnAreaTouchTraversalFrontToBack();
-
-		//Setting the game background
-		Sprite backgroundSprite = new Sprite(0, 0, backgroundTextureRegion);
-		SpriteBackground backgroundSpriteBackgroudn = new SpriteBackground(backgroundSprite);
-		this.mainScene.setBackground(backgroundSpriteBackgroudn);
-
-		this.addButtons();
-
-		this.addSeats();
-
-		this.initializeGameController();
-
-		this.addDebugPlayers();
-
-		initializeSpriteContainers();
-
-		//Crear el texto donde se mostrará el estado de la mesa
-		this.bettingRoundText = new ChangeableText(0, 30, this.font, "Betting round: " + this.mGameController.table.betround.name());
-		mainScene.attachChild(bettingRoundText);
-
-		//Crear el texto donde se mostrará la ronda de apuestas de la mesa
-		this.tableStateText = new ChangeableText(0, 0, this.font, "Table state: " + this.mGameController.table.state.name());
-		mainScene.attachChild(tableStateText);
-
-		createStateTimeHandler();
-		createBettingRoundTimerHandler();
-
-		createCurrentPlayerIndicatorTimerHandler();
-
-		createPlayerNameAddTimeHandler();
-		createPlayerNameRemoveTimeHandler();
-
-		createPlayerStakeAddTimeHandler();
-		createPlayerStakeRemoveTimeHandler();
-
-		createSeatBetAddTimeHandler();
-		createSeatBetRemoveTimeHandler();
-
-		createCommunityCardAddTimeHandler();
-		createCommunityCardRemoveTimeHandler();
-
-		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
-		//
-		//			int flag = 0;
-		//
-		//			@Override
-		//			public void onTimePassed(final TimerHandler pTimerHandler)
-		//			{
-		//
-		//				if(flag==0)
-		//				{
-		//					System.out.println("SET FLOP");
-		//					if(mGameController.table.communitycards.size() == 0)
-		//					{
-		//						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
-		//					}
-		//
-		//					flag = 1;
-		//				}
-		//				else if(flag==1)
-		//				{
-		//					System.out.println("SET TURN");
-		//
-		//					mGameController.table.communitycards.setTurn(Card.CLUB_ACE);
-		//
-		//					flag = 2;
-		//				}
-		//				else if(flag==2)
-		//				{
-		//					System.out.println("SET RIVER");
-		//
-		//					mGameController.table.communitycards.setRiver(Card.CLUB_ACE);
-		//
-		//					flag = 3;
-		//				}
-		//				else if(flag==3)
-		//				{                                       
-		//					System.out.println("CLEAR CARDS");
-		//					mGameController.table.communitycards.clear();
-		//					flag = 0;
-		//				}
-		//			}
-		//
-		//		}));
-
-		this.mainScene.setTouchAreaBindingEnabled(true);
-
-		return this.mainScene;
-	}
-
-	@Override
-	public void onLoadComplete()
-	{	
-		mainLoop();
 	}
 
 	/**
