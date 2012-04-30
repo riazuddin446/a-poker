@@ -7,7 +7,6 @@ import java.util.Iterator;
 import logic.Card;
 import logic.Player;
 import logic.Player.Action;
-import logic.Player.SchedAction;
 
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
@@ -34,6 +33,7 @@ import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import server.Table.Seat;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
@@ -89,9 +89,9 @@ public class PServer extends BaseGameActivity
 	private ArrayList<Sprite> communityCardSprites;
 
 	//Player related
-	private HashMap<Integer, ChangeableText> playerNamesText;
-	private HashMap<Integer, ChangeableText> playerStakesText;
-	private HashMap<Integer, ChangeableText> seatBetText;
+	private ArrayList<ChangeableText> playerNamesText;
+	private ArrayList<ChangeableText> playerStakesText;
+	private ArrayList<ChangeableText> seatBetText;
 
 	GameController mGameController;
 
@@ -374,7 +374,7 @@ public class PServer extends BaseGameActivity
 		mainScene.registerUpdateHandler(communityCardRemover);
 	}
 
-	private void createPlayerInfoAddTimeHandler()
+	private void createPlayerNameAddTimeHandler()
 	{
 		IUpdateHandler detect = new IUpdateHandler() {
 			@Override
@@ -384,48 +384,114 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				for(int i=0; i<mGameController.table.seats.size(); i++)
-				{
-					ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, mGameController.table.seats.get(i).player.name);
-					playerNamesText.put(i, aux);
-					mainScene.attachChild(aux);
-				}
+				ArrayList<Seat> seats = mGameController.table.seats; //Get seats
+				int seatssize = seats.size(); //Get the number seats
+				int nametextsize = playerNamesText.size();
 
-				for(int i=0; i<mGameController.table.seats.size(); i++)
+				for(int i=0; i<5;i++)
 				{
-					ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, Integer.toString(mGameController.table.seats.get(i).player.stake));
-					playerStakesText.put(i, aux);
-					mainScene.attachChild(aux);
-				}
+					if(i<seatssize && i>=nametextsize) //Add ChangeableText
+					{
+						//Create new ChangeableText
+						ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, seats.get(i).player.name);
 
-				for(int i=0; i<mGameController.table.seats.size(); i++)
-				{
-					ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, Integer.toString(mGameController.table.seats.get(i).bet));
-					seatBetText.put(i, aux);
-					mainScene.attachChild(aux);
-				}
-				
-				//Draw player names
-				for(int i=0; i<mGameController.players.size(); i++)
-				{
-					playerNamesText.get(i).setText(mGameController.players.get(i).getPlayerName());
-				}
+						//Add it to the Array who saves the ChangeableTexts of the names of the players in seats
+						playerNamesText.add(i, aux);
 
-				//Draw player stakes
-				for(int i=0; i<mGameController.players.size(); i++)
-				{
-					playerStakesText.get(i).setText(String.valueOf(mGameController.players.get(i).getStake()));
+						//Attach it to the scene
+						mainScene.attachChild(playerNamesText.get(i));
+					}
 				}
+			}	
+		};
+		mainScene.registerUpdateHandler(detect);
+	}
 
-				//Draw seat bet
-				for(int i=0; i<mGameController.players.size(); i++)
-				{
-					seatBetText.get(i).setText(String.valueOf(mGameController.table.seats.get(i).bet));
+	private void createPlayerNameRemoveTimeHandler()
+	{
+		IUpdateHandler playerNameRemover = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				Iterator<ChangeableText> names = playerNamesText.iterator();
+				ChangeableText _name;		 
+
+				while (names.hasNext()) {
+					_name = names.next();
+					int pos = playerNamesText.indexOf(_name);
+
+					if (pos+1 > mGameController.table.seats.size()) {
+						removeText(_name, names);		
+					}	
 				}
 			}	
 		};
 
-		mainScene.registerUpdateHandler(detect);
+		mainScene.registerUpdateHandler(playerNameRemover);
+	}
+
+	private void createPlayerStakeAddTimeHandler()
+	{
+		IUpdateHandler playerStakeAdder = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				ArrayList<Seat> seats = mGameController.table.seats; //Get seats
+				int seatssize = seats.size(); //Get the number seats
+				int staketextsize = playerStakesText.size();
+
+				for(int i=0; i<5;i++)
+				{
+					if(i<seatssize && i>=staketextsize) //Add ChangeableText
+					{
+						//Create new ChangeableText
+						ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, Integer.toString(seats.get(i).player.stake));
+
+						//Add it to the Array who saves the ChangeableTexts of the names of the players in seats
+						playerStakesText.add(i, aux);
+
+						//Attach it to the scene
+						mainScene.attachChild(playerStakesText.get(i));
+					}
+				}
+			}	
+		};
+		mainScene.registerUpdateHandler(playerStakeAdder);
+	}
+
+	private void createPlayerStakeRemoveTimeHandler()
+	{
+		IUpdateHandler playerStakeRemover = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				Iterator<ChangeableText> stakes = playerStakesText.iterator();
+				ChangeableText _stake;		 
+
+				while (stakes.hasNext()) {
+					_stake = stakes.next();
+					int pos = playerNamesText.indexOf(_stake);
+
+					if (pos+1 > mGameController.table.seats.size()) {
+						removeText(_stake, stakes);		
+					}	
+				}
+			}	
+		};
+
+		mainScene.registerUpdateHandler(playerStakeRemover);
 	}
 
 	// ===========================================================
@@ -513,9 +579,9 @@ public class PServer extends BaseGameActivity
 		this.addDebugPlayers();
 
 		communityCardSprites = new ArrayList<Sprite>();
-		playerNamesText = new HashMap<Integer, ChangeableText>();
-		playerStakesText = new HashMap<Integer, ChangeableText>();
-		seatBetText = new HashMap<Integer, ChangeableText>();
+		playerNamesText = new ArrayList<ChangeableText>();
+		playerStakesText = new ArrayList<ChangeableText>();
+		seatBetText = new ArrayList<ChangeableText>();
 
 
 		this.bettingRoundText = new ChangeableText(0, 30, this.font, "Betting round: " + this.mGameController.table.betround.name());
@@ -528,7 +594,12 @@ public class PServer extends BaseGameActivity
 		createBettingRoundTimerHandler();
 
 		createCurrentPlayerIndicatorTimerHandler();
-		createPlayerInfoAddTimeHandler();
+
+		createPlayerNameAddTimeHandler();
+		createPlayerNameRemoveTimeHandler();
+
+		createPlayerStakeAddTimeHandler();
+		createPlayerStakeRemoveTimeHandler();
 
 		createCommunityCardAddTimeHandler();
 		createCommunityCardRemoveTimeHandler();
