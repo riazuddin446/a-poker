@@ -1,5 +1,6 @@
 package server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -16,7 +17,7 @@ public class Table {
 
 	public State state; //Estado de la mesa
 
-	public HashMap<Integer, Seat> seats;
+	public ArrayList<Seat> seats;
 	public int dealer, sb, bb;
 	public int currentPlayer;
 	public int lastBetPlayer;
@@ -39,7 +40,7 @@ public class Table {
 	{
 		deck = new Deck();
 		communitycards = new CommunityCards();
-		seats = new HashMap<Integer, Seat>();
+		seats = new ArrayList<Seat>();
 		pots = new Vector<Pot>();
 
 		state = State.GameStart;
@@ -338,7 +339,7 @@ public class Table {
 		newSeat.in_round = false;
 		newSeat.showcards = false;
 
-		seats.put(p.id, newSeat);
+		seats.add(p.id, newSeat);
 	}
 
 }
