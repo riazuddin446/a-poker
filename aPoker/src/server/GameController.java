@@ -1083,7 +1083,7 @@ public class GameController {
 			else
 				seat.occupied = false;
 
-			table.seats.put(i, seat);
+			table.seats.add(i, seat);
 		}
 
 		table.state = State.GameStart;
