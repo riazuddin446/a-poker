@@ -52,11 +52,6 @@ public class HoleCards {
 		cards.clear();
 	}
 
-	int size()
-	{
-		return cards.size();
-	}
-
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================

@@ -146,11 +146,11 @@ public class PServer extends BaseGameActivity
 		//Set the path for graphics
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
-		//Load the background texture
+		//Load the BACKGROUND texture
 		this.backgroundTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.backgroundTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.backgroundTextureAtlas, this,"game_table_background.png", 0, 0);
 
-		//Extract and load the textures of each button
+		//Extract and load the textures of each BUTTON
 		this.buttonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.buttonToTextureRegionMap = new HashMap<Button, TextureRegion>();
 		int i = 0;
@@ -160,7 +160,7 @@ public class PServer extends BaseGameActivity
 			i++;
 		}	
 
-		//Extract and load the card deck textures
+		//Extract and load the CARD DECK textures
 		this.cardDeckTextureAtlas = new BitmapTextureAtlas(1024, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.cardDeckTextureAtlas, this, "carddeck_tiled.png", 0, 0);
 		this.cardTotextureRegionMap = new HashMap<Card, TextureRegion>();
@@ -169,11 +169,11 @@ public class PServer extends BaseGameActivity
 			this.cardTotextureRegionMap.put(card, cardTextureRegion);
 		}
 
-		//Load the texture for seats
+		//Load the texture for SEATS
 		this.seatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.seatTiledTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.seatTextureAtlas, this,"seat.png", 0, 0, 1, 2);
 
-		//Load the textures for the dealer and blinds buttons
+		//Load the textures for the DEALER and BLINDS buttons
 		dealerAndBlindTextureAtlas = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		dealerAndBlindToTextureRegionList = new ArrayList<TextureRegion>();
 		for(int j=0; i<3; j++){
@@ -181,7 +181,7 @@ public class PServer extends BaseGameActivity
 			dealerAndBlindToTextureRegionList.add(i, buttonTextureRegion);
 		}
 
-		//Load the font for texts
+		//Load the font for TEXT
 		this.fontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.font = new Font(this.fontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
 
@@ -207,40 +207,34 @@ public class PServer extends BaseGameActivity
 		SpriteBackground backgroundSpriteBackgroudn = new SpriteBackground(backgroundSprite);
 		this.mainScene.setBackground(backgroundSpriteBackgroudn);
 
-		this.addButtons();
+		//		addButtons();
+		//
+		//		addSeats();
 
-		this.addSeats();
+		initializeGameController();
 
-		this.initializeGameController();
+		addDebugPlayers();
 
-		this.addDebugPlayers();
-
-		initializeSpriteContainers();
-
-		//Crear el texto donde se mostrará el estado de la mesa
-		this.bettingRoundText = new ChangeableText(0, 30, this.font, "Betting round: " + this.mGameController.table.betround.name());
-		mainScene.attachChild(bettingRoundText);
-
-		//Crear el texto donde se mostrará la ronda de apuestas de la mesa
-		this.tableStateText = new ChangeableText(0, 0, this.font, "Table state: " + this.mGameController.table.state.name());
-		mainScene.attachChild(tableStateText);
-
-		createStateTimeHandler();
-		createBettingRoundTimerHandler();
-
-		createCurrentPlayerIndicatorTimerHandler();
-
-		createPlayerNameAddTimeHandler();
-		createPlayerNameRemoveTimeHandler();
-
-		createPlayerStakeAddTimeHandler();
-		createPlayerStakeRemoveTimeHandler();
-
-		createSeatBetAddTimeHandler();
-		createSeatBetRemoveTimeHandler();
-
-		createCommunityCardAddTimeHandler();
-		createCommunityCardRemoveTimeHandler();
+		//		initializeSpriteContainers();
+		//		initializeStaticSprites();
+		//		initializeStaticTexts();
+		//
+		//		createStateTimeHandler();
+		//		createBettingRoundTimerHandler();
+		//
+		//		createCurrentPlayerIndicatorTimerHandler();
+		//
+		//		createPlayerNameAddTimeHandler();
+		//		createPlayerNameRemoveTimeHandler();
+		//
+		//		createPlayerStakeAddTimeHandler();
+		//		createPlayerStakeRemoveTimeHandler();
+		//
+		//		createSeatBetAddTimeHandler();
+		//		createSeatBetRemoveTimeHandler();
+		//
+		//		createCommunityCardAddTimeHandler();
+		//		createCommunityCardRemoveTimeHandler();
 
 		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
 		//
@@ -294,7 +288,9 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		mainLoop();
+		//mGameController.setOwner(2);
+
+		//mainLoop();
 	}
 
 	private void initializeGameController()
@@ -315,10 +311,31 @@ public class PServer extends BaseGameActivity
 		seatBetText = new ArrayList<ChangeableText>();
 	}
 
+	private void initializeStaticSprites()
+	{
+		for(int i=0; i<dealerAndBlindToTextureRegionList.size(); i++)
+		{
+			Sprite _sprite = new Sprite(-1, -1, dealerAndBlindToTextureRegionList.get(i));
+			dealerAndBlindButtons.add(_sprite);
+			mainScene.attachChild(_sprite);
+		}
+	}
+
+	private void initializeStaticTexts()
+	{
+		//Crear el texto donde se mostrará el estado de la mesa
+		bettingRoundText = new ChangeableText(0, 30, font, "Betting round: " + mGameController.table.betround.name());
+		mainScene.attachChild(bettingRoundText);
+
+		//Crear el texto donde se mostrará la ronda de apuestas de la mesa
+		tableStateText = new ChangeableText(0, 0, font, "Table state: " + mGameController.table.state.name());
+		mainScene.attachChild(tableStateText);
+	}
+
 	private void mainLoop()
 	{
-		//for(;;)
-		gameLoop();
+		//		for(;;)
+		//gameLoop();
 	}
 
 	private void gameLoop()
@@ -396,15 +413,10 @@ public class PServer extends BaseGameActivity
 	private void addSeat(final int pX, final int pY, final int pos)
 	{
 		final TiledSprite sprite = new TiledSprite(pX, pY, this.seatTiledTextureRegion);
+		sprite.setCurrentTileIndex(0);
+		seatSprites.add(pos, sprite);
 
 		this.mainScene.attachChild(sprite);
-
-		seatSprites.add(pos, sprite);
-	}
-
-	private void addDealerAndBlindButtons()
-	{
-
 	}
 
 	private void removeSprite(final Sprite _sprite, Iterator it) {
@@ -460,7 +472,8 @@ public class PServer extends BaseGameActivity
 
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
-				bettingRoundText.setText("Betting round: " + mGameController.table.betround.name());			}	
+				bettingRoundText.setText("Betting round: " + mGameController.table.betround.name());			
+			}	
 		};
 
 		mainScene.registerUpdateHandler(bettingRoundUpdater);
@@ -484,10 +497,19 @@ public class PServer extends BaseGameActivity
 					int owner = mGameController.getOwner();
 
 					if(i == owner){
-						seatSprites.get(i).setCurrentTileIndex(0);
+						System.out.println("OWNER!" + i + " " + owner);
+						System.out.println("Current tile index: " + seatSprites.get(i).getCurrentTileIndex());
+						if(seatSprites.get(i).getCurrentTileIndex() != 1)
+							seatSprites.get(i).setCurrentTileIndex(1);
+						System.out.println("Tile index despues de modificarlo: " + seatSprites.get(i).getCurrentTileIndex());
 					}
-					else 
-						seatSprites.get(i).setCurrentTileIndex(1);
+					else {
+						System.out.println("NOT!" + i + " " + owner);
+						System.out.println("Current tile index: " + seatSprites.get(i).getCurrentTileIndex());
+						if(seatSprites.get(i).getCurrentTileIndex() != 0)
+							seatSprites.get(i).setCurrentTileIndex(0);
+						System.out.println("Tile index despues de modificarlo: " + seatSprites.get(i).getCurrentTileIndex());
+					}
 				}
 			}	
 		};
