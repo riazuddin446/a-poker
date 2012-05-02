@@ -31,24 +31,34 @@ public class CommunityCards {
 	// Getter & Setter
 	// ===========================================================
 
-	public void setFlop(Card c1, Card c2, Card c3)
+	public boolean setFlop(Card c1, Card c2, Card c3)
 	{
 		cards.clear();
 		cards.add(c1);
 		cards.add(c2);
 		cards.add(c3);
+
+		return true;
 	}
 
-	public void setTurn(Card c)
+	public boolean setTurn(Card c)
 	{
-		if(cards.size() == 3)
-			cards.add(c);
+		if(cards.size() != 3)
+			return false;
+
+		cards.add(c);
+
+		return true;
 	}
 
-	public void setRiver(Card c)
+	public boolean setRiver(Card c)
 	{
-		if(cards.size() == 4)
-			cards.add(c);
+		if(cards.size() != 4)
+			return false;
+
+		cards.add(c);
+
+		return true;
 	}
 
 	// ===========================================================

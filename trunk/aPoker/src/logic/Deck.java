@@ -19,30 +19,35 @@ public class Deck {
 		cards.clear();
 
 		for(Card c : Card.values()){
-			cards.add(c);
+			push(c);
 		}
 
 		Collections.shuffle(cards);
 	}
 
 	//Clear the deck
-	public void clear(){
+	public boolean clear()
+	{
 		cards.clear();
+		return true;
 	}
 
 	//Return the number of cards that actually are on the deck
-	public int count(){
+	public int count()
+	{
 		return cards.size();
 	}
 
 	//Add a card at the end of the deck
-	public boolean push(Card card){
+	public boolean push(Card card)
+	{
 		cards.add(card);
 		return true;
 	}
 
 	//Return the last card of the deck and erase it
-	public Card pop(){
+	public Card pop()
+	{
 		if(count() == 0)
 			throw new EmptyStackException();
 
