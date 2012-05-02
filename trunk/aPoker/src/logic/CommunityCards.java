@@ -64,11 +64,6 @@ public class CommunityCards {
 		cards.clear();
 	}
 
-	public int size()
-	{
-		return cards.size();
-	}
-
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
