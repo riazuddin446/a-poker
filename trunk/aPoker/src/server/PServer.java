@@ -207,34 +207,34 @@ public class PServer extends BaseGameActivity
 		SpriteBackground backgroundSpriteBackgroudn = new SpriteBackground(backgroundSprite);
 		this.mainScene.setBackground(backgroundSpriteBackgroudn);
 
-		//		addButtons();
-		//
-		//		addSeats();
+		addButtons();
+
+		addSeats();
 
 		initializeGameController();
 
 		addDebugPlayers();
 
-		//		initializeSpriteContainers();
-		//		initializeStaticSprites();
-		//		initializeStaticTexts();
-		//
-		//		createStateTimeHandler();
-		//		createBettingRoundTimerHandler();
-		//
-		//		createCurrentPlayerIndicatorTimerHandler();
-		//
-		//		createPlayerNameAddTimeHandler();
-		//		createPlayerNameRemoveTimeHandler();
-		//
-		//		createPlayerStakeAddTimeHandler();
-		//		createPlayerStakeRemoveTimeHandler();
-		//
-		//		createSeatBetAddTimeHandler();
-		//		createSeatBetRemoveTimeHandler();
-		//
-		//		createCommunityCardAddTimeHandler();
-		//		createCommunityCardRemoveTimeHandler();
+		initializeSpriteContainers();
+		initializeStaticSprites();
+		initializeStaticTexts();
+
+		createStateTimeHandler();
+		createBettingRoundTimerHandler();
+
+		createCurrentPlayerIndicatorTimerHandler();
+
+		createPlayerNameAddTimeHandler();
+		createPlayerNameRemoveTimeHandler();
+
+		createPlayerStakeAddTimeHandler();
+		createPlayerStakeRemoveTimeHandler();
+
+		createSeatBetAddTimeHandler();
+		createSeatBetRemoveTimeHandler();
+
+		createCommunityCardAddTimeHandler();
+		createCommunityCardRemoveTimeHandler();
 
 		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
 		//
@@ -288,9 +288,8 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		//mGameController.setOwner(2);
-
-		//mainLoop();
+		mGameController.setOwner(2);
+		mainLoop();
 	}
 
 	private void initializeGameController()
@@ -334,8 +333,8 @@ public class PServer extends BaseGameActivity
 
 	private void mainLoop()
 	{
-		//		for(;;)
-		//gameLoop();
+		for(;;)
+			gameLoop();
 	}
 
 	private void gameLoop()
@@ -777,7 +776,7 @@ public class PServer extends BaseGameActivity
 					_card = cards.next();
 					int pos = communityCardSprites.indexOf(_card);
 
-					if (pos+1 > mGameController.table.communitycards.size()) {
+					if (pos+1 > mGameController.table.communitycards.cards.size()) {
 						removeSprite(_card, cards);		
 					}	
 				}
