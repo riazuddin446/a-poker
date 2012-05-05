@@ -14,7 +14,7 @@ public abstract class PokerHandEvaluator
 
 	public PokerHandStrength getStrength()
 	{
-		return strength;
+		return strength; //FIXME Clone!
 	}
 
 	protected void evaluate()
@@ -49,93 +49,57 @@ public abstract class PokerHandEvaluator
 		}
 	}
 
-	protected boolean evalFlush()
+	protected boolean evalTwoPair()
 	{
-		boolean isFlush = false;
-		Color flushSuit = null;
+		boolean isTwoPair = false;
 
-		int[] suitCount = new int[Color.values().length];	// FIXME: better method
-
-		for (Card c : this.all_cards)
+		// check for at least one pair
+		if (evalXOfAKind(2, null))
 		{
-			int idx = c.getColor().ordinal();	// FIXME: avoid using ordinal
-
-			// do we already have 5 cards with same suit?
-			if (++suitCount[idx] == 5)
-			{
-				flushSuit = c.getColor();
-				isFlush = true;
-				break;
-			}
-		}
-
-
-		if (isFlush)
-		{
-			Iterator<Card> citr = this.all_cards.listIterator();
-			while (citr.hasNext() && strength.rankCards.size() < 5)
-			{
-				Card c = citr.next();
-
-				// only set cards which have the flush suit
-				if (c.getColor() == flushSuit)
-					strength.rankCards.add(c);
-			}
-		}
-
-		return isFlush;
-	}
-
-	protected boolean evalFullHouse()
-	{
-		boolean isFullHouse = false;
-
-		// check for three-of-a-kind
-		if (evalXOfAKind(3, null))
-		{
-			// remember three-of-a-kind card (is first element of rank cards)
-			Card toakCard = (Card) strength.rankCards.firstElement();
+			// remember first pair card (is first element of rank cards)
+			Card fpCard = (Card) strength.rankCards.firstElement();
 
 			// clear rank and kicker cards before next test
 			strength.kickerCards.clear();
 			strength.rankCards.clear();
 
-			// check for additional pair but different face (using ignoreFace)
-			if (evalXOfAKind(2, toakCard.getValue()))
+			// check for another, different pair (using ignoreFace)
+			if (evalXOfAKind(2, fpCard.getValue()))
 			{
-				// remember pair card
-				Card pCard = strength.rankCards.firstElement();
+				// remember second pair card
+				Card spCard = (Card) strength.rankCards.firstElement();
 
-				// clear rank and kicker cards again, as we need to set them up for full house
+				// clear rank and kicker cards again, as we need to set them up for two pairs
 				strength.kickerCards.clear();
 				strength.rankCards.clear();
 
-				// set three-of-a-kind and pair card as rank cards
-				strength.rankCards.add(toakCard);
-				strength.rankCards.add(pCard);
+				// set first and second pair card as rank cards
+				strength.rankCards.add(fpCard);
+				strength.rankCards.add(spCard);
 
-				isFullHouse = true;
+				// set the remaining one card as kicker
+				Iterator<Card> citr = this.all_cards.listIterator();
+				while (citr.hasNext() && strength.kickerCards.size() < 1)
+				{
+					Card c = citr.next();
+
+					// only set the non-pair card
+					if (c.getValue() != fpCard.getValue() && c.getValue() != spCard.getValue())
+						strength.kickerCards.add(c);
+				}
+
+				isTwoPair = true;
 			}
 			else
 			{
-				// clear rank and kicker cards, as we don't have a full house
+				// clear rank and kicker cards, as we don't have two pair
 				strength.kickerCards.clear();
 				strength.rankCards.clear();
 			}
 
 		}
 
-		return isFullHouse;
-	}
-
-	protected void evalHighCard()
-	{
-		// set first card as rank card
-		strength.rankCards.add(this.all_cards.firstElement());
-
-		// set remaining cards as kicker
-		for (int i = 1; i < this.all_cards.size() && i < 5; ++i)
-			strength.kickerCards.add(this.all_cards.firstElement());
+		return isTwoPair;
 	}
 
 	protected boolean evalStraight(Color respectSuit)
@@ -197,85 +161,41 @@ public abstract class PokerHandEvaluator
 		return isStraight;
 	}
 
-	protected boolean evalStraightFlush()
+	protected boolean evalFlush()
 	{
-		boolean isStraightFlush = false;
+		boolean isFlush = false;
+		Color flushSuit = null;
 
-		// test for flush
-		if (evalFlush())
+		int[] suitCount = new int[Color.values().length];	// FIXME: better method
+
+		for (Card c : this.all_cards)
 		{
-			// remember flush suit
-			Color flushSuit = ((Card) strength.rankCards.firstElement()).getColor();
+			int idx = c.getColor().ordinal();	// FIXME: avoid using ordinal
 
-			// clear rank cards before next test
-			strength.rankCards.clear();
-
-			// test for straight with flush suit
-			if (evalStraight(flushSuit))
+			// do we already have 5 cards with same suit?
+			if (++suitCount[idx] == 5)
 			{
-				isStraightFlush = true;
-			}
-			else
-			{
-				// clear rank cards, as we don't have straight flush
-				strength.rankCards.clear();
+				flushSuit = c.getColor();
+				isFlush = true;
+				break;
 			}
 		}
 
-		return isStraightFlush;
-	}
 
-	protected boolean evalTwoPair()
-	{
-		boolean isTwoPair = false;
-
-		// check for at least one pair
-		if (evalXOfAKind(2, null))
+		if (isFlush)
 		{
-			// remember first pair card (is first element of rank cards)
-			Card fpCard = (Card) strength.rankCards.firstElement();
-
-			// clear rank and kicker cards before next test
-			strength.kickerCards.clear();
-			strength.rankCards.clear();
-
-			// check for another, different pair (using ignoreFace)
-			if (evalXOfAKind(2, fpCard.getValue()))
+			Iterator<Card> citr = this.all_cards.listIterator();
+			while (citr.hasNext() && strength.rankCards.size() < 5)
 			{
-				// remember second pair card
-				Card spCard = (Card) strength.rankCards.firstElement();
+				Card c = citr.next();
 
-				// clear rank and kicker cards again, as we need to set them up for two pairs
-				strength.kickerCards.clear();
-				strength.rankCards.clear();
-
-				// set first and second pair card as rank cards
-				strength.rankCards.add(fpCard);
-				strength.rankCards.add(spCard);
-
-				// set the remaining one card as kicker
-				Iterator<Card> citr = this.all_cards.listIterator();
-				while (citr.hasNext() && strength.kickerCards.size() < 1)
-				{
-					Card c = citr.next();
-
-					// only set the non-pair card
-					if (c.getValue() != fpCard.getValue() && c.getValue() != spCard.getValue())
-						strength.kickerCards.add(c);
-				}
-
-				isTwoPair = true;
+				// only set cards which have the flush suit
+				if (c.getColor() == flushSuit)
+					strength.rankCards.add(c);
 			}
-			else
-			{
-				// clear rank and kicker cards, as we don't have two pair
-				strength.kickerCards.clear();
-				strength.rankCards.clear();
-			}
-
 		}
 
-		return isTwoPair;
+		return isFlush;
 	}
 
 	protected boolean evalXOfAKind(int n, Value ignoreFace)
@@ -335,14 +255,96 @@ public abstract class PokerHandEvaluator
 		return isXOfAKind;
 	}
 
+	protected boolean evalStraightFlush()
+	{
+		boolean isStraightFlush = false;
+
+		// test for flush
+		if (evalFlush())
+		{
+			// remember flush suit
+			Color flushSuit = ((Card) strength.rankCards.firstElement()).getColor();
+
+			// clear rank cards before next test
+			strength.rankCards.clear();
+
+			// test for straight with flush suit
+			if (evalStraight(flushSuit))
+			{
+				isStraightFlush = true;
+			}
+			else
+			{
+				// clear rank cards, as we don't have straight flush
+				strength.rankCards.clear();
+			}
+		}
+
+		return isStraightFlush;
+	}
+
+	protected boolean evalFullHouse()
+	{
+		boolean isFullHouse = false;
+
+		// check for three-of-a-kind
+		if (evalXOfAKind(3, null))
+		{
+			// remember three-of-a-kind card (is first element of rank cards)
+			Card toakCard = (Card) strength.rankCards.firstElement();
+
+			// clear rank and kicker cards before next test
+			strength.kickerCards.clear();
+			strength.rankCards.clear();
+
+			// check for additional pair but different face (using ignoreFace)
+			if (evalXOfAKind(2, toakCard.getValue()))
+			{
+				// remember pair card
+				Card pCard = strength.rankCards.firstElement();
+
+				// clear rank and kicker cards again, as we need to set them up for full house
+				strength.kickerCards.clear();
+				strength.rankCards.clear();
+
+				// set three-of-a-kind and pair card as rank cards
+				strength.rankCards.add(toakCard);
+				strength.rankCards.add(pCard);
+
+				isFullHouse = true;
+			}
+			else
+			{
+				// clear rank and kicker cards, as we don't have a full house
+				strength.kickerCards.clear();
+				strength.rankCards.clear();
+			}
+
+		}
+
+		return isFullHouse;
+	}
+
+	protected void evalHighCard()
+	{
+		// set first card as rank card
+		strength.rankCards.add(this.all_cards.firstElement());
+
+		// set remaining cards as kicker
+		for (int i = 1; i < this.all_cards.size() && i < 5; ++i)
+			strength.kickerCards.add(this.all_cards.firstElement());
+	}
+
 	/**
-	 * 
+	 * Separa los PokerHandStrength (de hands) de mayor a menor y las añade en winList.
+	 * winList es un vector de vectores de PokerHandStrengths por la posibilidad de que haya dos de ellos del mismo valor
 	 * 
 	 * @param hands
-	 * @param winList
+	 * @param winList Lista con las manos ganadoras ordenadas de mayor a menor.
 	 */
-	public void getWinList(Vector<PokerHandStrength> hands, Vector< Vector<PokerHandStrength> > winList)
+	public Vector< Vector<PokerHandStrength>> getWinList(Vector<PokerHandStrength> hands)
 	{
+		Vector< Vector<PokerHandStrength> > winList = new Vector< Vector<PokerHandStrength> >();
 		winList.clear();
 		winList.add(hands);
 
@@ -353,23 +355,24 @@ public abstract class PokerHandEvaluator
 			Vector<PokerHandStrength> tmp = new Vector<PokerHandStrength>();
 
 			//Sort tw in descending order
-			Comparator comparator = Collections.reverseOrder();
-			Collections.sort(tw, comparator);
+			Collections.sort(tw, Collections.reverseOrder()); //FIXME Comprobar que los ordena bien
 
 			for(int i = tw.size()-1; i > 0; i--)
 			{
 				if(tw.get(i).compareTo(tw.get(0)) < 0) //FIXME
 				{
 					tmp.add(tw.get(i));
-					tw.remove(tw.size());
+					tw.remove(i);
 				}
 			}
-			
+
 			if(tmp.size() == 0)
 				break;
-			
+
 			winList.add(tmp);
 			index++;
 		}
+
+		return winList;
 	}
 }

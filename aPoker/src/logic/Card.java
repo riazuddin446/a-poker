@@ -10,7 +10,7 @@ import android.util.Log;
  * @author Nicolas Gramlich
  * @since 18:59:13 - 18.06.2010
  */
-public enum Card {
+public enum Card{
 	// ===========================================================
 	// Elements
 	// ===========================================================
@@ -105,7 +105,7 @@ public enum Card {
 	public Value getValue() {
 		return mValue;
 	}
-	
+
 	public int getTexturePositionX() {
 		return this.mValue.ordinal() * CARD_WIDTH;
 	}

@@ -1,6 +1,5 @@
 package logic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HoldemHandEvaluator extends PokerHandEvaluator{
@@ -14,11 +13,11 @@ public class HoldemHandEvaluator extends PokerHandEvaluator{
 
 		//Copy all hole cards
 		for (Card c : hole_cards)
-			this.all_cards.add((Card) c);
+			this.all_cards.add(c);
 
 		//Copy all community cards
 		for (Card c : community_cards)
-			this.all_cards.add((Card) c);
+			this.all_cards.add(c);
 
 		//For Texas Hold'em we can use every card from hole and community
 		this.strength = new PokerHandStrength();

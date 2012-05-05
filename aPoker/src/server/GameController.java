@@ -276,7 +276,7 @@ public class GameController {
 	 * @param t Table involved
 	 * @param winList
 	 */
-	protected void createWinList(Table t, Vector< Vector<PokerHandStrength> > winList)
+	protected Vector< Vector<PokerHandStrength> > createWinList(Table t)
 	{
 		Vector<PokerHandStrength> wl = new Vector<PokerHandStrength>(); //Vector where we are going to add
 
@@ -297,7 +297,7 @@ public class GameController {
 		}
 
 		HoldemHandEvaluator tmp = new HoldemHandEvaluator(null, null);
-		tmp.getWinList(wl, winList);
+		return tmp.getWinList(wl);
 	}
 
 	/**
@@ -896,8 +896,7 @@ public class GameController {
 		//TODO Start showing the cards on the screen. The player who did the last action is first showing
 
 		//Determine winners
-		Vector< Vector<PokerHandStrength> > winList = new Vector< Vector<PokerHandStrength> >();
-		createWinList(t, winList);
+		Vector< Vector<PokerHandStrength> > winList = createWinList(t);
 
 		//For each winner list:
 		for (int i=0; i < winList.size(); i++)

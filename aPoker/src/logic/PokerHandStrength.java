@@ -84,7 +84,7 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 	{
 		Vector<Card> cRank = new Vector<Card>();
 		for (Card c : this.rankCards)
-			cRank.add(c); //Does this destroy c from rankCards?
+			cRank.add(c); //FIXME elimina c de rankCards? hay que clonarlo?
 
 		return cRank;
 	}
@@ -93,7 +93,7 @@ public class PokerHandStrength implements Comparable<PokerHandStrength>, Cloneab
 	{
 		Vector<Card> cKicker = new Vector<Card>();
 		for (Card c : this.kickerCards)
-			cKicker.add(c); //Does this destroy c from kickerCards?
+			cKicker.add(c); //FIXME elimina c de rankCards? hay que clonarlo?
 
 		return cKicker;
 	}
