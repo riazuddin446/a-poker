@@ -11,8 +11,6 @@ import logic.Player.Action;
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
-import org.anddev.andengine.engine.handler.timer.ITimerCallback;
-import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -333,8 +331,8 @@ public class PServer extends BaseGameActivity
 
 	private void mainLoop()
 	{
-		for(;;)
-			gameLoop();
+		//for(;;)
+		gameLoop();
 	}
 
 	private void gameLoop()
