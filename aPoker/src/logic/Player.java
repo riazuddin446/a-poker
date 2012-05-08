@@ -1,8 +1,8 @@
 package logic;
 
 
-public class Player {
-
+public class Player
+{
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -11,34 +11,28 @@ public class Player {
 	// Fields
 	// ===========================================================
 
+	public int id;
+	
 	public String name;
-	
-	public int id, stake, stake_before;
-	
+
+	public int stake, stake_before;
+
 	public HoleCards holecards;
-	
+
 	public Action last_action;
 	public SchedAction next_action;
-	
+
 	public boolean sitout;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-//	public Player (){	
-//
-//	}
-//
-//	public Player (String name){
-//		this.name = name;
-//	}
-
 	public Player (String name, int id)
 	{
 		holecards = new HoleCards();
 		next_action = new SchedAction();
-		
+
 		this.name = name;
 		this.id = id;
 	}
@@ -47,24 +41,24 @@ public class Player {
 	// Getter & Setter
 	// ===========================================================
 
-	public String getPlayerName() {
-		return name;
-	}
-
-	public void setPlayerName(String playerName) {
-		this.name = playerName;
-	}
-
-	public int getPlayerID() {
+	public int getId() {
 		return id;
 	}
 
-	public void setPlayerID(int playerID) {
+	public void setId(int playerID) {
 		this.id = playerID;
 	}
 
 	public int getStake() {
 		return stake;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String playerName) {
+		this.name = playerName;
 	}
 
 	public void setStake(int stake) {
@@ -104,8 +98,8 @@ public class Player {
 	// Inner and Anonymous Classes
 	// ===========================================================
 
-	public enum Action{
-
+	public enum Action
+	{
 		None,
 		ResetAction,
 
@@ -118,10 +112,9 @@ public class Player {
 
 		Show,
 		Muck,
-		
+
 		Sitout,
 		Back;
-
 	}
 
 	public class SchedAction{

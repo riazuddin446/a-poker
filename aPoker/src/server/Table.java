@@ -1,7 +1,6 @@
 package server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 
 import logic.CommunityCards;
@@ -10,7 +9,19 @@ import logic.Player;
 import logic.PokerHandStrength;
 import android.text.format.Time;
 
-public class Table {
+public class Table
+{
+	// ===========================================================
+	// Elements
+	// ===========================================================
+
+	// ===========================================================
+	// Constants
+	// ===========================================================
+
+	// ===========================================================
+	// Fields
+	// ===========================================================
 
 	public Deck deck;
 	public CommunityCards communitycards;
@@ -36,6 +47,10 @@ public class Table {
 
 	Time timeout_start; //FIXME
 
+	// ===========================================================
+	// Constructors
+	// ===========================================================
+
 	public Table()
 	{
 		deck = new Deck();
@@ -46,6 +61,18 @@ public class Table {
 		state = State.GameStart;
 		betround = BettingRound.Preflop;
 	}
+
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
+
+	// ===========================================================
+	// Methods from SuperClass/Interfaces
+	// ===========================================================
+
+	// ===========================================================
+	// Methods
+	// ===========================================================
 
 	public int getNextPlayer(int i)
 	{
@@ -292,6 +319,23 @@ public class Table {
 		delay_start = null; //FIXME
 	}
 
+	public void addPlayerToSeat(Player p)
+	{
+		Seat newSeat = new Seat();
+		newSeat.occupied = true;
+		newSeat.seat_no = seats.size()-1;
+		newSeat.player = p;
+		newSeat.bet = 0;
+		newSeat.in_round = false;
+		newSeat.showcards = false;
+
+		seats.add(p.id, newSeat);
+	}
+
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
+
 	public enum State {
 		GameStart,
 		ElectDealer,
@@ -328,18 +372,4 @@ public class Table {
 		public Vector<Integer> vsteats;
 		public boolean isFinal;
 	}
-
-	public void addPlayerToSeat(Player p)
-	{
-		Seat newSeat = new Seat();
-		newSeat.occupied = true;
-		newSeat.seat_no = seats.size()-1;
-		newSeat.player = p;
-		newSeat.bet = 0;
-		newSeat.in_round = false;
-		newSeat.showcards = false;
-
-		seats.add(p.id, newSeat);
-	}
-
 }
