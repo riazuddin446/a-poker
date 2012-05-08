@@ -204,7 +204,7 @@ public class GameController {
 			table.addPlayerToSeat(p);
 		}
 		else
-			System.out.println("Can't add the player: " + p.getPlayerName());
+			System.out.println("Can't add the player: " + p.getName());
 	}
 
 	/**
