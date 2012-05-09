@@ -31,21 +31,16 @@ public class Table
 	public ArrayList<Seat> seats;
 	public int dealer, sb, bb;
 	public int currentPlayer;
-	public int lastBetPlayer;
+	public int lastBetPlayer; //Ultimo jugador que a apostado
 
-	public BettingRound betround;
+	public BettingRound betround; //Ronda de apuestas
 
-	public int bet_amount;
-	public int last_bet_amount;
+	public int bet_amount; //Apuesta en curso
+	public int last_bet_amount; //Ultima apuesta
 
-	public Vector<Pot> pots;
+	public Vector<Pot> pots; //Botes
 
 	public boolean nomoreaction;
-
-	Time delay_start; //FIXME
-	int delay; //FIXME
-
-	Time timeout_start; //FIXME
 
 	// ===========================================================
 	// Constructors
@@ -74,6 +69,12 @@ public class Table
 	// Methods
 	// ===========================================================
 
+	/**
+	 * Busca el siguiente jugador a partir de i
+	 *
+	 * @param i Jugador a partir del cual queremos buscar
+	 * @return Integer apuntando al siguiente jugador
+	 */
 	public int getNextPlayer(int i)
 	{
 		int start, cur;
@@ -98,6 +99,12 @@ public class Table
 		return cur;
 	}
 
+	/**
+	 * Busca el siguiente jugador ACTIVO a partir de i
+	 *
+	 * @param i Jugador a partir del cual queremos buscar
+	 * @return Integer apuntando al siguiente jugador ACTIVO
+	 */
 	public int getNextActivePlayer(int i)
 	{
 		int start, cur;
@@ -115,13 +122,18 @@ public class Table
 			if(cur == start) //No active player left
 				return -1;
 
-			else if(seats.get(cur).in_round) //FIXME && seats.get(ur).occupied?
+			else if(seats.get(cur).occupied && seats.get(cur).in_round)
 				found = true;
 		}
 
 		return cur;
 	}
 
+	/**
+	 * Cuenta el numero de seats ocupados por jugadores
+	 * 
+	 * @return Numero de seats ocupados por jugadores
+	 */
 	public int countPlayers(){
 
 		int count = 0;
@@ -134,6 +146,11 @@ public class Table
 		return count;
 	}
 
+	/**
+	 * Cuenta el numero de seats ocupados por jugadores ACTIVOS
+	 * 
+	 * @return Numero de seats ocupados por jugadores ACTIVOS
+	 */
 	public int countActivePlayers(){
 
 		int count = 0;
@@ -146,6 +163,11 @@ public class Table
 		return count;
 	}
 
+	/**
+	 * Comprueba que todos los jugadores, o excepto uno, van con allin
+	 * 
+	 * @return True si todos los jugadores, o excepto uno, van con allin
+	 */
 	public boolean isAllin() //All (or except one) players are allin
 	{
 		int count, active_players;
@@ -167,11 +189,11 @@ public class Table
 	}
 
 	/**
-	 * Returns true if the seat s is involved in the pot. False if not.
+	 * Comprueba si el asiento de la posicion 's' esta involucrado en el bote 'pot'
 	 * 
-	 * @param pot
-	 * @param s
-	 * @return
+	 * @param pot Pot en el que tenemos que comprobar si el seat esta involucrado
+	 * @param s Posicion del seat
+	 * @return True si el jugador en el seat 's'esta involucrado en el bote 'pot'
 	 */
 	public boolean isSeatInvolvedInPot(Pot pot, int s)
 	{
@@ -184,11 +206,11 @@ public class Table
 	}
 
 	/**
+	 * Cuenta el numero de seats involucrados en un pot
 	 * 
-	 * 
-	 * @param pot
-	 * @param wl
-	 * @return
+	 * @param pot Bote en el que estan involucrados varios seats
+	 * @param wl Lista de HandStrength ganadoras
+	 * @return Numero de seats involucrados en el bote 'pot'
 	 */
 	public int getInvolvedInPotCount(Pot pot, Vector<PokerHandStrength> wl)
 	{
@@ -208,6 +230,9 @@ public class Table
 		return involved_count;
 	}
 
+	/**
+	 * 
+	 */
 	public void collectBets(){
 
 		while(true)
@@ -315,8 +340,8 @@ public class Table
 	public void scheduleState(State schedState, int delay_sec)
 	{
 		state = schedState;
-		delay = delay_sec; //FIXME
-		delay_start = null; //FIXME
+		//delay = delay_sec; //FIXME
+		//delay_start = null; //FIXME
 	}
 
 	public void addPlayerToSeat(Player p)
