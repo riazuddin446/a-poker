@@ -231,7 +231,7 @@ public class Table
 	}
 
 	/**
-	 * 
+	 * Recoge las apuestas en juego y las separa, si es necesario, en distintos botes
 	 */
 	public void collectBets(){
 
@@ -324,37 +324,46 @@ public class Table
 		}
 	}
 
+	/**
+	 * Resetea la ultima accion de los jugadores en juego
+	 */
 	public void resetLastPlayerActions()
 	{
 		//Reset last player action
 		for(int i=0; i<5; i++)
 		{
-			Seat s = seats.get(i);
-
-			if(s.occupied)
-				s.player.resetLastAction();
+			if(seats.get(i).occupied)
+				seats.get(i).player.resetLastAction();
 		}
-
 	}
 
-	public void scheduleState(State schedState, int delay_sec)
+	/**
+	 * Programa el siguiente estado de la mesa
+	 */
+	public void scheduleState(State schedState)
 	{
 		state = schedState;
-		//delay = delay_sec; //FIXME
-		//delay_start = null; //FIXME
 	}
 
+	/**
+	 * Añade un jugador a un asiento
+	 * 
+	 * @param p Jugador a añadir
+	 */
 	public void addPlayerToSeat(Player p)
 	{
-		Seat newSeat = new Seat();
-		newSeat.occupied = true;
-		newSeat.seat_no = seats.size()-1;
-		newSeat.player = p;
-		newSeat.bet = 0;
-		newSeat.in_round = false;
-		newSeat.showcards = false;
+		if(seats.size() < 5)
+		{
+			Seat newSeat = new Seat();
+			newSeat.occupied = true;
+			newSeat.seat_no = seats.size()-1;
+			newSeat.player = p;
+			newSeat.bet = 0;
+			newSeat.in_round = false;
+			newSeat.showcards = false;
 
-		seats.add(p.id, newSeat);
+			seats.add(p.id, newSeat);
+		}
 	}
 
 	// ===========================================================
