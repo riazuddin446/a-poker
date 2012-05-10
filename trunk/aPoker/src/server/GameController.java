@@ -1,5 +1,6 @@
 package server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -28,7 +29,7 @@ public class GameController {
 	private String game_name; //Nombre de la partida
 
 	public Table table; //Mesa donde se jugara la partida
-	public HashMap<Integer, Player> players; //Lista de jugadores en la partida
+	public ArrayList<Player> players; //Lista de jugadores en la partida
 
 	private int max_players; //Maximo de jugadores
 	private int player_stakes; //Fichas iniciales de cada jugador
@@ -55,10 +56,10 @@ public class GameController {
 	{		
 		//Inicializar las variables
 		table = new Table();
-		players = new HashMap<Integer, Player>();
+		players = new ArrayList<Player>();
 		blind = new Blind();
 
-		//Asignar valores
+		//Asignar valores por defecto
 		game_name = "Game";
 
 		max_players = 5;
@@ -163,10 +164,6 @@ public class GameController {
 		return players.size();
 	}
 
-	public void getPlayerList(HashMap<Integer, Player> list){
-		list = players;
-	}
-
 	// ===========================================================
 	// Methods from SuperClass/Interfaces
 	// ===========================================================
@@ -176,22 +173,23 @@ public class GameController {
 	// ===========================================================
 
 	/**
-	 * Returns true if the player is already ingame
+	 * Comprueba si el jugador 'p' ya esta añadido
 	 * 
-	 * @param p Player to be checked
+	 * @param p Jugador que ha de ser comprobado
 	 */
-	public boolean isPlayer(Player p){
-
-		if(players.containsKey(p))
+	public boolean isPlayer(Player p)
+	{
+		if(players.contains(p))
 			return true;
 		else 
 			return false;
 	}
 
 	/**
-	 * Adds a player to the game
+	 * Añade un jugador a la partida
 	 * 
-	 * @param p Player to be added
+	 * @param i Posicion en la que añadir
+	 * @param p Jugador a añadir
 	 */
 	public void addPlayer(int i, Player p)
 	{
@@ -199,7 +197,7 @@ public class GameController {
 		if(!started && players.size() != max_players && !isPlayer(p))
 		{
 			p.setStake(player_stakes);
-			players.put(i, p);
+			players.add(i, p);
 
 			table.addPlayerToSeat(p);
 		}
@@ -208,9 +206,9 @@ public class GameController {
 	}
 
 	/**
-	 * Removes a player from the game
+	 * Elimina un jugador de la partida
 	 * 
-	 * @param p Player to be removed
+	 * @param p Jugador a ser eliminado
 	 */
 	public void removePlayer(Player p)
 	{
@@ -229,25 +227,24 @@ public class GameController {
 	}
 
 	/**
-	 * Finds a new owner of the game
+	 * Busca un nuevo owner de la partida
 	 */
 	private void selectNewOwner()
 	{
-		Iterator it = players.entrySet().iterator();
+		Iterator it = players.iterator();
 		if(it.hasNext())
 		{
-			//FIXME Buscar el int que apunte al jugador correctamente en la lista de players
 			Player tmp = (Player)it.next();
 			owner = tmp.id;
 		}
 	}
 
 	/**
-	 * Sets the player action
+	 * Fija la accion de un jugador
 	 * 
-	 * @param p Player involved
-	 * @param action Action to be set
-	 * @param amount The amount of the bet involved in the action, if needed
+	 * @param p Jugador involucrado
+	 * @param action Accion que se va a fijar
+	 * @param amount Fichas involucradas en la accion (si es necesario)
 	 */
 	public void setPlayerAction(Player p, Action action, int amount)
 	{
@@ -271,10 +268,10 @@ public class GameController {
 	}
 
 	/**
-	 * Create the list of the winner's hand strengths and their id
+	 * Crea una lista de las PokerHandStrength's ganadoras
 	 * 
-	 * @param t Table involved
-	 * @param winList
+	 * @param t Mesa involucrada
+	 * @return Vector con las PokerHandStrength's de los ganadores en orden
 	 */
 	protected Vector< Vector<PokerHandStrength> > createWinList(Table t)
 	{
@@ -301,10 +298,10 @@ public class GameController {
 	}
 
 	/**
-	 * Determines the minimum bet that a player can do
+	 * Determina la apuesta minima que puede realizar un jugador
 	 * 
-	 * @param t Table involved
-	 * @return The minimum bet
+	 * @param t Mesa involucrada
+	 * @return Apuesta minima
 	 */
 	protected int determineMinimumBet(Table t)
 	{
@@ -315,9 +312,9 @@ public class GameController {
 	}
 
 	/**
-	 * Deals the hole cards to all the players
+	 * Reparte las cartas a los jugadores
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void dealHole(Table t)
 	{		
@@ -341,9 +338,9 @@ public class GameController {
 	}
 
 	/**
-	 * Deals the flop cards
+	 * Reparte el flop
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void dealFlop(Table t)
 	{
@@ -356,9 +353,9 @@ public class GameController {
 	}
 
 	/**
-	 * Deals the turn card
+	 * Reparte el turn
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void dealTurn(Table t)
 	{
@@ -369,9 +366,9 @@ public class GameController {
 	}
 
 	/**
-	 * Deals the river card
+	 * Reparte el river
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void dealRiver(Table t)
 	{
@@ -382,9 +379,10 @@ public class GameController {
 	}
 
 	/**
-	 * Handle the 'NewRound' state
+	 * Maneja la mesa en el estado NewRound
+	 * Limpia y resetea todas las variables que necesitan estarlo para el inicio de una ronda nueva
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void stateNewRound(Table t)
 	{
@@ -446,12 +444,15 @@ public class GameController {
 	}
 
 	/**
-	 * Handle the 'Blinds' state
+	 * Maneja la mesa en el estado Blind
+	 * Auto-apuesta las ciegas, reparte las holecards y comprueba si hay alguna accion mas posible
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void stateBlinds(Table t)
 	{
+		//TODO Comprobar si hace falta aumentar la ciega
+
 		t.bet_amount = blind.amount;
 
 		Player pSmall = t.seats.get(t.sb).player;
@@ -475,12 +476,10 @@ public class GameController {
 		t.seats.get(t.bb).bet = amount;
 		pBig.stake -= amount;
 
-		//TODO Initialize the player's timeout
-
 		//Give out hole-cards
 		dealHole(t);
 
-		//TODO Tell the player under the gun that it's his turn
+		//FIXME Tell the player under the gun that it's his turn
 
 		//Check if there is any more possible action
 		if(t.isAllin())
@@ -495,13 +494,13 @@ public class GameController {
 
 		t.betround = BettingRound.Preflop;
 
-		t.scheduleState(State.Betting, 3); //FIXME Delay
+		t.scheduleState(State.Betting);
 	}
 
 	/**
-	 * Handle the betting round
+	 * Maneja el estado Betting de la mesa
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void stateBetting(Table t)
 	{
@@ -752,7 +751,7 @@ public class GameController {
 			//First action for next betting round is at this payer
 			t.lastBetPlayer = t.currentPlayer;
 			t.resetLastPlayerActions();
-			t.scheduleState(State.BettingEnd, 2);			
+			t.scheduleState(State.BettingEnd);			
 		}
 		else
 		{
@@ -769,14 +768,14 @@ public class GameController {
 			p = t.seats.get(t.currentPlayer).player;
 			p.resetLastAction();
 
-			t.scheduleState(State.Betting, 1);
+			t.scheduleState(State.Betting);
 		}
 	}
 
 	/**
 	 * Pseudo state to make a wait break
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void stateBettingEnd(Table t) //Pseudo-state
 	{	
@@ -872,7 +871,7 @@ public class GameController {
 	/**
 	 * Handles the case that all player have folded
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void stateAllFolded(Table t)
 	{
@@ -883,13 +882,13 @@ public class GameController {
 		p.stake += t.pots.get(0).amount;
 		t.seats.get(t.currentPlayer).bet = t.pots.get(0).amount;
 
-		t.scheduleState(State.EndRound, 2);
+		t.scheduleState(State.EndRound);
 	}
 
 	/**
 	 * Handles the showdown
 	 * 
-	 * @param t Table involved
+	 * @param t Mesa involucrada
 	 */
 	protected void stateShowdown(Table t)
 	{
@@ -986,7 +985,7 @@ public class GameController {
 		//Reset all pots
 		t.pots.clear();
 
-		t.scheduleState(State.EndRound, 2);
+		t.scheduleState(State.EndRound);
 	}
 
 	protected void stateEndRound(Table t)
@@ -1021,7 +1020,7 @@ public class GameController {
 		//Determine next dealer
 		t.dealer = t.getNextPlayer(t.dealer);
 
-		t.scheduleState(State.NewRound, 2);
+		t.scheduleState(State.NewRound);
 	}
 
 	protected int handleTable(Table t)
@@ -1089,7 +1088,7 @@ public class GameController {
 
 		blind.amount = blind.start;
 
-		table.scheduleState(State.NewRound, 5);
+		table.scheduleState(State.NewRound);
 	}
 
 	public int tick()
@@ -1119,6 +1118,10 @@ public class GameController {
 		return 0;
 	}
 
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
+
 	private class Blind{
 
 		int start; //Ciega inicial
@@ -1133,14 +1136,12 @@ public class GameController {
 			return start;
 		}
 
-		public int getBlindFactor() {
-			return blinds_factor;
-		}
-
 		public void setBlindFactor(int bFactor) {
 			blinds_factor = bFactor;
 		}
 
+		public int getBlindFactor() {
+			return blinds_factor;
+		}
 	}
-
 }

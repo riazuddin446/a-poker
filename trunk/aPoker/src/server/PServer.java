@@ -234,6 +234,17 @@ public class PServer extends BaseGameActivity
 		createCommunityCardAddTimeHandler();
 		createCommunityCardRemoveTimeHandler();
 
+		this.mainScene.registerUpdateHandler(new IUpdateHandler(){
+
+			public void onUpdate(float pSecondsElapsed) {
+				gameLoop();
+			}
+
+			public void reset() {                          
+			}
+
+		});
+
 		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
 		//
 		//			int flag = 0;
@@ -287,7 +298,7 @@ public class PServer extends BaseGameActivity
 	public void onLoadComplete()
 	{	
 		mGameController.setOwner(2);
-		mainLoop();
+		//mainLoop();
 	}
 
 	private void initializeGameController()
@@ -337,6 +348,8 @@ public class PServer extends BaseGameActivity
 
 	private void gameLoop()
 	{
+		System.out.println("¡¡¡¡¡¡¡¡¡¡¡¡¡GAMELOOP!!!!!!!!!!!!!!!!!");
+
 		if(mGameController.tick() < 0)
 		{
 			//Replicate game if "restart" is set
