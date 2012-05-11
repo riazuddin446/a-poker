@@ -92,7 +92,7 @@ public class PServer extends BaseGameActivity
 	private ArrayList<Sprite> communityCardSprites;
 
 	//Hole Cards
-	private ArrayList<Sprite> holeCardSprites;
+	private ArrayList< ArrayList<Sprite> > holeCardSprites;
 
 	//Player related
 	private ArrayList<ChangeableText> playerNamesText;
@@ -321,7 +321,13 @@ public class PServer extends BaseGameActivity
 	private void initializeSpriteContainers()
 	{
 		communityCardSprites = new ArrayList<Sprite>();
-		holeCardSprites = new ArrayList<Sprite>();
+		holeCardSprites = new ArrayList< ArrayList<Sprite> >();
+		for(int i=0; i<5; i++)
+		{
+			ArrayList<Sprite> auxArray = new ArrayList<Sprite>();
+
+			holeCardSprites.add(i, auxArray);
+		}
 		playerNamesText = new ArrayList<ChangeableText>();
 		playerStakesText = new ArrayList<ChangeableText>();
 		seatBetText = new ArrayList<ChangeableText>();
@@ -831,21 +837,22 @@ public class PServer extends BaseGameActivity
 						Player _player = _seats.get(j).player; //Cogemos la referencia al jugador que ocupa ese asiento
 						ArrayList<Card> hlcards = _player.holecards.cards; //Cogemos la referencia a sus holecards
 						int hlsize = hlcards.size(); //Get the number of cards
-						int hlspritesize = holeCardSprites.size();
+						int hlspritesize = holeCardSprites.get(j).size();
 
 						for(int i=0; i<2;i++)
 						{
 							if(i<hlsize && i>=hlspritesize) //Add sprite
 							{
+								System.out.println((seats_pX.get(j)+60+52*i)+","+(seats_pY.get(j)-20));
 								//Create new Sprite with the needed card texture
 								Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(hlcards.get(i)));
 								aux.setScale(0.7f);
 
 								//Add it to the Array who saves the sprites of the Community Cards
-								holeCardSprites.add(i, aux);
+								holeCardSprites.get(j).add(i, aux);
 
 								//Attach it to the scene
-								mainScene.attachChild(holeCardSprites.get(i));
+								mainScene.attachChild(holeCardSprites.get(j).get(i));
 							}
 						}
 					}
