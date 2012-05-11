@@ -91,6 +91,9 @@ public class PServer extends BaseGameActivity
 	//Community Cards
 	private ArrayList<Sprite> communityCardSprites;
 
+	//Hole Cards
+	private ArrayList<Sprite> holeCardSprites;
+
 	//Player related
 	private ArrayList<ChangeableText> playerNamesText;
 	private ArrayList<ChangeableText> playerStakesText;
@@ -234,15 +237,19 @@ public class PServer extends BaseGameActivity
 		createCommunityCardAddTimeHandler();
 		createCommunityCardRemoveTimeHandler();
 
-		this.mainScene.registerUpdateHandler(new IUpdateHandler(){
+		createHoleCardAddTimeHandler();
 
+		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
+			@Override
 			public void onUpdate(float pSecondsElapsed) {
 				gameLoop();
 			}
 
-			public void reset() {                          
-			}
+			@Override
+			public void reset() {
+				// TODO Auto-generated method stub
 
+			}
 		});
 
 		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
@@ -314,6 +321,7 @@ public class PServer extends BaseGameActivity
 	private void initializeSpriteContainers()
 	{
 		communityCardSprites = new ArrayList<Sprite>();
+		holeCardSprites = new ArrayList<Sprite>();
 		playerNamesText = new ArrayList<ChangeableText>();
 		playerStakesText = new ArrayList<ChangeableText>();
 		seatBetText = new ArrayList<ChangeableText>();
@@ -352,9 +360,11 @@ public class PServer extends BaseGameActivity
 
 		if(mGameController.tick() < 0)
 		{
+			System.out.println("¡Tick() < 0!");
 			//Replicate game if "restart" is set
 			if(mGameController.getRestart())
 			{
+				System.out.println("REPLICATE GAME!");
 				GameController newgame = new GameController();
 
 				newgame.setName(mGameController.getName());
@@ -463,7 +473,11 @@ public class PServer extends BaseGameActivity
 
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
-				tableStateText.setText("Table state: " + mGameController.table.state.name());
+				if(tableStateText.getText() != mGameController.table.state.name())
+				{
+					tableStateText.setText(mGameController.table.state.name());
+					System.out.println(mGameController.table.state.name());
+				}
 			}	
 		};
 
@@ -482,7 +496,11 @@ public class PServer extends BaseGameActivity
 
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
-				bettingRoundText.setText("Betting round: " + mGameController.table.betround.name());			
+				if(bettingRoundText.getText() != mGameController.table.betround.name())
+				{
+					bettingRoundText.setText(mGameController.table.betround.name());
+					System.out.println(mGameController.table.betround.name());
+				}
 			}	
 		};
 
@@ -507,18 +525,12 @@ public class PServer extends BaseGameActivity
 					int owner = mGameController.getOwner();
 
 					if(i == owner){
-						System.out.println("OWNER!" + i + " " + owner);
-						System.out.println("Current tile index: " + seatSprites.get(i).getCurrentTileIndex());
 						if(seatSprites.get(i).getCurrentTileIndex() != 1)
 							seatSprites.get(i).setCurrentTileIndex(1);
-						System.out.println("Tile index despues de modificarlo: " + seatSprites.get(i).getCurrentTileIndex());
 					}
 					else {
-						System.out.println("NOT!" + i + " " + owner);
-						System.out.println("Current tile index: " + seatSprites.get(i).getCurrentTileIndex());
 						if(seatSprites.get(i).getCurrentTileIndex() != 0)
 							seatSprites.get(i).setCurrentTileIndex(0);
-						System.out.println("Tile index despues de modificarlo: " + seatSprites.get(i).getCurrentTileIndex());
 					}
 				}
 			}	
@@ -795,6 +807,53 @@ public class PServer extends BaseGameActivity
 		};
 
 		mainScene.registerUpdateHandler(communityCardRemover);
+	}
+
+	/**
+	 * Encargado de crear los sprites de las community cards que aun no esten creadas
+	 */
+	private void createHoleCardAddTimeHandler()
+	{
+		IUpdateHandler holeCardCardAdder = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				ArrayList<Seat> _seats = mGameController.table.seats; //Cogemos la referencia a los asientos
+
+				for(int j = 0; j < _seats.size(); j++) //Por cada uno de ellos
+				{
+					if(_seats.get(j).occupied) //Primero comprobamos si esta ocupado por un jugador
+					{
+						Player _player = _seats.get(j).player; //Cogemos la referencia al jugador que ocupa ese asiento
+						ArrayList<Card> hlcards = _player.holecards.cards; //Cogemos la referencia a sus holecards
+						int hlsize = hlcards.size(); //Get the number of cards
+						int hlspritesize = holeCardSprites.size();
+
+						for(int i=0; i<2;i++)
+						{
+							if(i<hlsize && i>=hlspritesize) //Add sprite
+							{
+								//Create new Sprite with the needed card texture
+								Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(hlcards.get(i)));
+								aux.setScale(0.7f);
+
+								//Add it to the Array who saves the sprites of the Community Cards
+								holeCardSprites.add(i, aux);
+
+								//Attach it to the scene
+								mainScene.attachChild(holeCardSprites.get(i));
+							}
+						}
+					}
+				}
+			}	
+		};
+
+		mainScene.registerUpdateHandler(holeCardCardAdder);
 	}
 
 	/**
