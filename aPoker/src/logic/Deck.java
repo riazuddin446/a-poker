@@ -51,8 +51,8 @@ public class Deck {
 		if(count() == 0)
 			throw new EmptyStackException();
 
-		Card c = cards.get(cards.size()); //Get the last card
-		cards.remove(cards.size()); //Remove it
+		Card c = cards.get(count()-1); //Get the last card
+		cards.remove(count()-1); //Remove it
 		return c;
 	}
 }

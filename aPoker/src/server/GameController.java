@@ -321,7 +321,7 @@ public class GameController {
 		//Player in SB gets first cards
 		for(int i=t.sb, c=0; c<t.countPlayers(); i=t.getNextPlayer(i))
 		{
-			if(!t.seats.get(i).occupied)
+			if(t.seats.get(i).occupied)
 			{
 				Player p = t.seats.get(i).player;
 
@@ -331,9 +331,8 @@ public class GameController {
 				c2 = t.deck.pop();
 
 				p.holecards.setCards(c1, c2);
-
-				c++;
 			}
+			c++;
 		}
 	}
 
@@ -478,6 +477,9 @@ public class GameController {
 
 		//Give out hole-cards
 		dealHole(t);
+
+		System.out.println("Dealhole done!");
+		System.out.println("Numero de hlcards: "+table.seats.get(0).player.holecards.cards.size());
 
 		//FIXME Tell the player under the gun that it's his turn
 
@@ -1025,22 +1027,55 @@ public class GameController {
 
 	protected int handleTable(Table t)
 	{
+		System.out.println("handleTable()");
 		if(t.state == State.NewRound)
+		{
+			System.out.println("NewRound - start");
 			stateNewRound(t);
+			System.out.println("NewRound - end");
+		}
 		else if(t.state == State.Blinds)
+		{
+			System.out.println("Blinds - start");
 			stateBlinds(t);
+			System.out.println("Blinds - end");
+		}
 		else if(t.state == State.Betting)
+		{
+			System.out.println("Betting - start");
 			stateBetting(t);
+			System.out.println("Betting - end");
+		}
 		else if(t.state == State.BettingEnd)
+		{
+			System.out.println("BettingEnd - start");
 			stateBettingEnd(t);
+			System.out.println("BettingEnd - end");
+		}
 		else if(t.state == State.AskShow)
+		{
+			System.out.println("AskShow - start");
 			stateAskShow(t);
+			System.out.println("AskShow - end");
+		}
 		else if(t.state == State.AllFolded)
+		{
+			System.out.println("AllFolded - start");
 			stateAllFolded(t);
+			System.out.println("AllFolded - end");
+		}
 		else if(t.state == State.Showdown)
+		{
+			System.out.println("Showdown - start");
 			stateShowdown(t);
+			System.out.println("Showdown - end");
+		}
 		else if(t.state == State.EndRound)
+		{
+			System.out.println("EndRound - start");
 			stateEndRound(t);
+			System.out.println("EndRound - end");
+		}
 
 		//If there is one player left, close the table
 		if(t.countPlayers()==1)
@@ -1093,8 +1128,10 @@ public class GameController {
 
 	public int tick()
 	{
+		System.out.println("tick()");
 		if(!started) //If the game is not set as started
 		{
+			System.out.println("!started");
 			if(getPlayerCount() == max_players) //Start the game if player count reached
 				start();
 			else if(getPlayerCount() == 0 && !getRestart()) //Delete the game if no player registered
@@ -1104,6 +1141,7 @@ public class GameController {
 		}
 		else if(ended) //If the game is set as ended
 		{
+			System.out.println("ended");
 			//Remove all players
 			players.clear();
 			return -1;
@@ -1112,6 +1150,7 @@ public class GameController {
 		//Handle table
 		if(handleTable(table) < 0) //Is the table closed?
 		{
+			System.out.println("¡handleTable(table) < 0!");
 			ended = true;
 			//TODO ended_time + snap
 		}
