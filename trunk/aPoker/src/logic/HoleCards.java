@@ -47,6 +47,11 @@ public class HoleCards {
 	// Methods
 	// ===========================================================
 
+	public int size()
+	{
+		return cards.size();
+	}
+
 	public void clear()
 	{
 		cards.clear();

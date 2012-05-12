@@ -533,7 +533,6 @@ public class GameController {
 				//Allowed check?
 				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
 				{
-					//FIXME Send message that cannot check
 					Toast toast = Toast.makeText(null, "You can't check dude! Try call ;D", 3);
 					toast.show();
 				}
@@ -564,13 +563,11 @@ public class GameController {
 			else if(action == Action.Bet) //Iniciar apuesta
 			{
 				if(t.bet_amount > 0){
-					//FIXME there already was a bet
 					Toast toast = Toast.makeText(null, "You can't bet dude! There already was a bet, try raise.", 3);
 					toast.show();
 				}
 				else if(p.next_action.amount < minimun_bet)
 				{
-					//FIXME
 					Toast toast = Toast.makeText(null, "You can't bet this amount, the minimun bet is: " + minimun_bet, 3);
 					toast.show();			
 				}
@@ -585,7 +582,6 @@ public class GameController {
 			{
 				if(t.bet_amount == 0)
 				{
-					//FIXME Cant raise, nothing was bet
 					Toast toast = Toast.makeText(null, "You cannot raise, nothing was bet! Try bet.", 3);
 					toast.show();
 
@@ -595,7 +591,6 @@ public class GameController {
 				}
 				else if(p.next_action.amount < minimun_bet)
 				{
-					//FIXME Cant raise less than minimun_bet
 					Toast toast = Toast.makeText(null, "You cannot raise this amount. Minimum bet is: " + minimun_bet, 3);
 					toast.show();				
 				}
@@ -617,27 +612,28 @@ public class GameController {
 		}
 		else //Player didn't set next action, handle his timeout
 		{
-			if(p.sitout) //TODO Timeout
-			{
-				//Let player sit out (if he is not already)
-				p.sitout = true;
-
-				//Auto-action: fold or check if possible
-				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
-					action = Action.Fold;
-				else
-					action = Action.Check;
-
-				allowed_action = true;
-				auto_action = true;
-			}
+			//TODO Manejar el timeout
+			//			if(p.sitout)
+			//			{
+			//				//Let player sit out (if he is not already)
+			//				p.sitout = true;
+			//
+			//				//Auto-action: fold or check if possible
+			//				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
+			//					action = Action.Fold;
+			//				else
+			//					action = Action.Check;
+			//
+			//				allowed_action = true;
+			//				auto_action = true;
+			//			}
 		}
 
 		//Return here if no or invalid action
 		if(!allowed_action)
 			return;
 
-		//Remember action for snapshot
+		//FIXME Remember action for snapshot
 		p.last_action = action;
 
 		//PERFORM ACTION
@@ -764,11 +760,12 @@ public class GameController {
 
 			//Find next player
 			t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
+			System.out.println("New current player: "+t.currentPlayer);
+			
 			//t.timeout_start = time(NULL);
 
 			//Reset current player's last action
-			p = t.seats.get(t.currentPlayer).player;
-			p.resetLastAction();
+			t.seats.get(t.currentPlayer).player.resetLastAction();
 
 			t.scheduleState(State.Betting);
 		}
@@ -1128,7 +1125,6 @@ public class GameController {
 
 	public int tick()
 	{
-		System.out.println("tick()");
 		if(!started) //If the game is not set as started
 		{
 			System.out.println("!started");

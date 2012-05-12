@@ -69,6 +69,11 @@ public class CommunityCards {
 	// Methods
 	// ===========================================================
 
+	public int size()
+	{
+		return cards.size();
+	}
+
 	public void clear()
 	{
 		cards.clear();
