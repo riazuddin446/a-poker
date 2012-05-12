@@ -11,6 +11,8 @@ import logic.Player.Action;
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
+import org.anddev.andengine.engine.handler.timer.ITimerCallback;
+import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -238,6 +240,7 @@ public class PServer extends BaseGameActivity
 		createCommunityCardRemoveTimeHandler();
 
 		createHoleCardAddTimeHandler();
+		createHoleCardRemoveTimeHandler();
 
 		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
 			@Override
@@ -252,46 +255,36 @@ public class PServer extends BaseGameActivity
 			}
 		});
 
-		//		this.mainScene.registerUpdateHandler(new TimerHandler(2f, true, new ITimerCallback() {
-		//
-		//			int flag = 0;
+		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+				System.out.println(mGameController.table.currentPlayer);
+			}
+
+			@Override
+			public void reset() {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+
+		//		this.mainScene.registerUpdateHandler(new TimerHandler(20f, true, new ITimerCallback() {
 		//
 		//			@Override
 		//			public void onTimePassed(final TimerHandler pTimerHandler)
 		//			{
-		//
-		//				if(flag==0)
+		//				for(int i=0; i<mGameController.table.seats.size(); i++)
 		//				{
-		//					System.out.println("SET FLOP");
-		//					if(mGameController.table.communitycards.size() == 0)
+		//					if(mGameController.table.seats.get(i).occupied) //Si el asiento esta ocupado
 		//					{
-		//						mGameController.table.communitycards.setFlop(Card.CLUB_ACE, Card.CLUB_EIGHT, Card.CLUB_FIVE);
+		//						if(mGameController.table.seats.get(i).player.holecards.size()>0) //Si tiene holecards
+		//						{
+		//							mGameController.table.seats.get(i).player.holecards.clear();
+		//						}
 		//					}
-		//
-		//					flag = 1;
 		//				}
-		//				else if(flag==1)
-		//				{
-		//					System.out.println("SET TURN");
 		//
-		//					mGameController.table.communitycards.setTurn(Card.CLUB_ACE);
-		//
-		//					flag = 2;
-		//				}
-		//				else if(flag==2)
-		//				{
-		//					System.out.println("SET RIVER");
-		//
-		//					mGameController.table.communitycards.setRiver(Card.CLUB_ACE);
-		//
-		//					flag = 3;
-		//				}
-		//				else if(flag==3)
-		//				{                                       
-		//					System.out.println("CLEAR CARDS");
-		//					mGameController.table.communitycards.clear();
-		//					flag = 0;
-		//				}
 		//			}
 		//
 		//		}));
@@ -304,8 +297,7 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		mGameController.setOwner(2);
-		//mainLoop();
+		
 	}
 
 	private void initializeGameController()
@@ -354,16 +346,8 @@ public class PServer extends BaseGameActivity
 		mainScene.attachChild(tableStateText);
 	}
 
-	private void mainLoop()
-	{
-		//for(;;)
-		gameLoop();
-	}
-
 	private void gameLoop()
 	{
-		System.out.println("¡¡¡¡¡¡¡¡¡¡¡¡¡GAMELOOP!!!!!!!!!!!!!!!!!");
-
 		if(mGameController.tick() < 0)
 		{
 			System.out.println("¡Tick() < 0!");
@@ -864,6 +848,40 @@ public class PServer extends BaseGameActivity
 	}
 
 	/**
+	 * Encargado de eliminar los sprites de las community cards que ya no existen
+	 */
+	private void createHoleCardRemoveTimeHandler()
+	{
+		IUpdateHandler holeCardRemover = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				for(int j = 0; j < holeCardSprites.size(); j++) //Por cada uno de ellos
+				{
+					ArrayList<Sprite> aux = holeCardSprites.get(j);
+					Iterator<Sprite> cards = aux.iterator();
+					Sprite _card;		 
+
+					while (cards.hasNext()) {
+						_card = cards.next();
+						int pos = aux.indexOf(_card);
+
+						if (pos+1 > mGameController.table.seats.get(j).player.holecards.size()) {
+							removeSprite(_card, cards);		
+						}	
+					}
+				}
+			}	
+		};
+
+		mainScene.registerUpdateHandler(holeCardRemover);
+	}
+
+	/**
 	 * Establece la acción que el jugador ha presionado
 	 * 
 	 * @param pid Id del jugador que realiza la acción (En nuestro caso el jugador actual)
@@ -872,8 +890,6 @@ public class PServer extends BaseGameActivity
 	 */
 	private void doSetAction(int pid, Player.Action action, int amount)
 	{
-		//Player auxPlayer = this.mGameController.players.get(pid);
-
 		Player.SchedAction auxSchedAction = this.mGameController.players.get(pid).new SchedAction();
 		auxSchedAction.valid = true;
 		auxSchedAction.action = action;
@@ -884,8 +900,6 @@ public class PServer extends BaseGameActivity
 			auxSchedAction.amount = 0;
 
 		this.mGameController.players.get(pid).setNextAction(auxSchedAction);
-
-		//this.mGameController.players.put(pid, auxPlayer);
 	}
 
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
@@ -910,7 +924,7 @@ public class PServer extends BaseGameActivity
 					this.setScale(1.25f);
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.getOwner(), Player.Action.Fold, 0);
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Fold, 0);
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -938,7 +952,7 @@ public class PServer extends BaseGameActivity
 					this.setScale(1.25f);
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.getOwner(), Player.Action.Check, 0);
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Check, 0);
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -966,7 +980,7 @@ public class PServer extends BaseGameActivity
 					this.setScale(1.25f);
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.getOwner(), Player.Action.Call, 0); //TODO Pop up para insertar la cantidad
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Call, 0); //TODO Pop up para insertar la cantidad
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -994,7 +1008,7 @@ public class PServer extends BaseGameActivity
 					this.setScale(1.25f);
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.getOwner(), Player.Action.Raise, 0); //TODO Pop up para insertar la cantidad
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, 0); //TODO Pop up para insertar la cantidad
 
 					break;
 				case TouchEvent.ACTION_UP:
