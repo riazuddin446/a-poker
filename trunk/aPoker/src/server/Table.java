@@ -266,6 +266,7 @@ public class Table
 
 			//Last pot is current pot
 			Pot cur_pot = pots.lastElement();
+			System.out.println(cur_pot.vsteats.size());
 
 			//If current pot is final, create a new one
 			if(cur_pot.isFinal)
@@ -405,5 +406,9 @@ public class Table
 		public int amount;
 		public Vector<Integer> vsteats;
 		public boolean isFinal;
+
+		public Pot(){
+			vsteats = new Vector<Integer>();
+		}
 	}
 }
