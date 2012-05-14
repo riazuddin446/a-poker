@@ -8,8 +8,8 @@ import java.util.Vector;
 import logic.Card;
 import logic.HoldemHandEvaluator;
 import logic.Player;
-import logic.PokerHandStrength;
 import logic.Player.Action;
+import logic.PokerHandStrength;
 import server.Table.BettingRound;
 import server.Table.Pot;
 import server.Table.Seat;
@@ -533,8 +533,9 @@ public class GameController {
 				//Allowed check?
 				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
 				{
-					Toast toast = Toast.makeText(null, "You can't check dude! Try call ;D", 3);
-					toast.show();
+					//					Toast toast = Toast.makeText(null, "You can't check dude! Try call ;D", 3);
+					//					toast.show();
+					System.out.println("You can't check dude! Try call ;D");
 				}
 				else
 					allowed_action = true;
@@ -563,13 +564,16 @@ public class GameController {
 			else if(action == Action.Bet) //Iniciar apuesta
 			{
 				if(t.bet_amount > 0){
-					Toast toast = Toast.makeText(null, "You can't bet dude! There already was a bet, try raise.", 3);
-					toast.show();
+					//					Toast toast = Toast.makeText(null, "You can't bet dude! There already was a bet, try raise.", 3);
+					//					toast.show();
+					System.out.println("You can't bet dude! There already was a bet, try raise.");
+
 				}
 				else if(p.next_action.amount < minimun_bet)
 				{
-					Toast toast = Toast.makeText(null, "You can't bet this amount, the minimun bet is: " + minimun_bet, 3);
-					toast.show();			
+					//					Toast toast = Toast.makeText(null, "You can't bet this amount, the minimun bet is: " + minimun_bet, 3);
+					//					toast.show();			
+					System.out.println("You can't bet this amount, the minimun bet is: " + minimun_bet);
 				}
 				else
 				{
@@ -582,8 +586,9 @@ public class GameController {
 			{
 				if(t.bet_amount == 0)
 				{
-					Toast toast = Toast.makeText(null, "You cannot raise, nothing was bet! Try bet.", 3);
-					toast.show();
+					//					Toast toast = Toast.makeText(null, "You cannot raise, nothing was bet! Try bet.", 3);
+					//					toast.show();
+					System.out.println("You cannot raise, nothing was bet! Try bet.");
 
 					//Retry with this action
 					p.next_action.action = Action.Bet;
@@ -591,8 +596,9 @@ public class GameController {
 				}
 				else if(p.next_action.amount < minimun_bet)
 				{
-					Toast toast = Toast.makeText(null, "You cannot raise this amount. Minimum bet is: " + minimun_bet, 3);
-					toast.show();				
+					//					Toast toast = Toast.makeText(null, "You cannot raise this amount. Minimum bet is: " + minimun_bet, 3);
+					//					toast.show();				
+					System.out.println("You cannot raise this amount. Minimum bet is: " + minimun_bet);
 				}
 				else
 				{
@@ -761,7 +767,7 @@ public class GameController {
 			//Find next player
 			t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
 			System.out.println("New current player: "+t.currentPlayer);
-			
+
 			//t.timeout_start = time(NULL);
 
 			//Reset current player's last action

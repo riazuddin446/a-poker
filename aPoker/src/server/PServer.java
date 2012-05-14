@@ -405,11 +405,11 @@ public class PServer extends BaseGameActivity
 
 		//Seat #4 - Top rigth
 		seats_pX.put(3, getCameraWidth()-165);
-		seats_pY.put(3, 120);
+		seats_pY.put(3, 270);
 
 		//Seat #5 - Bottom rigth
 		seats_pX.put(4, getCameraWidth()-165);
-		seats_pY.put(4, 270);
+		seats_pY.put(4, 120);
 
 		seatSprites = new ArrayList<TiledSprite>();
 
