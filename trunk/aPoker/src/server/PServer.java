@@ -11,8 +11,6 @@ import logic.Player.Action;
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
-import org.anddev.andengine.engine.handler.timer.ITimerCallback;
-import org.anddev.andengine.engine.handler.timer.TimerHandler;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -33,6 +31,7 @@ import org.anddev.andengine.opengl.texture.region.TextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TiledTextureRegion;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import server.Table.Pot;
 import server.Table.Seat;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -100,6 +99,9 @@ public class PServer extends BaseGameActivity
 	private ArrayList<ChangeableText> playerNamesText;
 	private ArrayList<ChangeableText> playerStakesText;
 	private ArrayList<ChangeableText> seatBetText;
+
+	//Pot related
+	private ArrayList<ChangeableText> potsText;
 
 	GameController mGameController;
 
@@ -236,6 +238,9 @@ public class PServer extends BaseGameActivity
 		createSeatBetAddTimeHandler();
 		createSeatBetRemoveTimeHandler();
 
+		createPotAddTimeHandler();
+		createPotRemoveTimeHandler();
+
 		createCommunityCardAddTimeHandler();
 		createCommunityCardRemoveTimeHandler();
 
@@ -258,7 +263,7 @@ public class PServer extends BaseGameActivity
 		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
-				System.out.println(mGameController.table.currentPlayer);
+				System.out.println("Current player: "+mGameController.table.currentPlayer);
 			}
 
 			@Override
@@ -268,27 +273,6 @@ public class PServer extends BaseGameActivity
 			}
 		});
 
-
-		//		this.mainScene.registerUpdateHandler(new TimerHandler(20f, true, new ITimerCallback() {
-		//
-		//			@Override
-		//			public void onTimePassed(final TimerHandler pTimerHandler)
-		//			{
-		//				for(int i=0; i<mGameController.table.seats.size(); i++)
-		//				{
-		//					if(mGameController.table.seats.get(i).occupied) //Si el asiento esta ocupado
-		//					{
-		//						if(mGameController.table.seats.get(i).player.holecards.size()>0) //Si tiene holecards
-		//						{
-		//							mGameController.table.seats.get(i).player.holecards.clear();
-		//						}
-		//					}
-		//				}
-		//
-		//			}
-		//
-		//		}));
-
 		this.mainScene.setTouchAreaBindingEnabled(true);
 
 		return this.mainScene;
@@ -297,7 +281,7 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-		
+
 	}
 
 	private void initializeGameController()
@@ -323,6 +307,7 @@ public class PServer extends BaseGameActivity
 		playerNamesText = new ArrayList<ChangeableText>();
 		playerStakesText = new ArrayList<ChangeableText>();
 		seatBetText = new ArrayList<ChangeableText>();
+		potsText = new ArrayList<ChangeableText>();
 	}
 
 	private void initializeStaticSprites()
@@ -404,11 +389,11 @@ public class PServer extends BaseGameActivity
 		seats_pY.put(2, getCameraHeight()-85);
 
 		//Seat #4 - Top rigth
-		seats_pX.put(3, getCameraWidth()-165);
+		seats_pX.put(3, getCameraWidth()-175);
 		seats_pY.put(3, 270);
 
 		//Seat #5 - Bottom rigth
-		seats_pX.put(4, getCameraWidth()-165);
+		seats_pX.put(4, getCameraWidth()-175);
 		seats_pY.put(4, 120);
 
 		seatSprites = new ArrayList<TiledSprite>();
@@ -458,7 +443,7 @@ public class PServer extends BaseGameActivity
 	{
 		IUpdateHandler stateUpdater = new IUpdateHandler() {
 			@Override
-			public void reset() {		
+			public void reset() {
 			}
 
 			@Override
@@ -509,18 +494,25 @@ public class PServer extends BaseGameActivity
 
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
-				//FIXME No cambia de textura
 				for(int i=0; i<seatSprites.size(); i++)
 				{
 					int owner = mGameController.getOwner();
 
 					if(i == owner){
-						if(seatSprites.get(i).getCurrentTileIndex() != 1)
-							seatSprites.get(i).setCurrentTileIndex(1);
+						System.out.println("Owner: "+mGameController.players.get(i).name);
+						System.out.println("Cambiar textura!");
+						System.out.println("Textura actual: "+seatSprites.get(i).getCurrentTileIndex());
+						//if(seatSprites.get(i).getCurrentTileIndex() != 1)
+						seatSprites.get(i).setCurrentTileIndex(1);
+						System.out.println("Textura posterior: "+seatSprites.get(i).getCurrentTileIndex());
 					}
 					else {
-						if(seatSprites.get(i).getCurrentTileIndex() != 0)
-							seatSprites.get(i).setCurrentTileIndex(0);
+						System.out.println("Player: "+mGameController.players.get(i).name);
+						System.out.println("Cambiar textura!");
+						System.out.println("Textura actual: "+seatSprites.get(i).getCurrentTileIndex());
+						//if(seatSprites.get(i).getCurrentTileIndex() != 0)
+						seatSprites.get(i).setCurrentTileIndex(0);
+						System.out.println("Textura posterior: "+seatSprites.get(i).getCurrentTileIndex());
 					}
 				}
 			}	
@@ -662,7 +654,7 @@ public class PServer extends BaseGameActivity
 	}
 
 	/**
-	 * Encargado de crear y añadir en pantalla las apuestas de los jugadores que aun no esten creados
+	 * Encargado de crear y añadir en pantalla las apuestas de los jugadores
 	 */
 	private void createSeatBetAddTimeHandler()
 	{
@@ -680,16 +672,25 @@ public class PServer extends BaseGameActivity
 
 				for(int i=0; i<5;i++)
 				{
+					String bet = Integer.toString(seats.get(i).bet);
+					System.out.println("Bet: "+bet);
+
 					if(i<seatssize && i>=bettextsize) //Add ChangeableText
 					{
 						//Create new ChangeableText
-						ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, Integer.toString(seats.get(i).bet));
+						ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, bet);
 
 						//Add it to the Array who saves the ChangeableTexts of the bets of the players in seats
 						seatBetText.add(i, aux);
 
 						//Attach it to the scene
 						mainScene.attachChild(seatBetText.get(i));
+					}
+					else if(seatBetText.get(i).getText() != bet) //Update text
+					{
+						System.out.println(seats.get(i).bet);
+						seatBetText.get(i).setText(bet);
+						System.out.println(seatBetText.get(i).getText());
 					}
 				}
 			}	
@@ -725,6 +726,79 @@ public class PServer extends BaseGameActivity
 		};
 
 		mainScene.registerUpdateHandler(seatBetRemover);
+	}
+
+	/**
+	 * Encargado de crear y añadir en pantalla las apuestas de los jugadores
+	 */
+	private void createPotAddTimeHandler()
+	{
+		IUpdateHandler seatBetAdder = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				ArrayList<Pot> pots = mGameController.table.pots; //Get seats
+				int potssize = pots.size(); //Get the number seats
+				int potstextsize = potsText.size();
+
+				for(int i=0; i<pots.size();i++)
+				{
+					String amount = Integer.toString(pots.get(i).amount);
+					System.out.println("Amount: "+amount);
+
+					if(i<potssize && i>=potstextsize) //Add ChangeableText
+					{
+						//Create new ChangeableText
+						ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+amount);
+
+						//Add it to the Array who saves the ChangeableTexts of the bets of the players in seats
+						potsText.add(i, aux);
+
+						//Attach it to the scene
+						mainScene.attachChild(potsText.get(i));
+					}
+					else if(potsText.get(i).getText() != amount) //Update text
+					{
+						potsText.get(i).setText("Pot"+i+": "+amount);
+					}
+				}
+			}	
+		};
+		mainScene.registerUpdateHandler(seatBetAdder);
+	}
+
+	/**
+	 * Encargado de eliminar de la pantalla las apuestas de los jugadores que ya no esten en la partida
+	 */
+	private void createPotRemoveTimeHandler()
+	{
+		IUpdateHandler potRemover = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				Iterator<ChangeableText> pots = potsText.iterator();
+				ChangeableText _pot;		 
+
+				while (pots.hasNext()) {
+					_pot = pots.next();
+					int pos = playerNamesText.indexOf(_pot);
+
+					if (pos+1 > mGameController.table.seats.size()) {
+						removeText(_pot, pots);		
+					}	
+				}
+			}	
+		};
+
+		mainScene.registerUpdateHandler(potRemover);
 	}
 
 	// ===========================================================

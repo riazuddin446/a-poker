@@ -38,7 +38,7 @@ public class Table
 	public int bet_amount; //Apuesta en curso
 	public int last_bet_amount; //Ultima apuesta
 
-	public Vector<Pot> pots; //Botes
+	public ArrayList<Pot> pots; //Botes
 
 	public boolean nomoreaction;
 
@@ -51,7 +51,7 @@ public class Table
 		deck = new Deck();
 		communitycards = new CommunityCards();
 		seats = new ArrayList<Seat>();
-		pots = new Vector<Pot>();
+		pots = new ArrayList<Pot>();
 
 		state = State.GameStart;
 		betround = BettingRound.Preflop;
@@ -265,7 +265,7 @@ public class Table
 				return;
 
 			//Last pot is current pot
-			Pot cur_pot = pots.lastElement();
+			Pot cur_pot = pots.get(pots.size()-1); //lastElement();
 			System.out.println(cur_pot.vsteats.size());
 
 			//If current pot is final, create a new one
@@ -276,7 +276,7 @@ public class Table
 				pot.isFinal = false;
 				pots.add(pot);
 
-				cur_pot = pots.lastElement();
+				cur_pot = pots.get(pots.size()-1); //lastElement();
 			}
 
 			//Collect the bet of each player
