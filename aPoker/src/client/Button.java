@@ -20,8 +20,8 @@ public enum Button {
 	// Constants
 	// ===========================================================
 
-	public static final int BUTTON_WIDTH = 69;
-	public static final int BUTTON_HEIGHT = 39;
+	public static final int BUTTON_WIDTH = 120;
+	public static final int BUTTON_HEIGHT = 120;
 
 	// ===========================================================
 	// Fields

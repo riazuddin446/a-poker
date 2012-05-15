@@ -67,7 +67,7 @@ public class PServer extends BaseGameActivity
 
 	//Buttons
 	private BitmapTextureAtlas buttonsTextureAtlas;
-	private HashMap<Button, TextureRegion> buttonToTextureRegionMap;
+	private HashMap<Button, TiledTextureRegion> buttonToTextureRegionMap;
 
 	//Card deck
 	private BitmapTextureAtlas cardDeckTextureAtlas;
@@ -156,11 +156,11 @@ public class PServer extends BaseGameActivity
 		this.backgroundTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.backgroundTextureAtlas, this,"game_table_background.png", 0, 0);
 
 		//Extract and load the textures of each BUTTON
-		this.buttonsTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.buttonToTextureRegionMap = new HashMap<Button, TextureRegion>();
+		this.buttonsTextureAtlas = new BitmapTextureAtlas(2048, 2048, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.buttonToTextureRegionMap = new HashMap<Button, TiledTextureRegion>();
 		int i = 0;
 		for(final Button button : Button.values()){
-			final TextureRegion buttonTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.buttonsTextureAtlas, this, button.name()+".png", i*button.BUTTON_HEIGHT, i*button.BUTTON_WIDTH);
+			final TiledTextureRegion buttonTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.buttonsTextureAtlas, this, button.name()+".png", i*button.BUTTON_HEIGHT, i*button.BUTTON_WIDTH, 1, 2);
 			this.buttonToTextureRegionMap.put(button, buttonTextureRegion);
 			i++;
 		}	
@@ -988,23 +988,22 @@ public class PServer extends BaseGameActivity
 	}
 
 	private void addFoldButton(final int pX, final int pY){
-		final Sprite sprite = new Sprite(pX, pY, this.buttonToTextureRegionMap.get(Button.FOLD)){
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.FOLD)){
 			boolean mGrabbed = false;
 
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {
 				case TouchEvent.ACTION_DOWN:
-					this.setScale(1.25f);
+					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
-
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Fold, 0);
 
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.mGrabbed = false;
-						this.setScale(1.0f);
+						this.setCurrentTileIndex(0);					
 					}
 					break;
 				}
@@ -1016,14 +1015,14 @@ public class PServer extends BaseGameActivity
 	}
 
 	private void addCheckButton(final int pX, final int pY){
-		final Sprite sprite = new Sprite(pX, pY, this.buttonToTextureRegionMap.get(Button.CHECK)){
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.CHECK)){
 			boolean mGrabbed = false;
 
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {
 				case TouchEvent.ACTION_DOWN:
-					this.setScale(1.25f);
+					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Check, 0);
@@ -1031,7 +1030,7 @@ public class PServer extends BaseGameActivity
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
-						this.mGrabbed = false;
+						this.setCurrentTileIndex(0);					
 						this.setScale(1.0f);
 					}
 					break;
@@ -1044,14 +1043,14 @@ public class PServer extends BaseGameActivity
 	}
 
 	private void addCallButton(final int pX, final int pY){
-		final Sprite sprite = new Sprite(pX, pY, this.buttonToTextureRegionMap.get(Button.CALL)){
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.CALL)){
 			boolean mGrabbed = false;
 
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {
 				case TouchEvent.ACTION_DOWN:
-					this.setScale(1.25f);
+					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Call, 0); //TODO Pop up para insertar la cantidad
@@ -1059,7 +1058,7 @@ public class PServer extends BaseGameActivity
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
-						this.mGrabbed = false;
+						this.setCurrentTileIndex(0);					
 						this.setScale(1.0f);
 					}
 					break;
@@ -1072,14 +1071,14 @@ public class PServer extends BaseGameActivity
 	}
 
 	private void addRaiseButton(final int pX, final int pY){
-		final Sprite sprite = new Sprite(pX, pY, this.buttonToTextureRegionMap.get(Button.RAISE)){
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.RAISE)){
 			boolean mGrabbed = false;
 
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {
 				case TouchEvent.ACTION_DOWN:
-					this.setScale(1.25f);
+					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, 0); //TODO Pop up para insertar la cantidad
@@ -1088,7 +1087,7 @@ public class PServer extends BaseGameActivity
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.mGrabbed = false;
-						this.setScale(1.0f);
+						this.setCurrentTileIndex(0);					
 					}
 					break;
 				}
@@ -1100,20 +1099,20 @@ public class PServer extends BaseGameActivity
 	}
 
 	private void addExitButton(final int pX, final int pY){
-		final Sprite sprite = new Sprite(pX, pY, this.buttonToTextureRegionMap.get(Button.EXIT)){
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.EXIT)){
 			boolean mGrabbed = false;
 
 			@Override
 			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
 				switch(pSceneTouchEvent.getAction()) {
 				case TouchEvent.ACTION_DOWN:
-					this.setScale(1.25f);
+					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.mGrabbed = false;
-						this.setScale(1.0f);
+						this.setCurrentTileIndex(0);					
 						finish();
 					}
 					break;
