@@ -224,19 +224,19 @@ public class PServer extends BaseGameActivity
 		initializeStaticSprites();
 		initializeStaticTexts();
 
-		createStateTimeHandler();
-		createBettingRoundTimerHandler();
+		createStateHandler();
+		createBettingRoundHandler();
 
-		createCurrentPlayerIndicatorTimerHandler();
+		createCurrentPlayerIndicatorHandler();
 
-		createPlayerNameAddTimeHandler();
-		createPlayerNameRemoveTimeHandler();
+		createPlayerNameAddHandler();
+		createPlayerNameRemoveHandler();
 
-		createPlayerStakeAddTimeHandler();
-		createPlayerStakeRemoveTimeHandler();
+		createPlayerStakeAddAndUpdateHandler();
+		createPlayerStakeRemoveHandler();
 
-		createSeatBetAddTimeHandler();
-		createSeatBetRemoveTimeHandler();
+		createSeatBetAddAndUpdaterHandler();
+		createSeatBetRemoveHandler();
 
 		createPotAddTimeHandler();
 		createPotRemoveTimeHandler();
@@ -260,18 +260,18 @@ public class PServer extends BaseGameActivity
 			}
 		});
 
-		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
-			@Override
-			public void onUpdate(float pSecondsElapsed) {
-				System.out.println("Current player: "+mGameController.table.currentPlayer);
-			}
-
-			@Override
-			public void reset() {
-				// TODO Auto-generated method stub
-
-			}
-		});
+		//		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
+		//			@Override
+		//			public void onUpdate(float pSecondsElapsed) {
+		//				System.out.println("Current player: "+mGameController.table.currentPlayer);
+		//			}
+		//
+		//			@Override
+		//			public void reset() {
+		//				// TODO Auto-generated method stub
+		//
+		//			}
+		//		});
 
 		this.mainScene.setTouchAreaBindingEnabled(true);
 
@@ -386,7 +386,7 @@ public class PServer extends BaseGameActivity
 
 		//Seat #3 - Center
 		seats_pX.put(2, getCameraWidth()/2-75);
-		seats_pY.put(2, getCameraHeight()-85);
+		seats_pY.put(2, getCameraHeight()-165);
 
 		//Seat #4 - Top rigth
 		seats_pX.put(3, getCameraWidth()-175);
@@ -408,7 +408,6 @@ public class PServer extends BaseGameActivity
 	private void addSeat(final int pX, final int pY, final int pos)
 	{
 		final TiledSprite sprite = new TiledSprite(pX, pY, this.seatTiledTextureRegion);
-		sprite.setCurrentTileIndex(0);
 		seatSprites.add(pos, sprite);
 
 		this.mainScene.attachChild(sprite);
@@ -439,7 +438,7 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado de mantener actualizado en pantalla el estado de la mesa
 	 */
-	private void createStateTimeHandler()
+	private void createStateHandler()
 	{
 		IUpdateHandler stateUpdater = new IUpdateHandler() {
 			@Override
@@ -451,7 +450,6 @@ public class PServer extends BaseGameActivity
 				if(tableStateText.getText() != mGameController.table.state.name())
 				{
 					tableStateText.setText(mGameController.table.state.name());
-					System.out.println(mGameController.table.state.name());
 				}
 			}	
 		};
@@ -462,7 +460,7 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado de mantener actualizado en pantalla la ronda de apuestas
 	 */
-	private void createBettingRoundTimerHandler()
+	private void createBettingRoundHandler()
 	{
 		IUpdateHandler bettingRoundUpdater = new IUpdateHandler() {
 			@Override
@@ -474,7 +472,6 @@ public class PServer extends BaseGameActivity
 				if(bettingRoundText.getText() != mGameController.table.betround.name())
 				{
 					bettingRoundText.setText(mGameController.table.betround.name());
-					System.out.println(mGameController.table.betround.name());
 				}
 			}	
 		};
@@ -485,48 +482,50 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado mantener actualizada la imagen del seat del current player
 	 */
-	private void createCurrentPlayerIndicatorTimerHandler()
+	private void createCurrentPlayerIndicatorHandler()
 	{
-		IUpdateHandler currentIndicatorUpdater = new IUpdateHandler() {
+		IUpdateHandler currentPlayerIndicatorUpdater = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
 
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
+
+				int currentPlayer = mGameController.table.currentPlayer;
+				System.out.println("Current player :"+currentPlayer);
+
 				for(int i=0; i<seatSprites.size(); i++)
 				{
-					int owner = mGameController.getOwner();
-
-					if(i == owner){
-						System.out.println("Owner: "+mGameController.players.get(i).name);
-						System.out.println("Cambiar textura!");
-						System.out.println("Textura actual: "+seatSprites.get(i).getCurrentTileIndex());
-						//if(seatSprites.get(i).getCurrentTileIndex() != 1)
-						seatSprites.get(i).setCurrentTileIndex(1);
-						System.out.println("Textura posterior: "+seatSprites.get(i).getCurrentTileIndex());
+					TiledSprite _seatSprite = seatSprites.get(i);
+					
+					if(i == currentPlayer){
+						System.out.println("¡Current player!: "+mGameController.players.get(i).name);
+						System.out.println("Textura actual: "+_seatSprite.getCurrentTileIndex());
+						if(_seatSprite.getCurrentTileIndex() != 1)
+							_seatSprite.setCurrentTileIndex(1);
+						System.out.println("Textura posterior: "+_seatSprite.getCurrentTileIndex());
 					}
-					else {
-						System.out.println("Player: "+mGameController.players.get(i).name);
-						System.out.println("Cambiar textura!");
-						System.out.println("Textura actual: "+seatSprites.get(i).getCurrentTileIndex());
-						//if(seatSprites.get(i).getCurrentTileIndex() != 0)
-						seatSprites.get(i).setCurrentTileIndex(0);
-						System.out.println("Textura posterior: "+seatSprites.get(i).getCurrentTileIndex());
+					else if(i != currentPlayer){
+						System.out.println("NORMAL player: "+mGameController.players.get(i).name);
+						System.out.println("Textura actual: "+_seatSprite.getCurrentTileIndex());
+						if(_seatSprite.getCurrentTileIndex() != 0)
+							_seatSprite.setCurrentTileIndex(0);
+						System.out.println("Textura posterior: "+_seatSprite.getCurrentTileIndex());
 					}
 				}
 			}	
 		};
 
-		mainScene.registerUpdateHandler(currentIndicatorUpdater);
+		mainScene.registerUpdateHandler(currentPlayerIndicatorUpdater);
 	}
 
 	/**
 	 * Encargado de crear y añadir en pantalla los nombres de los jugadores que aun no esten creados
 	 */
-	private void createPlayerNameAddTimeHandler()
+	private void createPlayerNameAddHandler()
 	{
-		IUpdateHandler nameAdder = new IUpdateHandler() {
+		IUpdateHandler playerNameAdder = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -554,15 +553,15 @@ public class PServer extends BaseGameActivity
 				}
 			}	
 		};
-		mainScene.registerUpdateHandler(nameAdder);
+		mainScene.registerUpdateHandler(playerNameAdder);
 	}
 
 	/**
 	 * Encargado de eliminar de la pantalla los nombres de los jugadores que ya no esten en la partida
 	 */
-	private void createPlayerNameRemoveTimeHandler()
+	private void createPlayerNameRemoveHandler()
 	{
-		IUpdateHandler nameRemover = new IUpdateHandler() {
+		IUpdateHandler playerNameRemover = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -584,15 +583,15 @@ public class PServer extends BaseGameActivity
 			}	
 		};
 
-		mainScene.registerUpdateHandler(nameRemover);
+		mainScene.registerUpdateHandler(playerNameRemover);
 	}
 
 	/**
 	 * Encargado de crear y añadir en pantalla las fichas de los jugadores que aun no esten creados
 	 */
-	private void createPlayerStakeAddTimeHandler()
+	private void createPlayerStakeAddAndUpdateHandler()
 	{
-		IUpdateHandler playerStakeAdder = new IUpdateHandler() {
+		IUpdateHandler playerStakeAdderAndUpdater = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -617,16 +616,20 @@ public class PServer extends BaseGameActivity
 						//Attach it to the scene
 						mainScene.attachChild(playerStakesText.get(i));
 					}
+					else if(playerStakesText.get(i).getText() != Integer.toString(seats.get(i).player.stake)) //Update text
+					{
+						playerStakesText.get(i).setText(Integer.toString(seats.get(i).player.stake));
+					}
 				}
 			}	
 		};
-		mainScene.registerUpdateHandler(playerStakeAdder);
+		mainScene.registerUpdateHandler(playerStakeAdderAndUpdater);
 	}
 
 	/**
 	 * Encargado de eliminar de la pantalla las fichas de los jugadores que ya no esten en la partida
 	 */
-	private void createPlayerStakeRemoveTimeHandler()
+	private void createPlayerStakeRemoveHandler()
 	{
 		IUpdateHandler playerStakeRemover = new IUpdateHandler() {
 			@Override
@@ -641,7 +644,7 @@ public class PServer extends BaseGameActivity
 
 				while (stakes.hasNext()) {
 					_stake = stakes.next();
-					int pos = playerNamesText.indexOf(_stake);
+					int pos = playerStakesText.indexOf(_stake);
 
 					if (pos+1 > mGameController.table.seats.size()) {
 						removeText(_stake, stakes);		
@@ -656,9 +659,9 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado de crear y añadir en pantalla las apuestas de los jugadores
 	 */
-	private void createSeatBetAddTimeHandler()
+	private void createSeatBetAddAndUpdaterHandler()
 	{
-		IUpdateHandler seatBetAdder = new IUpdateHandler() {
+		IUpdateHandler seatBetAdderAndUpdater = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -673,7 +676,6 @@ public class PServer extends BaseGameActivity
 				for(int i=0; i<5;i++)
 				{
 					String bet = Integer.toString(seats.get(i).bet);
-					System.out.println("Bet: "+bet);
 
 					if(i<seatssize && i>=bettextsize) //Add ChangeableText
 					{
@@ -688,20 +690,18 @@ public class PServer extends BaseGameActivity
 					}
 					else if(seatBetText.get(i).getText() != bet) //Update text
 					{
-						System.out.println(seats.get(i).bet);
 						seatBetText.get(i).setText(bet);
-						System.out.println(seatBetText.get(i).getText());
 					}
 				}
 			}	
 		};
-		mainScene.registerUpdateHandler(seatBetAdder);
+		mainScene.registerUpdateHandler(seatBetAdderAndUpdater);
 	}
 
 	/**
 	 * Encargado de eliminar de la pantalla las apuestas de los jugadores que ya no esten en la partida
 	 */
-	private void createSeatBetRemoveTimeHandler()
+	private void createSeatBetRemoveHandler()
 	{
 		IUpdateHandler seatBetRemover = new IUpdateHandler() {
 			@Override
@@ -716,7 +716,7 @@ public class PServer extends BaseGameActivity
 
 				while (bets.hasNext()) {
 					_bet = bets.next();
-					int pos = playerNamesText.indexOf(_bet);
+					int pos = seatBetText.indexOf(_bet);
 
 					if (pos+1 > mGameController.table.seats.size()) {
 						removeText(_bet, bets);		
@@ -733,7 +733,7 @@ public class PServer extends BaseGameActivity
 	 */
 	private void createPotAddTimeHandler()
 	{
-		IUpdateHandler seatBetAdder = new IUpdateHandler() {
+		IUpdateHandler potAdder = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -748,7 +748,7 @@ public class PServer extends BaseGameActivity
 				for(int i=0; i<pots.size();i++)
 				{
 					String amount = Integer.toString(pots.get(i).amount);
-					System.out.println("Amount: "+amount);
+					//System.out.println("Amount: "+amount);
 
 					if(i<potssize && i>=potstextsize) //Add ChangeableText
 					{
@@ -768,7 +768,7 @@ public class PServer extends BaseGameActivity
 				}
 			}	
 		};
-		mainScene.registerUpdateHandler(seatBetAdder);
+		mainScene.registerUpdateHandler(potAdder);
 	}
 
 	/**
@@ -789,7 +789,7 @@ public class PServer extends BaseGameActivity
 
 				while (pots.hasNext()) {
 					_pot = pots.next();
-					int pos = playerNamesText.indexOf(_pot);
+					int pos = potsText.indexOf(_pot);
 
 					if (pos+1 > mGameController.table.seats.size()) {
 						removeText(_pot, pots);		
@@ -901,7 +901,7 @@ public class PServer extends BaseGameActivity
 						{
 							if(i<hlsize && i>=hlspritesize) //Add sprite
 							{
-								System.out.println((seats_pX.get(j)+60+52*i)+","+(seats_pY.get(j)-20));
+								//System.out.println((seats_pX.get(j)+60+52*i)+","+(seats_pY.get(j)-20));
 								//Create new Sprite with the needed card texture
 								Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(hlcards.get(i)));
 								aux.setScale(0.7f);
@@ -979,10 +979,11 @@ public class PServer extends BaseGameActivity
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
 	private void addButtons()
 	{
-		this.addFoldButton(0, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.FOLD).getHeight());
-		this.addCheckButton(this.buttonToTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CHECK).getHeight());
-		this.addCallButton(getCameraWidth() - 2*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight());
-		this.addRaiseButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.buttonToTextureRegionMap.get(Button.RAISE).getHeight());
+		this.addFoldButton(0, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.FOLD).getHeight()/2);
+		this.addCheckButton(this.buttonToTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CHECK).getHeight()/2);
+		this.addBetButton(getCameraWidth() - 3*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 30, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2);
+		this.addCallButton(getCameraWidth() - 2*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2);
+		this.addRaiseButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.buttonToTextureRegionMap.get(Button.RAISE).getHeight()/2);
 		this.addExitButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.EXIT).getWidth(), 0);
 
 	}
@@ -1026,6 +1027,34 @@ public class PServer extends BaseGameActivity
 					this.mGrabbed = true;
 
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Check, 0);
+
+					break;
+				case TouchEvent.ACTION_UP:
+					if(this.mGrabbed) {
+						this.setCurrentTileIndex(0);					
+						this.setScale(1.0f);
+					}
+					break;
+				}
+				return true;
+			}
+		};
+		this.mainScene.attachChild(sprite);
+		this.mainScene.registerTouchArea(sprite);
+	}
+
+	private void addBetButton(final int pX, final int pY){
+		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.BET)){
+			boolean mGrabbed = false;
+
+			@Override
+			public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+				switch(pSceneTouchEvent.getAction()) {
+				case TouchEvent.ACTION_DOWN:
+					this.setCurrentTileIndex(1);					
+					this.mGrabbed = true;
+
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, 0); //TODO Pop up para insertar la cantidad
 
 					break;
 				case TouchEvent.ACTION_UP:

@@ -6,16 +6,11 @@ public enum Button {
 	// ===========================================================
 
 	FOLD,
-	FOLDPRESSED,
 	CHECK,
-	CHECKPRESSED,
 	CALL,
-	CALLPRESSED,
+	BET,
 	RAISE,
-	RAISEPRESSED,
-	EXIT,
-	EXITPRESSED;
-
+	EXIT;
 	// ===========================================================
 	// Constants
 	// ===========================================================
