@@ -227,7 +227,7 @@ public class PServer extends BaseGameActivity
 		createStateHandler();
 		createBettingRoundHandler();
 
-		createCurrentPlayerIndicatorHandler();
+		//FIXME createCurrentPlayerIndicatorHandler();
 
 		createPlayerNameAddHandler();
 		createPlayerNameRemoveHandler();

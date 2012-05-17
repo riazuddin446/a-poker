@@ -21,6 +21,11 @@ public class HoldemHandEvaluator extends PokerHandEvaluator
 	// Constructors
 	// ===========================================================
 
+	public HoldemHandEvaluator()
+	{
+		
+	}
+	
 	public HoldemHandEvaluator(List<Card> hole_cards, List<Card> community_cards)
 	{
 		super();
