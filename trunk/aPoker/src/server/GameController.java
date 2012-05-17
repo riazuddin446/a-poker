@@ -293,7 +293,7 @@ public class GameController {
 			showdown_player = t.getNextActivePlayer(showdown_player); //Find next showdown player
 		}
 
-		HoldemHandEvaluator tmp = new HoldemHandEvaluator(null, null);
+		HoldemHandEvaluator tmp = new HoldemHandEvaluator();
 		return tmp.getWinList(wl);
 	}
 
@@ -737,7 +737,7 @@ public class GameController {
 				if(t.nomoreaction)
 					t.state = State.Showdown;
 				else
-					t.state = State.AskShow;
+					t.state = State.Showdown; //State.AskShow;
 
 				t.resetLastPlayerActions();
 				return;
@@ -993,9 +993,13 @@ public class GameController {
 		t.scheduleState(State.EndRound);
 	}
 
+	/**
+	 * 
+	 * @param t
+	 */
 	protected void stateEndRound(Table t)
 	{
-		HashMap<Integer, Integer> broken_players = new HashMap<Integer, Integer>();
+		ArrayList<Integer> broken_players = new ArrayList<Integer>();
 
 		//Lets look for broken players
 		for(int i=0; i<5; i++)
@@ -1007,7 +1011,7 @@ public class GameController {
 
 			//Check if player has no stake left
 			if(p.stake == 0)
-				broken_players.put(p.stake_before, i);
+				broken_players.add(p.stake_before, i);
 		}
 
 		//Remove player in rigth order (sorted by stake_before)
