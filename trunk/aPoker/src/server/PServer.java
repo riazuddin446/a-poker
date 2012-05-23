@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import logic.Card;
+import logic.HoleCards;
 import logic.Player;
 import logic.Player.Action;
 
@@ -221,11 +222,10 @@ public class PServer extends BaseGameActivity
 		addDebugPlayers();
 
 		initializeSpriteContainers();
-		initializeStaticSprites();
-		initializeStaticTexts();
+		initializeInfoTexts();
 
-		createStateHandler();
-		createBettingRoundHandler();
+		createStateUpdateHandler();
+		createBettingRoundUpdateHandler();
 
 		//FIXME createCurrentPlayerIndicatorHandler();
 
@@ -242,10 +242,10 @@ public class PServer extends BaseGameActivity
 		createPotRemoveTimeHandler();
 
 		createCommunityCardAddTimeHandler();
-		createCommunityCardRemoveTimeHandler();
+		//createCommunityCardRemoveTimeHandler();
 
-		createHoleCardAddTimeHandler();
-		createHoleCardRemoveTimeHandler();
+		createHoleCardUpdateHandler();
+		//createHoleCardRemoveTimeHandler();
 
 		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
 			@Override
@@ -259,19 +259,6 @@ public class PServer extends BaseGameActivity
 
 			}
 		});
-
-		//		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
-		//			@Override
-		//			public void onUpdate(float pSecondsElapsed) {
-		//				System.out.println("Current player: "+mGameController.table.currentPlayer);
-		//			}
-		//
-		//			@Override
-		//			public void reset() {
-		//				// TODO Auto-generated method stub
-		//
-		//			}
-		//		});
 
 		this.mainScene.setTouchAreaBindingEnabled(true);
 
@@ -297,6 +284,7 @@ public class PServer extends BaseGameActivity
 	private void initializeSpriteContainers()
 	{
 		communityCardSprites = new ArrayList<Sprite>();
+
 		holeCardSprites = new ArrayList< ArrayList<Sprite> >();
 		for(int i=0; i<5; i++)
 		{
@@ -304,30 +292,24 @@ public class PServer extends BaseGameActivity
 
 			holeCardSprites.add(i, auxArray);
 		}
+
 		playerNamesText = new ArrayList<ChangeableText>();
+
 		playerStakesText = new ArrayList<ChangeableText>();
+
 		seatBetText = new ArrayList<ChangeableText>();
+
 		potsText = new ArrayList<ChangeableText>();
 	}
 
-	private void initializeStaticSprites()
-	{
-		for(int i=0; i<dealerAndBlindToTextureRegionList.size(); i++)
-		{
-			Sprite _sprite = new Sprite(-1, -1, dealerAndBlindToTextureRegionList.get(i));
-			dealerAndBlindButtons.add(_sprite);
-			mainScene.attachChild(_sprite);
-		}
-	}
-
-	private void initializeStaticTexts()
+	private void initializeInfoTexts()
 	{
 		//Crear el texto donde se mostrará el estado de la mesa
-		bettingRoundText = new ChangeableText(0, 30, font, "Betting round: " + mGameController.table.betround.name());
+		bettingRoundText = new ChangeableText(0, 30, font, mGameController.table.betround.name());
 		mainScene.attachChild(bettingRoundText);
 
 		//Crear el texto donde se mostrará la ronda de apuestas de la mesa
-		tableStateText = new ChangeableText(0, 0, font, "Table state: " + mGameController.table.state.name());
+		tableStateText = new ChangeableText(0, 0, font, mGameController.table.state.name());
 		mainScene.attachChild(tableStateText);
 	}
 
@@ -436,11 +418,11 @@ public class PServer extends BaseGameActivity
 	}
 
 	/**
-	 * Encargado de mantener actualizado en pantalla el estado de la mesa
+	 * Encargado de mantener actualizado en pantalla el texto con elestado de la mesa
 	 */
-	private void createStateHandler()
+	private void createStateUpdateHandler()
 	{
-		IUpdateHandler stateUpdater = new IUpdateHandler() {
+		IUpdateHandler tableStateUpdater = new IUpdateHandler() {
 			@Override
 			public void reset() {
 			}
@@ -454,13 +436,13 @@ public class PServer extends BaseGameActivity
 			}	
 		};
 
-		mainScene.registerUpdateHandler(stateUpdater);
+		mainScene.registerUpdateHandler(tableStateUpdater);
 	}
 
 	/**
 	 * Encargado de mantener actualizado en pantalla la ronda de apuestas
 	 */
-	private void createBettingRoundHandler()
+	private void createBettingRoundUpdateHandler()
 	{
 		IUpdateHandler bettingRoundUpdater = new IUpdateHandler() {
 			@Override
@@ -498,7 +480,7 @@ public class PServer extends BaseGameActivity
 				for(int i=0; i<seatSprites.size(); i++)
 				{
 					TiledSprite _seatSprite = seatSprites.get(i);
-					
+
 					if(i == currentPlayer){
 						System.out.println("¡Current player!: "+mGameController.players.get(i).name);
 						System.out.println("Textura actual: "+_seatSprite.getCurrentTileIndex());
@@ -534,7 +516,7 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Seat> seats = mGameController.table.seats; //Get seats
-				int seatssize = seats.size(); //Get the number seats
+				int seatssize = seats.size();
 				int nametextsize = playerNamesText.size();
 
 				for(int i=0; i<5;i++)
@@ -818,16 +800,17 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				ArrayList<Card> cmcards = mGameController.table.communitycards.cards; //Get community cards
-				int cmsize = cmcards.size(); //Get the number of cards
+				ArrayList<Card> _communitycards = mGameController.table.communitycards.cards; //Get community cards
+
+				int cmsize = _communitycards.size(); //Get the number of cards
 				int cmspritesize = communityCardSprites.size();
 
 				for(int i=0; i<5;i++)
 				{
-					if(i<cmsize && i>=cmspritesize) //Add sprite
+					if(i>=cmspritesize && i<cmsize) //Add sprite
 					{
 						//Create new Sprite with the needed card texture
-						Sprite aux = new Sprite(262+55*i, 175, cardTotextureRegionMap.get(cmcards.get(i)));
+						Sprite aux = new Sprite(262+55*i, 175, cardTotextureRegionMap.get(_communitycards.get(i)));
 						aux.setScale(0.7f);
 
 						//Add it to the Array who saves the sprites of the Community Cards
@@ -835,6 +818,24 @@ public class PServer extends BaseGameActivity
 
 						//Attach it to the scene
 						mainScene.attachChild(communityCardSprites.get(i));
+					}
+					else if(i<cmspritesize && i<cmsize) //Update sprite
+					{
+						Sprite _sprite = communityCardSprites.get(i);
+						TextureRegion _texture = cardTotextureRegionMap.get(_communitycards.get(i));
+
+						if(_sprite.getTextureRegion() != _texture) //Nueva carta = Nueva textura
+						{
+							mainScene.detachChild(_sprite);
+							_sprite = new Sprite(262+55*i, 175, _texture);
+							_sprite.setScale(0.7f);
+							mainScene.attachChild(_sprite);
+						}
+					}
+					else if(i<cmspritesize && i>= cmsize) //Detach sprite
+					{
+						Sprite _sprite = communityCardSprites.get(i);
+						mainScene.detachChild(_sprite);
 					}
 				}
 			}	
@@ -856,16 +857,18 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				Iterator<Sprite> cards = communityCardSprites.iterator();
-				Sprite _card;		 
+				ArrayList<Card> cmcards = mGameController.table.communitycards.cards; //Get community cards
 
-				while (cards.hasNext()) {
-					_card = cards.next();
-					int pos = communityCardSprites.indexOf(_card);
-
-					if (pos+1 > mGameController.table.communitycards.cards.size()) {
-						removeSprite(_card, cards);		
-					}	
+				for(int i=0; i<5;i++)
+				{
+					if(i<communityCardSprites.size())
+					{
+						if(i>=cmcards.size()) //Remove sprite
+						{
+							mainScene.detachChild(communityCardSprites.get(i)); //Detach from the scene (interface)
+							communityCardSprites.remove(i);	//Remove from his sprite container
+						}
+					}
 				}
 			}	
 		};
@@ -876,9 +879,9 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado de crear los sprites de las community cards que aun no esten creadas
 	 */
-	private void createHoleCardAddTimeHandler()
+	private void createHoleCardUpdateHandler()
 	{
-		IUpdateHandler holeCardCardAdder = new IUpdateHandler() {
+		IUpdateHandler holeCardUpdater = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -888,29 +891,41 @@ public class PServer extends BaseGameActivity
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Cogemos la referencia a los asientos
 
-				for(int j = 0; j < _seats.size(); j++) //Por cada uno de ellos
+				for(int j = 0; j < _seats.size(); j++) //Por cada asiento de la mesa
 				{
-					if(_seats.get(j).occupied) //Primero comprobamos si esta ocupado por un jugador
+					Seat _seat = _seats.get(j);
+
+					if(_seat.occupied) //Comprobamos si esta ocupado por un jugador
 					{
-						Player _player = _seats.get(j).player; //Cogemos la referencia al jugador que ocupa ese asiento
-						ArrayList<Card> hlcards = _player.holecards.cards; //Cogemos la referencia a sus holecards
-						int hlsize = hlcards.size(); //Get the number of cards
-						int hlspritesize = holeCardSprites.get(j).size();
+						ArrayList<Card> _holecards = _seat.player.holecards.cards; //Referencia a sus holecards
+						ArrayList<Sprite> _sprites = holeCardSprites.get(j); //Referencia a los sprites asociados a esos holecards
+
+						int hlsize = _holecards.size(); //Numero de cartas en la mano
+						int spritesize = _sprites.size(); //Numero de Sprites
 
 						for(int i=0; i<2;i++)
 						{
-							if(i<hlsize && i>=hlspritesize) //Add sprite
+							if(i>=spritesize && i<hlsize) //Añadir Sprite
 							{
-								//System.out.println((seats_pX.get(j)+60+52*i)+","+(seats_pY.get(j)-20));
-								//Create new Sprite with the needed card texture
-								Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(hlcards.get(i)));
-								aux.setScale(0.7f);
+								Sprite _sprite = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(_holecards.get(i)));
+								_sprite.setScale(0.7f);
 
-								//Add it to the Array who saves the sprites of the Community Cards
-								holeCardSprites.get(j).add(i, aux);
+								_sprites.add(i, _sprite);
 
-								//Attach it to the scene
-								mainScene.attachChild(holeCardSprites.get(j).get(i));
+								mainScene.attachChild(_sprites.get(i)); //Añadirlo a la escena para que se muestre
+							}
+							else if(i<spritesize && i<hlsize) //Actualizar Sprite
+							{
+								Sprite _sprite = _sprites.get(i);
+								TextureRegion _texture = cardTotextureRegionMap.get(_holecards.get(i));
+
+								if(_sprite.getTextureRegion() != _texture) //Nueva carta = Nueva textura
+								{
+									mainScene.detachChild(_sprite);
+									_sprite = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, _texture);
+									_sprite.setScale(0.7f);
+									mainScene.attachChild(_sprite);
+								}
 							}
 						}
 					}
@@ -918,7 +933,7 @@ public class PServer extends BaseGameActivity
 			}	
 		};
 
-		mainScene.registerUpdateHandler(holeCardCardAdder);
+		mainScene.registerUpdateHandler(holeCardUpdater);
 	}
 
 	/**
@@ -934,20 +949,45 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				for(int j = 0; j < holeCardSprites.size(); j++) //Por cada uno de ellos
+				for(int i = 0; i < holeCardSprites.size(); i++) //Por cada uno de los holesprites
 				{
-					ArrayList<Sprite> aux = holeCardSprites.get(j);
-					Iterator<Sprite> cards = aux.iterator();
-					Sprite _card;		 
+					HoleCards _holecards = mGameController.table.seats.get(i).player.holecards;
+					ArrayList<Sprite> _sprites = holeCardSprites.get(i);
+					Iterator<Sprite> _iterator = _sprites.iterator();
+					Sprite _aux;
 
-					while (cards.hasNext()) {
-						_card = cards.next();
-						int pos = aux.indexOf(_card);
+					while(_iterator.hasNext())
+					{
+						System.out.println("Tiene siguiente!");
+						_aux = _iterator.next();
+						int pos = _sprites.indexOf(_aux);
 
-						if (pos+1 > mGameController.table.seats.get(j).player.holecards.size()) {
-							removeSprite(_card, cards);		
-						}	
+						if(pos+1 > _holecards.size())
+						{
+							mainScene.detachChild(_aux);
+							_sprites.remove(_aux);
+						}
 					}
+
+					//					int hlsize = _holecards.size();
+					//					int spritesize = _sprites.size();
+					//
+					//					for(int j=0; j<2; j++)
+					//					{
+					//						if(j<spritesize) //Existe sprite en esa posicion
+					//						{
+					//							System.out.println("#Existe el sprite en la posicion "+j);
+					//							if(j>=hlsize) //Remove sprite
+					//							{
+					//								System.out.println("#Y no esta asociada a ninguna holecard ya que el tamaño de las misma es: "+hlsize);
+					//								mainScene.detachChild(holeCardSprites.get(i).get(j)); //Detach from the scene (interface)
+					//								_sprites.remove(j);	//Remove from his sprite container
+					//								System.out.println("#Sprite en la posicion "+j+" desasociado de la escena y eliminado del contenedor de sprites");
+					//							}
+					//							else
+					//								System.out.println("#Pero esta asociada a la carta ya que la posicion "+j+" esta dentro de las holecards, cuyo tamaño es ="+hlsize);
+					//						}
+					//					}
 				}
 			}	
 		};
@@ -979,12 +1019,12 @@ public class PServer extends BaseGameActivity
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
 	private void addButtons()
 	{
-		this.addFoldButton(0, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.FOLD).getHeight()/2);
-		this.addCheckButton(this.buttonToTextureRegionMap.get(Button.FOLD).getWidth() + 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CHECK).getHeight()/2);
-		this.addBetButton(getCameraWidth() - 3*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 30, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2);
-		this.addCallButton(getCameraWidth() - 2*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2);
-		this.addRaiseButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.buttonToTextureRegionMap.get(Button.RAISE).getHeight()/2);
-		this.addExitButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.EXIT).getWidth(), 0);
+		this.addFoldButton(5, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.FOLD).getHeight()/2 -5);
+		this.addCheckButton(this.buttonToTextureRegionMap.get(Button.FOLD).getWidth() + 20, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CHECK).getHeight()/2-5);
+		this.addBetButton(getCameraWidth() - 3*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 30, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2-5);
+		this.addCallButton(getCameraWidth() - 2*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2-5);
+		this.addRaiseButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.buttonToTextureRegionMap.get(Button.RAISE).getHeight()/2-5);
+		this.addExitButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.EXIT).getWidth()-5, 5);
 
 	}
 
