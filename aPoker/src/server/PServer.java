@@ -229,17 +229,17 @@ public class PServer extends BaseGameActivity
 
 		//FIXME createCurrentPlayerIndicatorHandler();
 
-		createPlayerNameAddHandler();
-		createPlayerNameRemoveHandler();
+		createPlayerNameUpdateHandler();
+		//createPlayerNameRemoveHandler();
 
-		createPlayerStakeAddAndUpdateHandler();
-		createPlayerStakeRemoveHandler();
+		//createPlayerStakeAddAndUpdateHandler();
+		//createPlayerStakeRemoveHandler();
 
-		createSeatBetAddAndUpdaterHandler();
-		createSeatBetRemoveHandler();
+		//createSeatBetAddAndUpdaterHandler();
+		//createSeatBetRemoveHandler();
 
-		createPotAddTimeHandler();
-		createPotRemoveTimeHandler();
+		//createPotAddTimeHandler();
+		//createPotRemoveTimeHandler();
 
 		createCommunityCardAddTimeHandler();
 		//createCommunityCardRemoveTimeHandler();
@@ -395,17 +395,6 @@ public class PServer extends BaseGameActivity
 		this.mainScene.attachChild(sprite);
 	}
 
-	private void removeSprite(final Sprite _sprite, Iterator it) {
-		runOnUpdateThread(new Runnable() {
-			@Override
-			public void run() {
-				mainScene.detachChild(_sprite);
-			}
-		});
-
-		it.remove();
-	}
-
 	private void removeText(final ChangeableText _text, Iterator it) {
 		runOnUpdateThread(new Runnable() {
 			@Override
@@ -505,9 +494,9 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado de crear y añadir en pantalla los nombres de los jugadores que aun no esten creados
 	 */
-	private void createPlayerNameAddHandler()
+	private void createPlayerNameUpdateHandler()
 	{
-		IUpdateHandler playerNameAdder = new IUpdateHandler() {
+		IUpdateHandler playerNameUpdater = new IUpdateHandler() {
 			@Override
 			public void reset() {		
 			}
@@ -515,27 +504,40 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				ArrayList<Seat> seats = mGameController.table.seats; //Get seats
-				int seatssize = seats.size();
-				int nametextsize = playerNamesText.size();
+				ArrayList<Seat> seats = mGameController.table.seats; //Referencia a los asientos
+				int namessize = playerNamesText.size();
 
 				for(int i=0; i<5;i++)
 				{
-					if(i<seatssize && i>=nametextsize) //Add ChangeableText
+					Seat _seat = seats.get(i);
+
+					if(_seat.occupied) //Si el asiento esta ocupado por un jugador
 					{
-						//Create new ChangeableText
-						ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, seats.get(i).player.name);
+						if(i>=namessize) //Añadir ChangeableText
+						{
+							//Create new ChangeableText
+							ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, _seat.player.name);
 
-						//Add it to the Array who saves the ChangeableTexts of the names of the players in seats
-						playerNamesText.add(i, aux);
+							//Add it to the Array who saves the ChangeableTexts of the names of the players in seats
+							playerNamesText.add(i, aux);
 
-						//Attach it to the scene
-						mainScene.attachChild(playerNamesText.get(i));
+							//Attach it to the scene
+							mainScene.attachChild(playerNamesText.get(i));
+						}
+						else if(i<namessize) //Actualizar ChangeableText
+						{
+							if(_seat.player.name != playerNamesText.get(i).getText())
+								playerNamesText.get(i).setText(_seat.player.name);
+						}
+					}
+					else //"Borrar" ChangeableText
+					{
+						mainScene.detachChild(playerNamesText.get(i));
 					}
 				}
 			}	
 		};
-		mainScene.registerUpdateHandler(playerNameAdder);
+		mainScene.registerUpdateHandler(playerNameUpdater);
 	}
 
 	/**
