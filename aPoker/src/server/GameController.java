@@ -196,6 +196,7 @@ public class GameController {
 		//If the game is not started of full and if the player is not already ingame
 		if(!started && players.size() != max_players && !isPlayer(p))
 		{
+			//p.setStake(200);
 			p.setStake(player_stakes);
 			players.add(i, p);
 
@@ -477,9 +478,6 @@ public class GameController {
 
 		//Give out hole-cards
 		dealHole(t);
-
-		System.out.println("Dealhole done!");
-		System.out.println("Numero de hlcards: "+table.seats.get(0).player.holecards.cards.size());
 
 		//FIXME Tell the player under the gun that it's his turn
 
@@ -1034,54 +1032,37 @@ public class GameController {
 
 	protected int handleTable(Table t)
 	{
-		System.out.println("handleTable()");
 		if(t.state == State.NewRound)
 		{
-			System.out.println("NewRound - start");
 			stateNewRound(t);
-			System.out.println("NewRound - end");
 		}
 		else if(t.state == State.Blinds)
 		{
-			System.out.println("Blinds - start");
 			stateBlinds(t);
-			System.out.println("Blinds - end");
 		}
 		else if(t.state == State.Betting)
 		{
-			System.out.println("Betting - start");
 			stateBetting(t);
-			System.out.println("Betting - end");
 		}
 		else if(t.state == State.BettingEnd)
 		{
-			System.out.println("BettingEnd - start");
 			stateBettingEnd(t);
-			System.out.println("BettingEnd - end");
 		}
 		else if(t.state == State.AskShow)
 		{
-			System.out.println("AskShow - start");
 			stateAskShow(t);
-			System.out.println("AskShow - end");
 		}
 		else if(t.state == State.AllFolded)
 		{
-			System.out.println("AllFolded - start");
 			stateAllFolded(t);
-			System.out.println("AllFolded - end");
 		}
 		else if(t.state == State.Showdown)
 		{
-			System.out.println("Showdown - start");
 			stateShowdown(t);
-			System.out.println("Showdown - end");
 		}
 		else if(t.state == State.EndRound)
 		{
-			System.out.println("EndRound - start");
 			stateEndRound(t);
-			System.out.println("EndRound - end");
 		}
 
 		//If there is one player left, close the table
