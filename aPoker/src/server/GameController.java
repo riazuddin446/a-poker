@@ -196,7 +196,6 @@ public class GameController {
 		//If the game is not started of full and if the player is not already ingame
 		if(!started && players.size() != max_players && !isPlayer(p))
 		{
-			//p.setStake(200);
 			p.setStake(player_stakes);
 			players.add(i, p);
 
