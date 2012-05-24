@@ -236,7 +236,7 @@ public class PServer extends BaseGameActivity
 		//playerStakeUpdater();
 		//seatBetUpdater();
 		//potUpdater();
-		//communityCardUpdater();
+		communityCardUpdater();
 		//holeCardUpdater();
 
 		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
@@ -296,6 +296,8 @@ public class PServer extends BaseGameActivity
 		for(int i=0; i<5; i++)
 		{
 			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, "        ");
+			aux.setVisible(false);
+
 			playerNameTexts.add(i, aux);
 			mainScene.attachChild(aux);
 		}
@@ -304,32 +306,45 @@ public class PServer extends BaseGameActivity
 		playerStakeTexts = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, "");
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, "        ");
+			aux.setVisible(false);
+
 			playerStakeTexts.add(i, aux);
+			mainScene.attachChild(aux);
 		}
 
 		//Apuestas de los jugadores
 		seatBetText = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, "");
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, "         ");
+			aux.setVisible(false);
+
 			seatBetText.add(i, aux);
+			mainScene.attachChild(aux);
 		}
 
 		//Botes en juego
 		potsText = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+"");
+			ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+"        ");
+			aux.setVisible(false);
+
 			potsText.add(i, aux);
+			mainScene.attachChild(aux);
 		}
 
 		//Cartas que comparten todos los jugadores
 		communityCardSprites = new ArrayList<Sprite>();
 		for(int i=0; i<5; i++)
 		{
-			Sprite aux = null; //FIXME ¿Crear el sprite?
+			Sprite aux = new Sprite(262+55*i, 175, cardTotextureRegionMap.get(Card.CLUB_ACE));
+			aux.setScale(0.7f);
+			aux.setVisible(false);
+
 			communityCardSprites.add(i, aux);
+			mainScene.attachChild(aux);
 		}
 
 		//Cartas de las manos de los jugadores
@@ -340,8 +355,12 @@ public class PServer extends BaseGameActivity
 			ArrayList<Sprite> auxArray = new ArrayList<Sprite>();
 			for(int j=0; j<2; j++)
 			{
-				Sprite aux = null;
+				Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(Card.CLUB_ACE));
+				aux.setScale(0.7f);
+				aux.setVisible(false);
+
 				auxArray.add(j, aux);
+				mainScene.attachChild(aux);
 			}
 
 			holeCardSprites.add(i, auxArray);
@@ -552,6 +571,7 @@ public class PServer extends BaseGameActivity
 						if(_seat.player.name != _name.getText())
 							_name.setText(_seat.player.name);
 
+						System.out.println("Name visible? "+_name.isVisible());						
 						if(!_name.isVisible())
 							_name.setVisible(true);
 						//if(mainScene.getChildIndex(_name)>=0)
@@ -733,41 +753,29 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Card> _communitycards = mGameController.table.communitycards.cards; //Get community cards
-
 				int cmsize = _communitycards.size(); //Get the number of cards
-				int cmspritesize = communityCardSprites.size();
 
 				for(int i=0; i<5;i++)
 				{
-					if(i>=cmspritesize && i<cmsize) //Add sprite
+					if(i<cmsize) //Existe la carta, tratar de actualizar el sprite asociado
 					{
-						//Create new Sprite with the needed card texture
-						Sprite aux = new Sprite(262+55*i, 175, cardTotextureRegionMap.get(_communitycards.get(i)));
-						aux.setScale(0.7f);
-
-						//Add it to the Array who saves the sprites of the Community Cards
-						communityCardSprites.add(i, aux);
-
-						//Attach it to the scene
-						mainScene.attachChild(communityCardSprites.get(i));
-					}
-					else if(i<cmspritesize && i<cmsize) //Update sprite
-					{
+						Card _card = _communitycards.get(i);
 						Sprite _sprite = communityCardSprites.get(i);
-						TextureRegion _texture = cardTotextureRegionMap.get(_communitycards.get(i));
 
-						if(_sprite.getTextureRegion() != _texture) //Nueva carta = Nueva textura
+						TextureRegion _texture = cardTotextureRegionMap.get(_card); //Textura del sprite actualmente
+
+						if(_sprite.getTextureRegion() != _texture) //Nueva textura = Nueva carta
 						{
-							mainScene.detachChild(_sprite);
-							_sprite = new Sprite(262+55*i, 175, _texture);
-							_sprite.setScale(0.7f);
-							mainScene.attachChild(_sprite);
+							_sprite.setTextureRegion(_texture);
 						}
+
+						if(!_sprite.isVisible())
+							_sprite.setVisible(true);
 					}
-					else if(i<cmspritesize && i>= cmsize) //Detach sprite
+					else if(i>= cmsize) //No existe la carta, ocultar sprite asociado
 					{
 						Sprite _sprite = communityCardSprites.get(i);
-						mainScene.detachChild(_sprite);
+						_sprite.setVisible(false);
 					}
 				}
 			}	
