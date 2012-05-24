@@ -291,23 +291,60 @@ public class PServer extends BaseGameActivity
 		tableStateText = new ChangeableText(0, 0, font, mGameController.table.state.name());
 		mainScene.attachChild(tableStateText);
 
+		//Cartas que comparten todos los jugadores
 		communityCardSprites = new ArrayList<Sprite>();
+		for(int i=0; i<5; i++)
+		{
+			Sprite aux = null; //FIXME ¿Crear el sprite?
+			communityCardSprites.add(i, aux);
+		}
 
+		//Cartas de las manos de los jugadores
 		holeCardSprites = new ArrayList< ArrayList<Sprite> >();
 		for(int i=0; i<5; i++)
 		{
+			//Cartas de la mano de un jugador
 			ArrayList<Sprite> auxArray = new ArrayList<Sprite>();
+			for(int j=0; j<2; j++)
+			{
+				Sprite aux = null;
+				auxArray.add(j, aux);
+			}
 
 			holeCardSprites.add(i, auxArray);
 		}
 
+		//Nombres de los jugadores
 		playerNameTexts = new ArrayList<ChangeableText>();
+		for(int i=0; i<5; i++)
+		{
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, "");
+			playerNameTexts.add(i, aux);
+		}
 
+		//Fichas de los jugadores
 		playerStakeTexts = new ArrayList<ChangeableText>();
+		for(int i=0; i<5; i++)
+		{
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, "");
+			playerStakeTexts.add(i, aux);
+		}
 
+		//Apuestas de los jugadores
 		seatBetText = new ArrayList<ChangeableText>();
+		for(int i=0; i<5; i++)
+		{
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, "");
+			seatBetText.add(i, aux);
+		}
 
+		//Botes en juego
 		potsText = new ArrayList<ChangeableText>();
+		for(int i=0; i<5; i++)
+		{
+			ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+"");
+			potsText.add(i, aux);
+		}
 	}
 
 	private void gameLoop()
