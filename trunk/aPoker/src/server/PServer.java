@@ -233,11 +233,11 @@ public class PServer extends BaseGameActivity
 		bettingRoundUpdater();
 		//FIXME createCurrentPlayerIndicatorHandler();
 		playerNameUpdater();
-		//playerStakeUpdater();
-		//seatBetUpdater();
+		playerStakeUpdater();
+		seatBetUpdater();
 		//potUpdater();
 		communityCardUpdater();
-		//holeCardUpdater();
+		holeCardUpdater();
 
 		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
 			@Override
@@ -352,18 +352,18 @@ public class PServer extends BaseGameActivity
 		for(int i=0; i<5; i++)
 		{
 			//Cartas de la mano de un jugador
-			ArrayList<Sprite> auxArray = new ArrayList<Sprite>();
+			ArrayList<Sprite> subArray = new ArrayList<Sprite>();
 			for(int j=0; j<2; j++)
 			{
 				Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(Card.CLUB_ACE));
 				aux.setScale(0.7f);
 				aux.setVisible(false);
 
-				auxArray.add(j, aux);
+				subArray.add(j, aux);
 				mainScene.attachChild(aux);
 			}
 
-			holeCardSprites.add(i, auxArray);
+			holeCardSprites.add(i, subArray);
 		}
 	}
 
@@ -571,18 +571,14 @@ public class PServer extends BaseGameActivity
 						if(_seat.player.name != _name.getText())
 							_name.setText(_seat.player.name);
 
-						System.out.println("Name visible? "+_name.isVisible());						
 						if(!_name.isVisible())
 							_name.setVisible(true);
-						//if(mainScene.getChildIndex(_name)>=0)
-						//mainScene.attachChild(_name);
 					}
 					else //"Borrar" ChangeableText
 					{
 						ChangeableText _name = playerNameTexts.get(i);
 
 						_name.setVisible(false);
-						//mainScene.detachChild(playerNameTexts.get(i));
 					}
 				}
 			}	
@@ -604,7 +600,6 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Get seats
-				int textsize = playerStakeTexts.size();
 
 				for(int i=0; i<5;i++)
 				{
@@ -612,28 +607,20 @@ public class PServer extends BaseGameActivity
 
 					if(_seat.occupied)
 					{
-						if(i>=textsize) //Add ChangeableText
-						{
-							//Create new ChangeableText
-							ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, Integer.toString(_seats.get(i).player.stake));
+						ChangeableText _stake = playerStakeTexts.get(i);
 
-							//Add it to the Array who saves the ChangeableTexts of the names of the players in seats
-							playerStakeTexts.add(i, aux);
+						if(Integer.toString(_seat.player.stake) != _stake.getText())
+							_stake.setText(Integer.toString(_seat.player.stake));
 
-							//Attach it to the scene
-							mainScene.attachChild(playerStakeTexts.get(i));
-						}
-						else if(i<textsize) //Update text
-						{
-							String _stake = Integer.toString(_seat.player.stake);
-							if(_stake != playerStakeTexts.get(i).getText())
-								playerStakeTexts.get(i).setText(_stake);
-						}
-						else //"Borrar" ChangeableText
-						{
-							mainScene.detachChild(playerStakeTexts.get(i));
-						}
+						if(!_stake.isVisible())
+							_stake.setVisible(true);
 					}
+					else //"Borrar" ChangeableText
+					{
+						ChangeableText _stake = playerStakeTexts.get(i);
+						_stake.setVisible(false);
+					}
+
 				}
 			}	
 		};
@@ -655,7 +642,6 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Get seats
-				int textssize = seatBetText.size();
 
 				for(int i=0; i<5;i++)
 				{
@@ -663,29 +649,20 @@ public class PServer extends BaseGameActivity
 
 					if(_seat.occupied)
 					{
-						if(i>=textssize) //Add ChangeableText
-						{
-							//Create new ChangeableText
-							ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, Integer.toString(_seats.get(i).bet));
+						ChangeableText _bet = seatBetText.get(i);
 
-							//Add it to the Array who saves the ChangeableTexts of the bets of the players in seats
-							seatBetText.add(i, aux);
+						if(Integer.toString(_seats.get(i).bet) != _bet.getText())
+							_bet.setText(Integer.toString(_seats.get(i).bet));
 
-							//Attach it to the scene
-							mainScene.attachChild(seatBetText.get(i));
-						}
-						else if(i<textssize) //Update text
-						{
-							String _bet = Integer.toString(_seat.bet);
-
-							if(_bet != seatBetText.get(i).getText())
-								seatBetText.get(i).setText(_bet);
-						}
-						else //"Borrar" ChangeableText
-						{
-							mainScene.detachChild(seatBetText.get(i));
-						}
+						if(!_bet.isVisible())
+							_bet.setVisible(true);
 					}
+					else //"Borrar" ChangeableText
+					{
+						ChangeableText _bet = seatBetText.get(i);
+						_bet.setVisible(false);
+					}
+
 				}
 			}	
 		};
@@ -765,9 +742,8 @@ public class PServer extends BaseGameActivity
 						TextureRegion _texture = cardTotextureRegionMap.get(_card); //Textura del sprite actualmente
 
 						if(_sprite.getTextureRegion() != _texture) //Nueva textura = Nueva carta
-						{
 							_sprite.setTextureRegion(_texture);
-						}
+
 
 						if(!_sprite.isVisible())
 							_sprite.setVisible(true);
@@ -809,31 +785,26 @@ public class PServer extends BaseGameActivity
 						ArrayList<Sprite> _sprites = holeCardSprites.get(j); //Referencia a los sprites asociados a esos holecards
 
 						int hlsize = _holecards.size(); //Numero de cartas en la mano
-						int spritesize = _sprites.size(); //Numero de Sprites
 
 						for(int i=0; i<2;i++)
 						{
-							if(i>=spritesize && i<hlsize) //Añadir Sprite
+							if(i<hlsize) //Existe la carta, tratar de actualizar el sprite asociado
 							{
-								Sprite _sprite = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(_holecards.get(i)));
-								_sprite.setScale(0.7f);
-
-								_sprites.add(i, _sprite);
-
-								mainScene.attachChild(_sprites.get(i)); //Añadirlo a la escena para que se muestre
-							}
-							else if(i<spritesize && i<hlsize) //Actualizar Sprite
-							{
+								Card _card = _holecards.get(i);
 								Sprite _sprite = _sprites.get(i);
-								TextureRegion _texture = cardTotextureRegionMap.get(_holecards.get(i));
+
+								TextureRegion _texture = cardTotextureRegionMap.get(_card); //Textura del sprite actualmente
 
 								if(_sprite.getTextureRegion() != _texture) //Nueva carta = Nueva textura
-								{
-									mainScene.detachChild(_sprite);
-									_sprite = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, _texture);
-									_sprite.setScale(0.7f);
-									mainScene.attachChild(_sprite);
-								}
+									_sprite.setTextureRegion(_texture);
+
+								if(!_sprite.isVisible())
+									_sprite.setVisible(true);
+							}
+							else //No existe la carta, ocultar sprite asociado
+							{
+								Sprite _sprite = _sprites.get(i);
+								_sprite.setVisible(false);
 							}
 						}
 					}
