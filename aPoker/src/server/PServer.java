@@ -233,11 +233,11 @@ public class PServer extends BaseGameActivity
 		bettingRoundUpdater();
 		//FIXME createCurrentPlayerIndicatorHandler();
 		playerNameUpdater();
-		playerStakeUpdater();
-		seatBetUpdater();
-		potUpdater();
-		communityCardUpdater();
-		holeCardUpdater();
+		//playerStakeUpdater();
+		//seatBetUpdater();
+		//potUpdater();
+		//communityCardUpdater();
+		//holeCardUpdater();
 
 		this.mainScene.registerUpdateHandler(new IUpdateHandler() {
 			@Override
@@ -291,35 +291,13 @@ public class PServer extends BaseGameActivity
 		tableStateText = new ChangeableText(0, 0, font, mGameController.table.state.name());
 		mainScene.attachChild(tableStateText);
 
-		//Cartas que comparten todos los jugadores
-		communityCardSprites = new ArrayList<Sprite>();
-		for(int i=0; i<5; i++)
-		{
-			Sprite aux = null; //FIXME ¿Crear el sprite?
-			communityCardSprites.add(i, aux);
-		}
-
-		//Cartas de las manos de los jugadores
-		holeCardSprites = new ArrayList< ArrayList<Sprite> >();
-		for(int i=0; i<5; i++)
-		{
-			//Cartas de la mano de un jugador
-			ArrayList<Sprite> auxArray = new ArrayList<Sprite>();
-			for(int j=0; j<2; j++)
-			{
-				Sprite aux = null;
-				auxArray.add(j, aux);
-			}
-
-			holeCardSprites.add(i, auxArray);
-		}
-
 		//Nombres de los jugadores
 		playerNameTexts = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, "");
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, "        ");
 			playerNameTexts.add(i, aux);
+			mainScene.attachChild(aux);
 		}
 
 		//Fichas de los jugadores
@@ -344,6 +322,29 @@ public class PServer extends BaseGameActivity
 		{
 			ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+"");
 			potsText.add(i, aux);
+		}
+
+		//Cartas que comparten todos los jugadores
+		communityCardSprites = new ArrayList<Sprite>();
+		for(int i=0; i<5; i++)
+		{
+			Sprite aux = null; //FIXME ¿Crear el sprite?
+			communityCardSprites.add(i, aux);
+		}
+
+		//Cartas de las manos de los jugadores
+		holeCardSprites = new ArrayList< ArrayList<Sprite> >();
+		for(int i=0; i<5; i++)
+		{
+			//Cartas de la mano de un jugador
+			ArrayList<Sprite> auxArray = new ArrayList<Sprite>();
+			for(int j=0; j<2; j++)
+			{
+				Sprite aux = null;
+				auxArray.add(j, aux);
+			}
+
+			holeCardSprites.add(i, auxArray);
 		}
 	}
 
@@ -539,7 +540,6 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Referencia a los asientos
-				int namessize = playerNameTexts.size();
 
 				for(int i=0; i<5;i++)
 				{
@@ -547,26 +547,22 @@ public class PServer extends BaseGameActivity
 
 					if(_seat.occupied) //Si el asiento esta ocupado por un jugador
 					{
-						if(i>=namessize) //Añadir ChangeableText
-						{
-							//Create new ChangeableText
-							ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, _seat.player.name);
+						ChangeableText _name = playerNameTexts.get(i);
 
-							//Add it to the Array who saves the ChangeableTexts of the names of the players in seats
-							playerNameTexts.add(i, aux);
+						if(_seat.player.name != _name.getText())
+							_name.setText(_seat.player.name);
 
-							//Attach it to the scene
-							mainScene.attachChild(playerNameTexts.get(i));
-						}
-						else if(i<namessize) //Actualizar ChangeableText
-						{
-							if(_seat.player.name != playerNameTexts.get(i).getText())
-								playerNameTexts.get(i).setText(_seat.player.name);
-						}
+						if(!_name.isVisible())
+							_name.setVisible(true);
+						//if(mainScene.getChildIndex(_name)>=0)
+						//mainScene.attachChild(_name);
 					}
 					else //"Borrar" ChangeableText
 					{
-						mainScene.detachChild(playerNameTexts.get(i));
+						ChangeableText _name = playerNameTexts.get(i);
+
+						_name.setVisible(false);
+						//mainScene.detachChild(playerNameTexts.get(i));
 					}
 				}
 			}	
