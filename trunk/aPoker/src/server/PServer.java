@@ -235,7 +235,7 @@ public class PServer extends BaseGameActivity
 		playerNameUpdater();
 		playerStakeUpdater();
 		seatBetUpdater();
-		//potUpdater();
+		potUpdater();
 		communityCardUpdater();
 		holeCardUpdater();
 
@@ -326,7 +326,7 @@ public class PServer extends BaseGameActivity
 
 		//Botes en juego
 		potsText = new ArrayList<ChangeableText>();
-		for(int i=0; i<5; i++)
+		for(int i=0; i<4; i++)
 		{
 			ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+"        ");
 			aux.setVisible(false);
@@ -355,7 +355,7 @@ public class PServer extends BaseGameActivity
 			ArrayList<Sprite> subArray = new ArrayList<Sprite>();
 			for(int j=0; j<2; j++)
 			{
-				Sprite aux = new Sprite(seats_pX.get(j)+60+52*i, seats_pY.get(j)-20, cardTotextureRegionMap.get(Card.CLUB_ACE));
+				Sprite aux = new Sprite(seats_pX.get(i)+60+52*j, seats_pY.get(i)-20, cardTotextureRegionMap.get(Card.CLUB_ACE));
 				aux.setScale(0.7f);
 				aux.setVisible(false);
 
@@ -682,34 +682,27 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				ArrayList<Pot> _pots = mGameController.table.pots; //Get seats
-				int potssize = _pots.size(); //Get the number seats
-				int textssize = potsText.size();
+				ArrayList<Pot> _pots = mGameController.table.pots; //Get pots
+				int potssize = _pots.size(); //Get the number pots
 
 				for(int i=0; i<_pots.size();i++)
 				{
 					if(i<potssize)
 					{
-						if(i>=textssize) //Add ChangeableText
-						{
-							ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+Integer.toString(_pots.get(i).amount));
+						ChangeableText _pot = potsText.get(i);
 
-							potsText.add(i, aux);
+						if(Integer.toString(_pots.get(i).amount) != _pot.getText())
+							_pot.setText("Pot"+i+": "+Integer.toString(_pots.get(i).amount));
 
-							mainScene.attachChild(potsText.get(i));
-						}
-						else if(i<textssize) //Update ChangeableText
-						{
-							String amount = Integer.toString(_pots.get(i).amount);
-
-							if(amount != potsText.get(i).getText())
-								potsText.get(i).setText("Pot"+i+": "+amount);
-						}
-						else //"Borrar" ChangeableText
-						{
-							mainScene.detachChild(potsText.get(i));
-						}
+						if(!_pot.isVisible())
+							_pot.setVisible(true);
 					}
+					else //Ocultar ChangeableText
+					{
+						ChangeableText _pot = potsText.get(i);
+						_pot.setVisible(false);
+					}
+
 				}
 			}	
 		};
