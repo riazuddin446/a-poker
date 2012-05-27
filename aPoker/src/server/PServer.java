@@ -80,13 +80,18 @@ public class PServer extends BaseGameActivity
 
 	//Seat related
 	private BitmapTextureAtlas seatTextureAtlas;
-	private TiledTextureRegion seatTiledTextureRegion;
-	private ArrayList<TiledSprite> seatSprites;
+	private TextureRegion seatTextureRegion;
+	private TextureRegion currentSeatTextureRegion;
+	private ArrayList<Sprite> seatSprites;
 
 	//Dealer and blind buttons
 	private BitmapTextureAtlas dealerAndBlindTextureAtlas;
-	private ArrayList<TextureRegion> dealerAndBlindToTextureRegionList;
-	private ArrayList<Sprite> dealerAndBlindButtons;
+	private TextureRegion dealerTextureRegion;
+	private TextureRegion smallBlindTextureRegion;
+	private TextureRegion bigBlindTextureRegion;
+	private Sprite dealerButton;
+	private Sprite smallBlindButton;
+	private Sprite bigBlindButton;
 
 	//Game related
 	private ChangeableText tableStateText;
@@ -182,15 +187,14 @@ public class PServer extends BaseGameActivity
 
 		//Load the texture for SEATS
 		this.seatTextureAtlas = new BitmapTextureAtlas(512, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.seatTiledTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.seatTextureAtlas, this,"seat.png", 0, 0, 1, 2);
+		this.seatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.seatTextureAtlas, this,"seat.png", 0, 0);
+		this.currentSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.seatTextureAtlas, this,"current_seat.png", 0, 85);
 
 		//Load the textures for the DEALER and BLINDS buttons
-		dealerAndBlindTextureAtlas = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		dealerAndBlindToTextureRegionList = new ArrayList<TextureRegion>();
-		for(int j=0; i<3; j++){
-			TextureRegion buttonTextureRegion = TextureRegionFactory.extractFromTexture(dealerAndBlindTextureAtlas, 0, i*25, 25, 25, true);
-			dealerAndBlindToTextureRegionList.add(i, buttonTextureRegion);
-		}
+		this.dealerAndBlindTextureAtlas = new BitmapTextureAtlas(256, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.dealerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"dealer.png", 0, 0);
+		this.smallBlindTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"smallblind.png", 0, 30);
+		this.bigBlindTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"bigblind.png", 0, 60);
 
 		//Load the font for TEXT
 		this.fontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
@@ -231,7 +235,7 @@ public class PServer extends BaseGameActivity
 
 		stateUpdater();
 		bettingRoundUpdater();
-		//FIXME createCurrentPlayerIndicatorHandler();
+		currentPlayerUpdater();
 		playerNameUpdater();
 		playerStakeUpdater();
 		seatBetUpdater();
@@ -272,7 +276,7 @@ public class PServer extends BaseGameActivity
 		mGameController = new GameController();
 		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
 		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
-		mGameController.setPlayerStakes(500); //(4000);
+		mGameController.setPlayerStakes(100); //(4000);
 		mGameController.setRestart(true);
 		mGameController.setOwner(-1);
 	}
@@ -323,6 +327,19 @@ public class PServer extends BaseGameActivity
 			seatBetText.add(i, aux);
 			mainScene.attachChild(aux);
 		}
+
+		//Dealer and blind buttons related
+		dealerButton = new Sprite(0, 0, dealerTextureRegion);
+		//dealerButton.setVisible(false);
+		mainScene.attachChild(dealerButton);
+
+		//smallBlindButton = new Sprite(0, 0, smallBlindTextureRegion);
+		//smallBlindButton.setVisible(false);
+		//mainScene.attachChild(smallBlindButton);
+
+		//bigBlindButton = new Sprite(0, 0, bigBlindTextureRegion);
+		//bigBlindButton.setVisible(false);
+		//mainScene.attachChild(bigBlindButton);
 
 		//Botes en juego
 		potsText = new ArrayList<ChangeableText>();
@@ -432,7 +449,7 @@ public class PServer extends BaseGameActivity
 		seats_pX.put(4, getCameraWidth()-175);
 		seats_pY.put(4, 120);
 
-		seatSprites = new ArrayList<TiledSprite>();
+		seatSprites = new ArrayList<Sprite>();
 
 		//Add seat sprites
 		for(int i=0; i<5; i++)
@@ -443,7 +460,7 @@ public class PServer extends BaseGameActivity
 
 	private void addSeat(final int pX, final int pY, final int pos)
 	{
-		final TiledSprite sprite = new TiledSprite(pX, pY, this.seatTiledTextureRegion);
+		final Sprite sprite = new Sprite(pX, pY, this.seatTextureRegion);
 		seatSprites.add(pos, sprite);
 
 		this.mainScene.attachChild(sprite);
@@ -507,7 +524,7 @@ public class PServer extends BaseGameActivity
 	/**
 	 * Encargado mantener actualizada la imagen del seat del current player
 	 */
-	private void currentPlayerIndicatorUpdater()
+	private void currentPlayerUpdater()
 	{
 		IUpdateHandler currentPlayerIndicatorUpdater = new IUpdateHandler() {
 			@Override
@@ -518,26 +535,18 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				int currentPlayer = mGameController.table.currentPlayer;
-				System.out.println("Current player :"+currentPlayer);
 
 				for(int i=0; i<seatSprites.size(); i++)
 				{
-					TiledSprite _seatSprite = seatSprites.get(i);
+					Sprite _seatSprite = seatSprites.get(i);
 
-					if(i == currentPlayer){
-						System.out.println("¡Current player!: "+mGameController.players.get(i).name);
-						System.out.println("Textura actual: "+_seatSprite.getCurrentTileIndex());
-						if(_seatSprite.getCurrentTileIndex() != 1)
-							_seatSprite.setCurrentTileIndex(1);
-						System.out.println("Textura posterior: "+_seatSprite.getCurrentTileIndex());
+					if(i == currentPlayer) //Current player, check his texture
+					{
+						if(_seatSprite.getTextureRegion() != currentSeatTextureRegion)
+							_seatSprite.setTextureRegion(currentSeatTextureRegion);
 					}
-					else if(i != currentPlayer){
-						System.out.println("NORMAL player: "+mGameController.players.get(i).name);
-						System.out.println("Textura actual: "+_seatSprite.getCurrentTileIndex());
-						if(_seatSprite.getCurrentTileIndex() != 0)
-							_seatSprite.setCurrentTileIndex(0);
-						System.out.println("Textura posterior: "+_seatSprite.getCurrentTileIndex());
-					}
+					else if(_seatSprite.getTextureRegion() != seatTextureRegion)
+						_seatSprite.setTextureRegion(seatTextureRegion);
 				}
 			}	
 		};
@@ -800,6 +809,13 @@ public class PServer extends BaseGameActivity
 								_sprite.setVisible(false);
 							}
 						}
+					}
+					else //Asiento vacio, ocultar cartas
+					{
+						ArrayList<Sprite> _sprites = holeCardSprites.get(j); //Referencia a los sprites asociados a esos holecards
+
+						for(int i=0; i<_sprites.size(); i++)
+							_sprites.get(i).setVisible(false);
 					}
 				}
 			}	

@@ -996,31 +996,18 @@ public class GameController {
 	 */
 	protected void stateEndRound(Table t)
 	{
-		ArrayList<Integer> broken_players = new ArrayList<Integer>();
-
-		//Lets look for broken players
+		//Lets look for broken players to get them off from the game
 		for(int i=0; i<5; i++)
 		{
-			if(!t.seats.get(i).occupied) //Skip not occupied seats
-				continue;
+			if(t.seats.get(i).occupied) //Skip not occupied seats
+			{
+				Seat s = t.seats.get(i);
 
-			Player p = t.seats.get(i).player;
-
-			//Check if player has no stake left
-			if(p.stake == 0)
-				broken_players.add(p.stake_before, i);
-		}
-
-		//Remove player in rigth order (sorted by stake_before)
-		for(int i=0; i<broken_players.size(); i++)
-		{
-			int seat_num = broken_players.get(i);
-
-			Player p = t.seats.get(seat_num).player;
-
-			//TODO Tell player that he is out
-
-			t.seats.get(seat_num).occupied = false;
+				//Check if player has no stake left
+				if(s.player.stake == 0)
+					//TODO Tell player that he is out (TOAST)
+					s.occupied = false;
+			}
 		}
 
 		//Determine next dealer
