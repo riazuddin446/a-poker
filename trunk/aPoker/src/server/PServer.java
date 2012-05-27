@@ -191,7 +191,7 @@ public class PServer extends BaseGameActivity
 		this.currentSeatTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.seatTextureAtlas, this,"current_seat.png", 0, 85);
 
 		//Load the textures for the DEALER and BLINDS buttons
-		this.dealerAndBlindTextureAtlas = new BitmapTextureAtlas(256, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.dealerAndBlindTextureAtlas = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.dealerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"dealer.png", 0, 0);
 		this.smallBlindTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"smallblind.png", 0, 30);
 		this.bigBlindTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"bigblind.png", 0, 60);
@@ -201,10 +201,11 @@ public class PServer extends BaseGameActivity
 		this.font = new Font(this.fontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
 
 		//Load the textures into the engine
-		mEngine.getTextureManager().loadTextures(backgroundTextureAtlas,
+		mEngine.getTextureManager().loadTextures(this.backgroundTextureAtlas,
 				this.buttonsTextureAtlas,
 				this.cardDeckTextureAtlas,
 				this.seatTextureAtlas,
+				this.dealerAndBlindTextureAtlas,
 				this.fontTexture);
 		//Load the fonts into the engine
 		this.mEngine.getFontManager().loadFont(this.font);
@@ -329,17 +330,17 @@ public class PServer extends BaseGameActivity
 		}
 
 		//Dealer and blind buttons related
-		dealerButton = new Sprite(0, 0, dealerTextureRegion);
-		//dealerButton.setVisible(false);
+		dealerButton = new Sprite(230, 0, dealerTextureRegion);
+		dealerButton.setVisible(false);
 		mainScene.attachChild(dealerButton);
 
-		//smallBlindButton = new Sprite(0, 0, smallBlindTextureRegion);
-		//smallBlindButton.setVisible(false);
-		//mainScene.attachChild(smallBlindButton);
+		smallBlindButton = new Sprite(0, 0, smallBlindTextureRegion);
+		smallBlindButton.setVisible(false);
+		mainScene.attachChild(smallBlindButton);
 
-		//bigBlindButton = new Sprite(0, 0, bigBlindTextureRegion);
-		//bigBlindButton.setVisible(false);
-		//mainScene.attachChild(bigBlindButton);
+		bigBlindButton = new Sprite(0, 0, bigBlindTextureRegion);
+		bigBlindButton.setVisible(false);
+		mainScene.attachChild(bigBlindButton);
 
 		//Botes en juego
 		potsText = new ArrayList<ChangeableText>();
