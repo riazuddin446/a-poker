@@ -949,6 +949,13 @@ public class GameController {
 						//Transfer winning amount to player
 						p.stake += win_amount;
 
+						try{
+							Thread.currentThread().sleep(1000);//sleep for 1000 ms
+						}
+						catch(InterruptedException ie){
+
+						}
+
 						//FIXME Put winnings to seat (needed for snapshot)
 						//seat.bet += win_amount;
 
