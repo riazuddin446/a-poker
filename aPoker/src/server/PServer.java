@@ -577,6 +577,9 @@ public class PServer extends BaseGameActivity
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Referencia a los asientos
 
+				if(_seats.isEmpty())
+					return;
+
 				for(int i=0; i<5;i++)
 				{
 					Seat _seat = _seats.get(i);
@@ -617,6 +620,9 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Get seats
+
+				if(_seats.isEmpty())
+					return;
 
 				for(int i=0; i<5;i++)
 				{
@@ -659,6 +665,9 @@ public class PServer extends BaseGameActivity
 			public void onUpdate(float pSecondsElapsed) {
 
 				ArrayList<Seat> _seats = mGameController.table.seats; //Get seats
+
+				if(_seats.isEmpty())
+					return;
 
 				for(int i=0; i<5;i++)
 				{
@@ -974,7 +983,6 @@ public class PServer extends BaseGameActivity
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.setCurrentTileIndex(0);					
-						this.setScale(1.0f);
 					}
 					break;
 				}
@@ -1011,7 +1019,6 @@ public class PServer extends BaseGameActivity
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.setCurrentTileIndex(0);					
-						this.setScale(1.0f);
 					}
 					break;
 				}
@@ -1039,7 +1046,6 @@ public class PServer extends BaseGameActivity
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.setCurrentTileIndex(0);					
-						this.setScale(1.0f);
 					}
 					break;
 				}
