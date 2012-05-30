@@ -33,6 +33,7 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import server.Table.Pot;
 import server.Table.Seat;
+import server.Table.State;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -280,7 +281,7 @@ public class PServer extends BaseGameActivity
 
 	private void initializeGameController()
 	{
-		mGameController = new GameController(this);
+		mGameController = new GameController();
 		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
 		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
 		mGameController.setPlayerStakes(100); //(4000);
@@ -400,7 +401,7 @@ public class PServer extends BaseGameActivity
 			if(mGameController.getRestart())
 			{
 				System.out.println("REPLICATE GAME!");
-				GameController newgame = new GameController(this);
+				GameController newgame = new GameController();
 
 				newgame.setName(mGameController.getName());
 				newgame.setMaxPlayers(mGameController.getMaxPlayers());
@@ -961,6 +962,12 @@ public class PServer extends BaseGameActivity
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
+					//Allowed check?
+					if(mGameController.table.seats.get(mGameController.table.currentPlayer).bet < mGameController.table.bet_amount)
+					{
+						Toast.makeText(getApplicationContext(), "You can't check dude! Try call ;D", 3).show();
+					}
+
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Check, 0);
 
 					break;
@@ -989,11 +996,16 @@ public class PServer extends BaseGameActivity
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
-					System.out.println("Bet antes de mostrar el dialogo: "+bet);
-					betDialog();
-					System.out.println("Bet despues de mostrar el dialogo: "+bet);
-
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, bet);
+					if(mGameController.table.state == State.Betting) //Solo permitir apostar cuando nos encontremos en ronda de apuestas
+					{
+						if(mGameController.table.bet_amount > 0){
+							Toast.makeText(getApplicationContext(), "You can't bet dude! There already was a bet, try call or raise.", 3).show();
+						}
+						else
+							betDialog();
+					}
+					else
+						Toast.makeText(getApplicationContext(), "You can't bet. This is not a betting round.", 2).show();
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -1021,7 +1033,7 @@ public class PServer extends BaseGameActivity
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Call, 0); //TODO Pop up para insertar la cantidad
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Call, 0);
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -1049,7 +1061,14 @@ public class PServer extends BaseGameActivity
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, 0); //TODO Pop up para insertar la cantidad
+					if(mGameController.table.state == State.Betting) //Solo permitir apostar cuando nos encontremos en ronda de apuestas
+					{
+						raiseDialog();
+					}
+					else
+					{
+						Toast.makeText(getApplicationContext(), "You can't raise. This is not a betting round.", 2).show();
+					}
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -1092,8 +1111,6 @@ public class PServer extends BaseGameActivity
 		this.mainScene.registerTouchArea(sprite);
 	}
 
-	public int bet = 0;
-
 	private void betDialog()
 	{
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -1107,9 +1124,49 @@ public class PServer extends BaseGameActivity
 
 		alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				String value = input.getText().toString();
-				bet = Integer.parseInt(value);
-				System.out.println("Bet despues de darle Ok: "+bet);
+
+				String betValue = input.getText().toString();
+
+				if(Integer.parseInt(betValue) < mGameController.minimun_bet)
+				{	
+					Toast.makeText(getApplicationContext(), "You can't bet this amount, the minimun bet is: " + mGameController.minimun_bet, 3).show();
+				}
+
+				doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, Integer.parseInt(betValue));
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+
+			}
+		});
+
+		alert.show();
+	}
+
+	private void raiseDialog()
+	{
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Make your raise:");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		alert.setView(input);
+
+		alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+
+				String raiseValue = input.getText().toString();
+
+				if(Integer.parseInt(raiseValue) < mGameController.minimun_bet)
+				{	
+					Toast.makeText(getApplicationContext(), "You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
+				}
+
+				doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, Integer.parseInt(raiseValue));
 			}
 		});
 
@@ -1125,15 +1182,5 @@ public class PServer extends BaseGameActivity
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
-
-	public class Bet
-	{
-		public int betAmount;
-	}
-
-	public class Raise
-	{
-		public int raiseAmount;
-	}
 
 }
