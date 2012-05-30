@@ -26,7 +26,6 @@ public class JoinTable extends Activity {
 		Button backButton = (Button) findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("JoinTable","Back button clicked");
 				finish();
 			}
 		});

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import logic.Card;
-import logic.HoleCards;
 import logic.Player;
 import logic.Player.Action;
 
@@ -37,6 +36,7 @@ import server.Table.Seat;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Display;
+import android.widget.Toast;
 import client.Button;
 
 public class PServer extends BaseGameActivity
@@ -106,6 +106,7 @@ public class PServer extends BaseGameActivity
 	private ArrayList< ArrayList<Sprite> > holeCardSprites;
 
 	//Player related
+	int dealer, sb, bb;
 	private ArrayList<ChangeableText> playerNameTexts;
 	private ArrayList<ChangeableText> playerStakeTexts;
 	private ArrayList<ChangeableText> seatBetText;
@@ -241,6 +242,7 @@ public class PServer extends BaseGameActivity
 		playerStakeUpdater();
 		seatBetUpdater();
 		potUpdater();
+		buttonUpdater();
 		communityCardUpdater();
 		holeCardUpdater();
 
@@ -265,7 +267,7 @@ public class PServer extends BaseGameActivity
 	@Override
 	public void onLoadComplete()
 	{	
-
+		Toast.makeText(getApplicationContext(), "This is just a Poker game emulation", 2).show();
 	}
 
 	// ===========================================================
@@ -274,7 +276,7 @@ public class PServer extends BaseGameActivity
 
 	private void initializeGameController()
 	{
-		mGameController = new GameController();
+		mGameController = new GameController(this);
 		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
 		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
 		mGameController.setPlayerStakes(100); //(4000);
@@ -394,7 +396,7 @@ public class PServer extends BaseGameActivity
 			if(mGameController.getRestart())
 			{
 				System.out.println("REPLICATE GAME!");
-				GameController newgame = new GameController();
+				GameController newgame = new GameController(this);
 
 				newgame.setName(mGameController.getName());
 				newgame.setMaxPlayers(mGameController.getMaxPlayers());
@@ -719,6 +721,65 @@ public class PServer extends BaseGameActivity
 		mainScene.registerUpdateHandler(potUpdater);
 	}
 
+	private void buttonUpdater()
+	{
+		IUpdateHandler buttonUpdater = new IUpdateHandler() {
+			@Override
+			public void reset() {		
+			}
+
+			@Override
+			public void onUpdate(float pSecondsElapsed) {
+
+				/*
+				 * Dealer button
+				 */
+				if(!dealerButton.isVisible()) //First time
+				{
+					dealer = mGameController.table.dealer;
+					dealerButton.setPosition(seats_pX.get(dealer), seats_pY.get(dealer)-30);
+					dealerButton.setVisible(true);
+				}
+				else if(dealer != mGameController.table.dealer)
+				{
+					dealer = mGameController.table.dealer;
+					dealerButton.setPosition(seats_pX.get(dealer), seats_pY.get(dealer)-30);
+				}
+
+				/*
+				 * Small blind button
+				 */
+				if(!smallBlindButton.isVisible()) //First time
+				{
+					sb = mGameController.table.sb;
+					smallBlindButton.setPosition(seats_pX.get(sb), seats_pY.get(sb)-30);
+					smallBlindButton.setVisible(true);
+				}
+				else if(sb != mGameController.table.sb)
+				{
+					sb = mGameController.table.sb;
+					smallBlindButton.setPosition(seats_pX.get(sb), seats_pY.get(sb)-30);
+				}
+
+				/*
+				 * Big blind button
+				 */
+				if(!bigBlindButton.isVisible()) //First time
+				{
+					bb = mGameController.table.bb;
+					bigBlindButton.setPosition(seats_pX.get(bb), seats_pY.get(bb)-30);
+					bigBlindButton.setVisible(true);
+				}
+				else if(bb != mGameController.table.bb)
+				{
+					bb = mGameController.table.bb;
+					bigBlindButton.setPosition(seats_pX.get(bb), seats_pY.get(bb)-30);
+				}
+			}
+		};
+		mainScene.registerUpdateHandler(buttonUpdater);
+	}
+
 	/**
 	 * Encargado de crear los sprites de las community cards que aun no esten creadas
 	 */
@@ -782,7 +843,7 @@ public class PServer extends BaseGameActivity
 				{
 					Seat _seat = _seats.get(j);
 
-					if(_seat.occupied) //Comprobamos si esta ocupado por un jugador
+					if(_seat.occupied && _seat.in_round) //Comprobamos si esta ocupado por un jugador
 					{
 						ArrayList<Card> _holecards = _seat.player.holecards.cards; //Referencia a sus holecards
 						ArrayList<Sprite> _sprites = holeCardSprites.get(j); //Referencia a los sprites asociados a esos holecards

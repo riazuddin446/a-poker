@@ -25,15 +25,12 @@ public class Menu extends Activity {
 		
 		setContentView(R.layout.menulayout);
 		
-		Toast.makeText(this, "Kaixo!", Toast.LENGTH_LONG).show();
-
 		final Intent joinorcreate = new Intent(this, JoinOrCreate.class);
 		final Intent options = new Intent(this, Options.class);
 		
 		Button playButton = (Button) findViewById(R.id.playButton);
 		playButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Menu","Play button clicked");
 				startActivity(joinorcreate);
 			}
 		});
@@ -41,7 +38,6 @@ public class Menu extends Activity {
 		Button optionsButton = (Button) findViewById(R.id.optionsButton);
 		optionsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Menu", "Options button clicked");
 				startActivity(options);
 			}
 		}); 
@@ -49,7 +45,6 @@ public class Menu extends Activity {
 		Button exitButton = (Button) findViewById(R.id.exitButton);
 		exitButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Menu","Exit button clicked");
 				finish();
 			}
 		});

@@ -1,7 +1,6 @@
 package server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -14,6 +13,8 @@ import server.Table.BettingRound;
 import server.Table.Pot;
 import server.Table.Seat;
 import server.Table.State;
+import android.app.Activity;
+import android.content.Context;
 import android.widget.Toast;
 
 public class GameController {
@@ -48,12 +49,15 @@ public class GameController {
 	//Apuntador hacia el dueño de la partida
 	private int owner;
 
+	private Activity activity;
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public GameController()
+	public GameController(Activity _activity)
 	{		
+
 		//Inicializar las variables
 		table = new Table();
 		players = new ArrayList<Player>();
@@ -73,6 +77,8 @@ public class GameController {
 		blind.blinds_factor = 2;
 
 		hand_no = 0;
+
+		this.activity = _activity;
 	}
 
 	// ===========================================================
@@ -173,19 +179,6 @@ public class GameController {
 	// ===========================================================
 
 	/**
-	 * Comprueba si el jugador 'p' ya esta añadido
-	 * 
-	 * @param p Jugador que ha de ser comprobado
-	 */
-	public boolean isPlayer(Player p)
-	{
-		if(players.contains(p))
-			return true;
-		else 
-			return false;
-	}
-
-	/**
 	 * Añade un jugador a la partida
 	 * 
 	 * @param i Posicion en la que añadir
@@ -199,7 +192,7 @@ public class GameController {
 			p.setStake(player_stakes);
 			players.add(i, p);
 
-			table.addPlayerToSeat(p);
+			table.addPlayerToSeat(p); //TODO Añadir al jugador en el seat que quiera
 		}
 		else
 			System.out.println("Can't add the player: " + p.getName());
@@ -226,16 +219,37 @@ public class GameController {
 		}
 	}
 
+	// ===========================================================
+	// Methods from SuperClass/Interfaces
+	// ===========================================================
+
+	// ===========================================================
+	// Methods
+	// ===========================================================
+
+	/**
+	 * Comprueba si el jugador 'p' ya esta añadido
+	 * 
+	 * @param p Jugador que ha de ser comprobado
+	 */
+	public boolean isPlayer(Player p)
+	{
+		if(players.contains(p))
+			return true;
+		else 
+			return false;
+	}
+
 	/**
 	 * Busca un nuevo owner de la partida
 	 */
-	private void selectNewOwner()
+	public void selectNewOwner()
 	{
 		Iterator it = players.iterator();
 		if(it.hasNext())
 		{
 			Player tmp = (Player)it.next();
-			owner = tmp.id;
+			owner = players.indexOf(tmp);
 		}
 	}
 
@@ -258,12 +272,14 @@ public class GameController {
 		}
 		else if(action == Action.Back)
 		{
-			p.sitout = true;
+			p.sitout = false;
 		}
-
-		p.next_action.valid = true;
-		p.next_action.action = action;
-		p.next_action.amount = amount;
+		else
+		{
+			p.next_action.valid = true;
+			p.next_action.action = action;
+			p.next_action.amount = amount;
+		}
 
 	}
 
@@ -475,10 +491,9 @@ public class GameController {
 		t.seats.get(t.bb).bet = amount;
 		pBig.stake -= amount;
 
+		//TODO Tiempo de espera
 		//Give out hole-cards
 		dealHole(t);
-
-		//FIXME Tell the player under the gun that it's his turn
 
 		//Check if there is any more possible action
 		if(t.isAllin())
@@ -530,16 +545,14 @@ public class GameController {
 				//Allowed check?
 				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
 				{
-					//					Toast toast = Toast.makeText(null, "You can't check dude! Try call ;D", 3);
-					//					toast.show();
-					System.out.println("You can't check dude! Try call ;D");
+					//Toast.makeText(activity, "You can't check dude! Try call ;D", 2).show();
 				}
 				else
 					allowed_action = true;
 			}
 			else if(action == Action.Call) //Igualar apuesta
 			{
-				if(t.bet_amount == 0 || t.bet_amount == t.seats.get(t.currentPlayer).bet) //Cannot call, just check or fold
+				if(t.bet_amount == 0 || t.bet_amount == t.seats.get(t.currentPlayer).bet) //Cannot call, try check
 				{
 					//Retry with this action
 					p.next_action.action = Action.Check;
@@ -561,16 +574,11 @@ public class GameController {
 			else if(action == Action.Bet) //Iniciar apuesta
 			{
 				if(t.bet_amount > 0){
-					//					Toast toast = Toast.makeText(null, "You can't bet dude! There already was a bet, try raise.", 3);
-					//					toast.show();
-					System.out.println("You can't bet dude! There already was a bet, try raise.");
-
+					//Toast.makeText(activity, "You can't bet dude! There already was a bet, try call or raise.", 2).show();
 				}
 				else if(p.next_action.amount < minimun_bet)
-				{
-					//					Toast toast = Toast.makeText(null, "You can't bet this amount, the minimun bet is: " + minimun_bet, 3);
-					//					toast.show();			
-					System.out.println("You can't bet this amount, the minimun bet is: " + minimun_bet);
+				{	
+					//Toast.makeText(activity, "You can't bet this amount, the minimun bet is: " + minimun_bet, 2).show();
 				}
 				else
 				{
@@ -583,9 +591,7 @@ public class GameController {
 			{
 				if(t.bet_amount == 0)
 				{
-					//					Toast toast = Toast.makeText(null, "You cannot raise, nothing was bet! Try bet.", 3);
-					//					toast.show();
-					System.out.println("You cannot raise, nothing was bet! Try bet.");
+					//Toast.makeText(activity, "You cannot raise, nothing was bet! Let's try betting.", 2).show();
 
 					//Retry with this action
 					p.next_action.action = Action.Bet;
@@ -593,9 +599,7 @@ public class GameController {
 				}
 				else if(p.next_action.amount < minimun_bet)
 				{
-					//					Toast toast = Toast.makeText(null, "You cannot raise this amount. Minimum bet is: " + minimun_bet, 3);
-					//					toast.show();				
-					System.out.println("You cannot raise this amount. Minimum bet is: " + minimun_bet);
+					//Toast.makeText(activity, "You cannot raise this amount. Minimum bet is: " + minimun_bet, 2).show();			
 				}
 				else
 				{
@@ -616,27 +620,12 @@ public class GameController {
 		else //Player didn't set next action, handle his timeout
 		{
 			//TODO Manejar el timeout
-			//			if(p.sitout)
-			//			{
-			//				//Let player sit out (if he is not already)
-			//				p.sitout = true;
-			//
-			//				//Auto-action: fold or check if possible
-			//				if(t.seats.get(t.currentPlayer).bet < t.bet_amount)
-			//					action = Action.Fold;
-			//				else
-			//					action = Action.Check;
-			//
-			//				allowed_action = true;
-			//				auto_action = true;
-			//			}
 		}
 
 		//Return here if no or invalid action
 		if(!allowed_action)
 			return;
 
-		//FIXME Remember action for snapshot
 		p.last_action = action;
 
 		//PERFORM ACTION
@@ -682,12 +671,10 @@ public class GameController {
 			//Collect bets into pot
 			t.collectBets();
 
-			t.state = State.AskShow;
+			t.state = State.Showdown; //State.AskShow;
 
 			//Set last remaining player as current player
 			t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
-
-			//TODO Initialize the player's timeout
 
 			t.resetLastPlayerActions();
 			return;
@@ -728,8 +715,6 @@ public class GameController {
 				//Set the player behind last action as current player
 				t.currentPlayer = t.getNextActivePlayer(t.lastBetPlayer);
 
-				//TODO Initialize the player's timeout
-
 				//End of hand, do showdown/ask for show
 				if(t.nomoreaction)
 					t.state = State.Showdown;
@@ -745,11 +730,9 @@ public class GameController {
 			t.last_bet_amount = 0;
 
 			//Set the current player as SB (or next active behing SB)
-			t.currentPlayer = t.getNextActivePlayer(t.dealer);
+			t.currentPlayer = t.getNextActivePlayer(t.dealer); //FIXME No debería de ser el dealer el current player?!
 
-			//TODO Reinitialize the player's timeout
-
-			//First action for next betting round is at this payer
+			//First action for next betting round is at this player
 			t.lastBetPlayer = t.currentPlayer;
 			t.resetLastPlayerActions();
 			t.scheduleState(State.BettingEnd);			
