@@ -1,41 +1,50 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+        <EditText
+            android:id="@+id/betText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:inputType="number" >
 
-            <EditText
-                android:id="@+id/betText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:ems="10"
-                android:inputType="number" >
+            <requestFocus />
+        </EditText>
 
-                <requestFocus />
-            </EditText>
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/betText"
+            android:layout_below="@+id/betText"
+            android:text="@string/cancel" />
 
-            <Button
-                android:id="@+id/cancelButton"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/betText"
-                android:layout_below="@+id/betText"
-                android:text="@string/cancel" />
+        <Button
+            android:id="@+id/acceptButton"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/cancelButton"
+            android:layout_alignBottom="@+id/cancelButton"
+            android:layout_alignLeft="@+id/betText"
+            android:text="@string/accept" />
 
-            <Button
-                android:id="@+id/acceptButton"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/cancelButton"
-                android:layout_alignBottom="@+id/cancelButton"
-                android:layout_alignLeft="@+id/betText"
-                android:text="@string/accept" />
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/cancelButton"
+            android:layout_below="@+id/cancelButton"
+            android:layout_marginTop="44dp"
+            android:ems="10"
+            android:inputType="number" />
 
-        </RelativeLayout>
+    </RelativeLayout>
 
-    </FrameLayout>
+</FrameLayout>
