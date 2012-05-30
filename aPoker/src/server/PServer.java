@@ -33,9 +33,13 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import server.Table.Pot;
 import server.Table.Seat;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.InputType;
 import android.view.Display;
+import android.widget.EditText;
 import android.widget.Toast;
 import client.Button;
 
@@ -898,7 +902,7 @@ public class PServer extends BaseGameActivity
 		Player.SchedAction auxSchedAction = this.mGameController.players.get(pid).new SchedAction();
 		auxSchedAction.valid = true;
 		auxSchedAction.action = action;
-		if(action == Action.Call || action == Action.Raise)
+		if(action == Action.Bet || action == Action.Call || action == Action.Raise)
 		{
 			auxSchedAction.amount = amount;
 		} else
@@ -985,7 +989,11 @@ public class PServer extends BaseGameActivity
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, 0); //TODO Pop up para insertar la cantidad
+					System.out.println("Bet antes de mostrar el dialogo: "+bet);
+					betDialog();
+					System.out.println("Bet despues de mostrar el dialogo: "+bet);
+
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, bet);
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -1084,8 +1092,48 @@ public class PServer extends BaseGameActivity
 		this.mainScene.registerTouchArea(sprite);
 	}
 
+	public int bet = 0;
+
+	private void betDialog()
+	{
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Make your bet:");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		alert.setView(input);
+
+		alert.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getText().toString();
+				bet = Integer.parseInt(value);
+				System.out.println("Bet despues de darle Ok: "+bet);
+			}
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+
+			}
+		});
+
+		alert.show();
+	}
+
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
+
+	public class Bet
+	{
+		public int betAmount;
+	}
+
+	public class Raise
+	{
+		public int raiseAmount;
+	}
 
 }

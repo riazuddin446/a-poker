@@ -19,30 +19,34 @@ public final class R {
         public static final int menubackground=0x7f020002;
     }
     public static final class id {
-        public static final int Autor=0x7f060015;
-        public static final int aboutButton=0x7f060013;
-        public static final int absoluteLayout1=0x7f060000;
-        public static final int backButton=0x7f060009;
-        public static final int callButton=0x7f06000c;
-        public static final int checkButton=0x7f06000b;
-        public static final int createButton=0x7f060008;
-        public static final int exitButton=0x7f06000e;
-        public static final int foldButton=0x7f06000a;
-        public static final int gridView1=0x7f060010;
-        public static final int joinButton=0x7f060011;
-        public static final int linearLayout1=0x7f060002;
-        public static final int linearLayout2=0x7f060007;
-        public static final int maxPlayersSpinner=0x7f060006;
-        public static final int maxPlayersTextView=0x7f060005;
-        public static final int nicknameEditText=0x7f060017;
-        public static final int nicknameTextView=0x7f060016;
-        public static final int optionsButton=0x7f060014;
-        public static final int playButton=0x7f060012;
-        public static final int raiseButton=0x7f06000d;
-        public static final int tableNameEditText=0x7f060004;
-        public static final int tableNameTextView=0x7f060003;
-        public static final int textView1=0x7f060001;
-        public static final int textView2=0x7f06000f;
+        public static final int Autor=0x7f060019;
+        public static final int aboutButton=0x7f060017;
+        public static final int absoluteLayout1=0x7f060004;
+        public static final int acceptButton=0x7f060002;
+        public static final int backButton=0x7f06000d;
+        public static final int betText=0x7f060000;
+        public static final int callButton=0x7f060010;
+        public static final int cancelButton=0x7f060001;
+        public static final int checkButton=0x7f06000f;
+        public static final int createButton=0x7f06000c;
+        public static final int editText1=0x7f060003;
+        public static final int exitButton=0x7f060012;
+        public static final int foldButton=0x7f06000e;
+        public static final int gridView1=0x7f060014;
+        public static final int joinButton=0x7f060015;
+        public static final int linearLayout1=0x7f060006;
+        public static final int linearLayout2=0x7f06000b;
+        public static final int maxPlayersSpinner=0x7f06000a;
+        public static final int maxPlayersTextView=0x7f060009;
+        public static final int nicknameEditText=0x7f06001b;
+        public static final int nicknameTextView=0x7f06001a;
+        public static final int optionsButton=0x7f060018;
+        public static final int playButton=0x7f060016;
+        public static final int raiseButton=0x7f060011;
+        public static final int tableNameEditText=0x7f060008;
+        public static final int tableNameTextView=0x7f060007;
+        public static final int textView1=0x7f060005;
+        public static final int textView2=0x7f060013;
     }
     public static final class layout {
         public static final int betdialog=0x7f030000;
@@ -56,10 +60,12 @@ public final class R {
     }
     public static final class string {
         public static final int about=0x7f040003;
+        public static final int accept=0x7f040014;
         public static final int app_name=0x7f040000;
         public static final int autor=0x7f040001;
         public static final int back=0x7f040007;
         public static final int call=0x7f040012;
+        public static final int cancel=0x7f040015;
         public static final int check=0x7f040011;
         public static final int create=0x7f04000b;
         public static final int exit=0x7f040004;
