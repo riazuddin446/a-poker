@@ -39,20 +39,20 @@ public final class R {
         public static final int optionsButton=0x7f060014;
         public static final int playButton=0x7f060012;
         public static final int raiseButton=0x7f06000d;
-        public static final int soundButton=0x7f060018;
         public static final int tableNameEditText=0x7f060004;
         public static final int tableNameTextView=0x7f060003;
         public static final int textView1=0x7f060001;
         public static final int textView2=0x7f06000f;
     }
     public static final class layout {
-        public static final int createlayout=0x7f030000;
-        public static final int gamelayout=0x7f030001;
-        public static final int joinlayout=0x7f030002;
-        public static final int joinorcreatelayout=0x7f030003;
-        public static final int main=0x7f030004;
-        public static final int menulayout=0x7f030005;
-        public static final int optionslayout=0x7f030006;
+        public static final int betdialog=0x7f030000;
+        public static final int createlayout=0x7f030001;
+        public static final int gamelayout=0x7f030002;
+        public static final int joinlayout=0x7f030003;
+        public static final int joinorcreatelayout=0x7f030004;
+        public static final int main=0x7f030005;
+        public static final int menulayout=0x7f030006;
+        public static final int optionslayout=0x7f030007;
     }
     public static final class string {
         public static final int about=0x7f040003;

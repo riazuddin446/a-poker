@@ -28,5 +28,7 @@
         <string name="check">Check</string>
         <string name="call">Call</string>
         <string name="raise">Raise</string>
+        <string name="accept">Accept</string>
+        <string name="cancel">Cancel</string>
 
 </resources>
