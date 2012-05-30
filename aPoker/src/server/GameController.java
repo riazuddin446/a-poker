@@ -13,9 +13,6 @@ import server.Table.BettingRound;
 import server.Table.Pot;
 import server.Table.Seat;
 import server.Table.State;
-import android.app.Activity;
-import android.content.Context;
-import android.widget.Toast;
 
 public class GameController {
 
@@ -49,13 +46,13 @@ public class GameController {
 	//Apuntador hacia el dueño de la partida
 	private int owner;
 
-	private Activity activity;
+	public int minimun_bet;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public GameController(Activity _activity)
+	public GameController()
 	{		
 
 		//Inicializar las variables
@@ -78,7 +75,7 @@ public class GameController {
 
 		hand_no = 0;
 
-		this.activity = _activity;
+		minimun_bet = determineMinimumBet(table);
 	}
 
 	// ===========================================================
@@ -491,7 +488,13 @@ public class GameController {
 		t.seats.get(t.bb).bet = amount;
 		pBig.stake -= amount;
 
-		//TODO Tiempo de espera
+		try{
+			Thread.currentThread().sleep(1000);//sleep for 1000 ms
+		}
+		catch(InterruptedException ie){
+
+		}
+
 		//Give out hole-cards
 		dealHole(t);
 
@@ -526,7 +529,7 @@ public class GameController {
 		Action action = null;
 		int amount = 0;
 
-		int minimun_bet = determineMinimumBet(t);
+		minimun_bet = determineMinimumBet(t);
 
 		if(t.nomoreaction || //Early showdonw, no more action at table possible
 				p.stake == 0) //Or player is allin and has no more options
@@ -589,10 +592,8 @@ public class GameController {
 
 			else if(action == Action.Raise) //Subir apuesta
 			{
-				if(t.bet_amount == 0)
+				if(t.bet_amount == 0) //Can't raise, nothing was bet
 				{
-					//Toast.makeText(activity, "You cannot raise, nothing was bet! Let's try betting.", 2).show();
-
 					//Retry with this action
 					p.next_action.action = Action.Bet;
 					return;
@@ -698,14 +699,38 @@ public class GameController {
 			{
 			case Preflop:
 				t.betround = BettingRound.Flop;
+
+				try{
+					Thread.currentThread().sleep(1000);//sleep for 1000 ms
+				}
+				catch(InterruptedException ie){
+
+				}
+
 				dealFlop(t);
 				break;
 			case Flop:
 				t.betround = BettingRound.Turn;
+
+				try{
+					Thread.currentThread().sleep(1000);//sleep for 1000 ms
+				}
+				catch(InterruptedException ie){
+
+				}
+
 				dealTurn(t);
 				break;
 			case Turn:
 				t.betround = BettingRound.River;
+
+				try{
+					Thread.currentThread().sleep(1000);//sleep for 1000 ms
+				}
+				catch(InterruptedException ie){
+
+				}
+
 				dealRiver(t);
 				break;
 			case River:
