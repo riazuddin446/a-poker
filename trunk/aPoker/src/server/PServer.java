@@ -1150,12 +1150,16 @@ public class PServer extends BaseGameActivity
 
 				String betValue = input.getText().toString();
 
-				if(Integer.parseInt(betValue) < mGameController.minimun_bet)
+				if(betValue.length() == 0)
+				{
+					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun bet is: " + mGameController.minimun_bet, 2).show();
+				}
+				else if(Integer.parseInt(betValue) < mGameController.minimun_bet)
 				{	
 					Toast.makeText(getApplicationContext(), "You can't bet this amount, the minimun bet is: " + mGameController.minimun_bet, 3).show();
 				}
-
-				doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, Integer.parseInt(betValue));
+				else
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, Integer.parseInt(betValue));
 			}
 		});
 
@@ -1184,12 +1188,16 @@ public class PServer extends BaseGameActivity
 
 				String raiseValue = input.getText().toString();
 
-				if(Integer.parseInt(raiseValue) < mGameController.minimun_bet)
+				if(raiseValue.length() == 0)
+				{
+					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun raise is: " + mGameController.minimun_bet, 2).show();
+				}
+				else if(Integer.parseInt(raiseValue) < mGameController.minimun_bet)
 				{	
 					Toast.makeText(getApplicationContext(), "You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
 				}
-
-				doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, Integer.parseInt(raiseValue));
+				else
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, Integer.parseInt(raiseValue));
 			}
 		});
 
