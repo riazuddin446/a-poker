@@ -68,8 +68,11 @@ public class PServer extends BaseGameActivity
 	private Scene mainScene;
 
 	//Font
-	private Font font;
-	private Texture fontTexture;
+	private Font blackFont;
+	private Texture blackFontTexture;
+
+	private Font whiteFont;
+	private Texture whiteFontTexture;
 
 	//Background
 	private BitmapTextureAtlas backgroundTextureAtlas;
@@ -203,8 +206,11 @@ public class PServer extends BaseGameActivity
 		this.bigBlindTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.dealerAndBlindTextureAtlas, this,"bigblind.png", 0, 60);
 
 		//Load the font for TEXT
-		this.fontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		this.font = new Font(this.fontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
+		this.blackFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.blackFont = new Font(this.blackFontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.BLACK);
+
+		this.whiteFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.whiteFont = new Font(this.whiteFontTexture, Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD_ITALIC), 20, true, Color.WHITE);
 
 		//Load the textures into the engine
 		mEngine.getTextureManager().loadTextures(this.backgroundTextureAtlas,
@@ -212,9 +218,11 @@ public class PServer extends BaseGameActivity
 				this.cardDeckTextureAtlas,
 				this.seatTextureAtlas,
 				this.dealerAndBlindTextureAtlas,
-				this.fontTexture);
+				this.blackFontTexture,
+				this.whiteFontTexture);
 		//Load the fonts into the engine
-		this.mEngine.getFontManager().loadFont(this.font);
+		this.mEngine.getFontManager().loadFonts(this.blackFont,
+				this.whiteFont);
 	}
 
 	@Override
@@ -296,18 +304,18 @@ public class PServer extends BaseGameActivity
 	private void initializeGUIElements()
 	{
 		//Texto donde se mostrará el estado de la mesa
-		bettingRoundText = new ChangeableText(0, 30, font, mGameController.table.betround.name());
+		bettingRoundText = new ChangeableText(0, 30, blackFont, mGameController.table.betround.name());
 		mainScene.attachChild(bettingRoundText);
 
 		//Texto donde se mostrará la ronda de apuestas de la mesa
-		tableStateText = new ChangeableText(0, 0, font, mGameController.table.state.name());
+		tableStateText = new ChangeableText(0, 0, blackFont, mGameController.table.state.name());
 		mainScene.attachChild(tableStateText);
 
 		//Nombres de los jugadores
 		playerNameTexts = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+2, font, "        ");
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+7, seats_pY.get(i)+5, blackFont, "        ");
 			aux.setVisible(false);
 
 			playerNameTexts.add(i, aux);
@@ -318,7 +326,7 @@ public class PServer extends BaseGameActivity
 		playerStakeTexts = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+20, font, "        ");
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+7, seats_pY.get(i)+25, blackFont, "        ");
 			aux.setVisible(false);
 
 			playerStakeTexts.add(i, aux);
@@ -329,7 +337,7 @@ public class PServer extends BaseGameActivity
 		seatBetText = new ArrayList<ChangeableText>();
 		for(int i=0; i<5; i++)
 		{
-			ChangeableText aux = new ChangeableText(seats_pX.get(i)+5, seats_pY.get(i)+40, font, "         ");
+			ChangeableText aux = new ChangeableText(seats_pX.get(i)+7, seats_pY.get(i)+45, blackFont, "         ");
 			aux.setVisible(false);
 
 			seatBetText.add(i, aux);
@@ -353,7 +361,7 @@ public class PServer extends BaseGameActivity
 		potsText = new ArrayList<ChangeableText>();
 		for(int i=0; i<4; i++)
 		{
-			ChangeableText aux = new ChangeableText(280+15*i, 100, font, "Pot"+i+": "+"        ");
+			ChangeableText aux = new ChangeableText(280+15*i, 100, whiteFont, "Pot"+i+": "+"        ");
 			aux.setVisible(false);
 
 			potsText.add(i, aux);
@@ -380,7 +388,7 @@ public class PServer extends BaseGameActivity
 			ArrayList<Sprite> subArray = new ArrayList<Sprite>();
 			for(int j=0; j<2; j++)
 			{
-				Sprite aux = new Sprite(seats_pX.get(i)+60+52*j, seats_pY.get(i)-20, cardTotextureRegionMap.get(Card.CLUB_ACE));
+				Sprite aux = new Sprite(seats_pX.get(i)+65+52*j, seats_pY.get(i)-20, cardTotextureRegionMap.get(Card.CLUB_ACE));
 				aux.setScale(0.7f);
 				aux.setVisible(false);
 
