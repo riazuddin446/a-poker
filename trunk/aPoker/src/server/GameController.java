@@ -296,7 +296,7 @@ public class GameController {
 		{
 			Player p = t.seats.get(showdown_player).player;
 
-			PokerHandStrength strength; // = new PokerHandStrength(); FIXME
+			PokerHandStrength strength;
 			HoldemHandEvaluator evaluator = new HoldemHandEvaluator(p.holecards.cards, table.communitycards.cards);
 			strength = evaluator.getStrength();
 			strength.setId(showdown_player); //Save the id of the player to link with his hand strength
@@ -725,7 +725,7 @@ public class GameController {
 				t.betround = BettingRound.River;
 
 				try{
-					Thread.currentThread().sleep(1000);//sleep for 1000 ms
+					Thread.currentThread().sleep(1000); //sleep for 1000 ms
 				}
 				catch(InterruptedException ie){
 
@@ -772,8 +772,6 @@ public class GameController {
 			//Find next player
 			t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
 			System.out.println("New current player: "+t.currentPlayer);
-
-			//t.timeout_start = time(NULL);
 
 			//Reset current player's last action
 			t.seats.get(t.currentPlayer).player.resetLastAction();
@@ -872,8 +870,6 @@ public class GameController {
 			{
 				//Find next player
 				t.currentPlayer = t.getNextActivePlayer(t.currentPlayer);
-
-				//TODO Start timeout?
 			}
 		}
 	}
@@ -946,22 +942,17 @@ public class GameController {
 
 					if(win_amount > 0)
 					{
+						//TODO Tiempo de espera al entregrar las ganancias
+						
 						//Transfer winning amount to player
 						p.stake += win_amount;
-
-						try{
-							Thread.currentThread().sleep(1000);//sleep for 1000 ms
-						}
-						catch(InterruptedException ie){
-
-						}
 
 						//FIXME Put winnings to seat (needed for snapshot)
 						//seat.bet += win_amount;
 
 						//Count up overall cashed-out
 						cashout_amount += win_amount;
-
+						
 					}
 				}
 
@@ -1068,19 +1059,57 @@ public class GameController {
 
 		//If there is one player left, close the table
 		if(t.countPlayers()==1)
+		{
+			System.out.println("Table.countPlayers() == 1 ---> Solo un jugador, cerrar mesa");
 			return -1;
+		}
+
+		return 0;
+	}
+
+	public int tick()
+	{
+		if(!started) //If the game is not started
+		{
+			if(getPlayerCount() == max_players) //Start the game if player count reached
+			{	
+				System.out.println("start();");
+				start();
+			}
+			else if(getPlayerCount() == 0 && !getRestart()) //Delete the game if no player registered
+			{	
+				System.out.print("0 players y no restart");
+				return -1;
+			}
+			else //Nothing to do, early exit
+				return 0;
+		}
+		else if(ended) //If the game is set as ended
+		{
+			System.out.println("ended");
+			players.clear();
+			return -1;
+		}
+
+		//Handle table
+		if(handleTable(table) < 0) //Is the table closed?
+		{
+			System.out.println("¡handleTable(table) < 0!");
+			ended = true;
+		}
 
 		return 0;
 	}
 
 	public void start()
 	{
-		//Game not started or at least 2 players needed
+		//Si la partida ya estaba empezada o no tenemos 2 jugadores siquiera
 		if(started || players.size() < 2)
 			return;
 
 		started = true;
 
+		//Clear seats
 		table.seats.clear();
 
 		//Place players on seats
@@ -1091,7 +1120,7 @@ public class GameController {
 
 			seat.seat_no = i;
 
-			if(players.get(i) != null) //TODO comprobar
+			if(players.get(i) != null)
 			{
 				seat.occupied = true;
 				seat.player = players.get(i);
@@ -1113,36 +1142,6 @@ public class GameController {
 		blind.amount = blind.start;
 
 		table.scheduleState(State.NewRound);
-	}
-
-	public int tick()
-	{
-		if(!started) //If the game is not set as started
-		{
-			System.out.println("!started");
-			if(getPlayerCount() == max_players) //Start the game if player count reached
-				start();
-			else if(getPlayerCount() == 0 && !getRestart()) //Delete the game if no player registered
-				return -1;
-			else //Nothing to do, early exit
-				return 0;
-		}
-		else if(ended) //If the game is set as ended
-		{
-			System.out.println("ended");
-			//Remove all players
-			players.clear();
-			return -1;
-		}
-
-		//Handle table
-		if(handleTable(table) < 0) //Is the table closed?
-		{
-			System.out.println("¡handleTable(table) < 0!");
-			ended = true;
-			//TODO ended_time + snap
-		}
-		return 0;
 	}
 
 	// ===========================================================
