@@ -284,8 +284,8 @@ public class PServer extends BaseGameActivity
 		mGameController = new GameController();
 		mGameController.setName("Prueba"); //FIXME Recibir el nombre del activity anterior
 		mGameController.setMaxPlayers(5); //FIXME Recibir el numero maximo de jugadores del activity anterior
-		mGameController.setPlayerStakes(100); //(4000);
-		mGameController.setRestart(true);
+		mGameController.setPlayerStakes(2000);
+		mGameController.setRestart(false);
 		mGameController.setOwner(-1);
 	}
 
@@ -396,7 +396,8 @@ public class PServer extends BaseGameActivity
 	{
 		if(mGameController.tick() < 0)
 		{
-			System.out.println("¡Tick() < 0!");
+			System.out.println("¡Tick() < 0!" + "Restart? "+mGameController.getRestart());
+
 			//Replicate game if "restart" is set
 			if(mGameController.getRestart())
 			{
@@ -410,6 +411,11 @@ public class PServer extends BaseGameActivity
 				newgame.setOwner(mGameController.getOwner());
 
 				mGameController = newgame;
+			}
+			else
+			{
+				//FIXME Toast.makeText(this, "Partida finalizada", 3).show();
+				finish();
 			}
 		}
 	}
@@ -745,49 +751,52 @@ public class PServer extends BaseGameActivity
 			@Override
 			public void onUpdate(float pSecondsElapsed) {
 
-				/*
-				 * Dealer button
-				 */
-				if(!dealerButton.isVisible()) //First time
+				if(!mGameController.isEnded())
 				{
-					dealer = mGameController.table.dealer;
-					dealerButton.setPosition(seats_pX.get(dealer), seats_pY.get(dealer)-30);
-					dealerButton.setVisible(true);
-				}
-				else if(dealer != mGameController.table.dealer)
-				{
-					dealer = mGameController.table.dealer;
-					dealerButton.setPosition(seats_pX.get(dealer), seats_pY.get(dealer)-30);
-				}
+					/*
+					 * Dealer button
+					 */
+					if(!dealerButton.isVisible()) //First time
+					{
+						dealer = mGameController.table.dealer;
+						dealerButton.setPosition(seats_pX.get(dealer), seats_pY.get(dealer)-30);
+						dealerButton.setVisible(true);
+					}
+					else if(dealer != mGameController.table.dealer)
+					{
+						dealer = mGameController.table.dealer;
+						dealerButton.setPosition(seats_pX.get(dealer), seats_pY.get(dealer)-30);
+					}
 
-				/*
-				 * Small blind button
-				 */
-				if(!smallBlindButton.isVisible()) //First time
-				{
-					sb = mGameController.table.sb;
-					smallBlindButton.setPosition(seats_pX.get(sb), seats_pY.get(sb)-30);
-					smallBlindButton.setVisible(true);
-				}
-				else if(sb != mGameController.table.sb)
-				{
-					sb = mGameController.table.sb;
-					smallBlindButton.setPosition(seats_pX.get(sb), seats_pY.get(sb)-30);
-				}
+					/*
+					 * Small blind button
+					 */
+					if(!smallBlindButton.isVisible()) //First time
+					{
+						sb = mGameController.table.sb;
+						smallBlindButton.setPosition(seats_pX.get(sb), seats_pY.get(sb)-30);
+						smallBlindButton.setVisible(true);
+					}
+					else if(sb != mGameController.table.sb)
+					{
+						sb = mGameController.table.sb;
+						smallBlindButton.setPosition(seats_pX.get(sb), seats_pY.get(sb)-30);
+					}
 
-				/*
-				 * Big blind button
-				 */
-				if(!bigBlindButton.isVisible()) //First time
-				{
-					bb = mGameController.table.bb;
-					bigBlindButton.setPosition(seats_pX.get(bb), seats_pY.get(bb)-30);
-					bigBlindButton.setVisible(true);
-				}
-				else if(bb != mGameController.table.bb)
-				{
-					bb = mGameController.table.bb;
-					bigBlindButton.setPosition(seats_pX.get(bb), seats_pY.get(bb)-30);
+					/*
+					 * Big blind button
+					 */
+					if(!bigBlindButton.isVisible()) //First time
+					{
+						bb = mGameController.table.bb;
+						bigBlindButton.setPosition(seats_pX.get(bb), seats_pY.get(bb)-30);
+						bigBlindButton.setVisible(true);
+					}
+					else if(bb != mGameController.table.bb)
+					{
+						bb = mGameController.table.bb;
+						bigBlindButton.setPosition(seats_pX.get(bb), seats_pY.get(bb)-30);
+					}
 				}
 			}
 		};
