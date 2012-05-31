@@ -11,7 +11,7 @@
 
     <application
         android:debuggable="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name" >
         <activity
             android:name="client.Menu"
@@ -79,16 +79,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".APoker"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="com.zorrozua.asier.aPoker" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="server.PServer"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
@@ -96,15 +86,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="com.zorrozua.asier.APokerClient" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".pruebas.SimpleGame"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <action android:name="com.zorrozua.asier.pruebas.SimpleGame" />
             </intent-filter>
         </activity>
     </application>
