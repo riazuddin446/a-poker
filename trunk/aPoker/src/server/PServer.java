@@ -1190,11 +1190,14 @@ public class PServer extends BaseGameActivity
 
 				if(raiseValue.length() == 0)
 				{
-					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun raise is: " + mGameController.minimun_bet, 2).show();
+					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun raise is: " + mGameController.minimun_bet, 5).show();
 				}
 				else if(Integer.parseInt(raiseValue) < mGameController.minimun_bet)
 				{	
-					Toast.makeText(getApplicationContext(), "You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
+					Toast.makeText(getApplicationContext(), "Bet amount: "+mGameController.table.bet_amount+
+							" Last bet amount: "+mGameController.table.last_bet_amount
+							+" || "
+							+"You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
 				}
 				else
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, Integer.parseInt(raiseValue));

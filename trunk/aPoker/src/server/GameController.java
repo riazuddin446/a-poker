@@ -321,7 +321,7 @@ public class GameController {
 		if(t.bet_amount == 0)
 			return blind.amount;
 		else
-			return t.bet_amount + (t.bet_amount - t.last_bet_amount);
+			return (t.bet_amount*2); //return t.bet_amount + (t.bet_amount - t.last_bet_amount);
 	}
 
 	/**
@@ -943,7 +943,7 @@ public class GameController {
 					if(win_amount > 0)
 					{
 						//TODO Tiempo de espera al entregrar las ganancias
-						
+
 						//Transfer winning amount to player
 						p.stake += win_amount;
 
@@ -952,7 +952,7 @@ public class GameController {
 
 						//Count up overall cashed-out
 						cashout_amount += win_amount;
-						
+
 					}
 				}
 
