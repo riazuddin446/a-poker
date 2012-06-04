@@ -1187,12 +1187,13 @@ public class PServer extends BaseGameActivity
 			public void onClick(DialogInterface dialog, int whichButton) {
 
 				String raiseValue = input.getText().toString();
+				int raiseAmount = Integer.parseInt(raiseValue)+mGameController.table.seats.get(mGameController.table.currentPlayer).bet;
 
 				if(raiseValue.length() == 0)
 				{
 					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun raise is: " + mGameController.minimun_bet, 5).show();
 				}
-				else if(Integer.parseInt(raiseValue) < mGameController.minimun_bet)
+				else if(raiseAmount < mGameController.minimun_bet)
 				{	
 					Toast.makeText(getApplicationContext(), "Bet amount: "+mGameController.table.bet_amount+
 							" Last bet amount: "+mGameController.table.last_bet_amount
@@ -1200,7 +1201,7 @@ public class PServer extends BaseGameActivity
 							+"You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
 				}
 				else
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, Integer.parseInt(raiseValue));
+					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, raiseAmount);
 			}
 		});
 
