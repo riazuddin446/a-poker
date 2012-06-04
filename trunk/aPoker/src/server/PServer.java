@@ -267,7 +267,6 @@ public class PServer extends BaseGameActivity
 
 			@Override
 			public void reset() {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -361,7 +360,7 @@ public class PServer extends BaseGameActivity
 		potsText = new ArrayList<ChangeableText>();
 		for(int i=0; i<4; i++)
 		{
-			ChangeableText aux = new ChangeableText(280+15*i, 100, whiteFont, "Pot"+i+": "+"        ");
+			ChangeableText aux = new ChangeableText(280+110*i, 100, whiteFont, "Pot"+i+": "+"        ");
 			aux.setVisible(false);
 
 			potsText.add(i, aux);
@@ -1191,14 +1190,11 @@ public class PServer extends BaseGameActivity
 
 				if(raiseValue.length() == 0)
 				{
-					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun raise is: " + mGameController.minimun_bet, 5).show();
+					Toast.makeText(getApplicationContext(), "You have to bet something. The minimun raise is: " + mGameController.minimun_bet, 3).show();
 				}
 				else if(raiseAmount < mGameController.minimun_bet)
 				{	
-					Toast.makeText(getApplicationContext(), "Bet amount: "+mGameController.table.bet_amount+
-							" Last bet amount: "+mGameController.table.last_bet_amount
-							+" || "
-							+"You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
+					Toast.makeText(getApplicationContext(), "You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
 				}
 				else
 					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, raiseAmount);
