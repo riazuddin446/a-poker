@@ -72,7 +72,7 @@
                 android:id="@+id/createButton"
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
-                android:text="@string/create" />
+                android:text="@string/start1" />
 
             <Button
                 android:id="@+id/backButton"
