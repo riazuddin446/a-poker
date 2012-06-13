@@ -30,5 +30,7 @@
         <string name="raise">Raise</string>
         <string name="accept">Accept</string>
         <string name="cancel">Cancel</string>
+        <string name="start">start</string>
+        <string name="start1">Start</string>
 
 </resources>
