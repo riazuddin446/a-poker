@@ -942,8 +942,6 @@ public class GameController {
 
 					if(win_amount > 0)
 					{
-						//TODO Tiempo de espera al entregrar las ganancias
-
 						//Transfer winning amount to player
 						p.stake += win_amount;
 

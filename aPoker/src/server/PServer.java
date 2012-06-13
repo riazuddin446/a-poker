@@ -942,8 +942,8 @@ public class PServer extends BaseGameActivity
 	{
 		this.addFoldButton(5, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.FOLD).getHeight()/2 -5);
 		this.addCheckButton(this.buttonToTextureRegionMap.get(Button.FOLD).getWidth() + 20, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CHECK).getHeight()/2-5);
-		this.addBetButton(getCameraWidth() - 3*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 30, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2-5);
-		this.addCallButton(getCameraWidth() - 2*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2-5);
+		this.addCallButton(getCameraWidth() - 3*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 30, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2-5);
+		this.addBetButton(getCameraWidth() - 2*(this.buttonToTextureRegionMap.get(Button.RAISE).getWidth()) - 15, getCameraHeight() - this.buttonToTextureRegionMap.get(Button.CALL).getHeight()/2-5);
 		this.addRaiseButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.RAISE).getWidth(), getCameraHeight() - this.buttonToTextureRegionMap.get(Button.RAISE).getHeight()/2-5);
 		this.addExitButton(getCameraWidth() - this.buttonToTextureRegionMap.get(Button.EXIT).getWidth()-5, 5);
 
