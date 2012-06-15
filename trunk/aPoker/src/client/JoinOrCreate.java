@@ -22,31 +22,42 @@ public class JoinOrCreate extends Activity {
 
 		setContentView(R.layout.joinorcreatelayout);
 
-		//final Intent joinTable = new Intent(this, JoinTable.class);
-		final Intent createTable = new Intent(this, CreateTable.class);
-
 		Button joinButton = (Button) findViewById(R.id.joinButton);
 		joinButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
-				//startActivity(joinTable);
+				accederPantallaJoin();
 			}
 		});
 
 		Button createButton = (Button) findViewById(R.id.createButton);
 		createButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(createTable);
+				accederPantallaCreate();
 			}
 		});
 
 		Button backButton = (Button) findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				finish();
+				volverPantallaAnterior();
 			}
 		});
-
+	}
+	
+	private void accederPantallaJoin()
+	{
+		Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
+	}
+	
+	private void accederPantallaCreate()
+	{
+		final Intent createTable = new Intent(this, CreateTable.class);
+		startActivity(createTable);
+	}
+	
+	private void volverPantallaAnterior()
+	{
+		finish();
 	}
 
 }

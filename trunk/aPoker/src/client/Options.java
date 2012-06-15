@@ -25,17 +25,26 @@ public class Options extends Activity {
 		final Button aboutButton = (Button) findViewById(R.id.aboutButton);
 		aboutButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
+				accederPantallaAbout();
 			}
 		});
 
 		final Button backButton = (Button) findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Log.i("Options","Back button clicked");
-				finish();
+				volverPantallaAnterior();
 			}
 		});
+	}
+
+	private void accederPantallaAbout()
+	{
+		Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
+	}
+
+	private void volverPantallaAnterior()
+	{
+		finish();
 	}
 
 }

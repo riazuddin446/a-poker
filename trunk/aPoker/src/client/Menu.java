@@ -20,34 +20,47 @@ public class Menu extends Activity {
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.menulayout);
-		
-		final Intent joinorcreate = new Intent(this, JoinOrCreate.class);
-		final Intent options = new Intent(this, Options.class);
-		
+
 		Button playButton = (Button) findViewById(R.id.playButton);
 		playButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(joinorcreate);
+				accederPantallaPlay();
 			}
 		});
 
 		Button optionsButton = (Button) findViewById(R.id.optionsButton);
 		optionsButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(options);
+				accederPantallaOptions();
 			}
 		}); 
 
 		Button exitButton = (Button) findViewById(R.id.exitButton);
 		exitButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				finish();
+				salirAplicación();
 			}
 		});
+	}
 
+	private void accederPantallaPlay()
+	{
+		final Intent joinorcreate = new Intent(this, JoinOrCreate.class);
+		startActivity(joinorcreate);
+	}
+
+	private void accederPantallaOptions()
+	{
+		final Intent options = new Intent(this, Options.class);
+		startActivity(options);
+	}
+	
+	private void salirAplicación()
+	{
+		finish();
 	}
 }

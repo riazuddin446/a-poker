@@ -22,24 +22,32 @@ public class CreateTable extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.createlayout);
-
-		final Intent aPokerClient = new Intent(this, PServer.class);
-
 		Toast.makeText(getApplicationContext(), "Changing settings will not affect the next game!", 2).show();
 
 		Button createButton = (Button) findViewById(R.id.createButton);
 		createButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				startActivity(aPokerClient);
+				iniciarPartida();
 			}
 		});
 
 		Button backButton = (Button) findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				finish();
+				volverPantallaAnterior();
 			}
 		});
+	}
+
+	private void iniciarPartida()
+	{
+		final Intent aPokerClient = new Intent(this, PServer.class);
+		startActivity(aPokerClient);
+	}
+
+	private void volverPantallaAnterior()
+	{
+		finish();
 	}
 
 }
