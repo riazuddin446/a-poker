@@ -1106,6 +1106,11 @@ public class PServer extends BaseGameActivity
 		this.mainScene.attachChild(sprite);
 		this.mainScene.registerTouchArea(sprite);
 	}
+	
+	private void acabarPartida()
+	{
+		finish();
+	}
 
 	private void addExitButton(final int pX, final int pY){
 		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.EXIT)){
@@ -1121,8 +1126,8 @@ public class PServer extends BaseGameActivity
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
 						this.mGrabbed = false;
-						this.setCurrentTileIndex(0);					
-						finish();
+						this.setCurrentTileIndex(0);
+						acabarPartida();
 					}
 					break;
 				}

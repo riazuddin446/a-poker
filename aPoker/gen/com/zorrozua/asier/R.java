@@ -81,6 +81,8 @@ public final class R {
         public static final int selectaTable=0x7f04000e;
         public static final int soundOFF=0x7f040009;
         public static final int soundON=0x7f040008;
+        public static final int start=0x7f040016;
+        public static final int start1=0x7f040017;
         public static final int tableName=0x7f04000d;
     }
 }
