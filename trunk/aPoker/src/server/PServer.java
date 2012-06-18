@@ -936,6 +936,31 @@ public class PServer extends BaseGameActivity
 
 		this.mGameController.players.get(pid).setNextAction(auxSchedAction);
 	}
+	
+	private void fold()
+	{
+		doSetAction(mGameController.table.currentPlayer, Player.Action.Fold, 0);
+	}
+	
+	private void check()
+	{
+		doSetAction(mGameController.table.currentPlayer, Player.Action.Check, 0);
+	}
+	
+	private void call()
+	{
+		doSetAction(mGameController.table.currentPlayer, Player.Action.Call, 0);
+	}
+	
+	private void bet(int amount)
+	{
+		doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, amount);
+	}
+	
+	private void raise(int amount)
+	{
+		doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, amount);
+	}
 
 	//This function adds the following buttons: Fold, Check, Call, Raise and Exit
 	private void addButtons()
@@ -959,8 +984,8 @@ public class PServer extends BaseGameActivity
 				case TouchEvent.ACTION_DOWN:
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Fold, 0);
-
+					fold();
+					
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
@@ -993,7 +1018,7 @@ public class PServer extends BaseGameActivity
 						Toast.makeText(getApplicationContext(), "You can't check dude! Try call ;D", 3).show();
 					}
 
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Check, 0);
+					check();
 
 					break;
 				case TouchEvent.ACTION_UP:
@@ -1056,8 +1081,8 @@ public class PServer extends BaseGameActivity
 					this.setCurrentTileIndex(1);					
 					this.mGrabbed = true;
 
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Call, 0);
-
+					call();
+					
 					break;
 				case TouchEvent.ACTION_UP:
 					if(this.mGrabbed) {
@@ -1107,11 +1132,6 @@ public class PServer extends BaseGameActivity
 		this.mainScene.registerTouchArea(sprite);
 	}
 	
-	private void acabarPartida()
-	{
-		finish();
-	}
-
 	private void addExitButton(final int pX, final int pY){
 		final TiledSprite sprite = new TiledSprite(pX, pY, this.buttonToTextureRegionMap.get(Button.EXIT)){
 			boolean mGrabbed = false;
@@ -1136,6 +1156,11 @@ public class PServer extends BaseGameActivity
 		};
 		this.mainScene.attachChild(sprite);
 		this.mainScene.registerTouchArea(sprite);
+	}
+
+	private void acabarPartida()
+	{
+		finish();
 	}
 
 	private void betDialog()
@@ -1163,7 +1188,8 @@ public class PServer extends BaseGameActivity
 					Toast.makeText(getApplicationContext(), "You can't bet this amount, the minimun bet is: " + mGameController.minimun_bet, 3).show();
 				}
 				else
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, Integer.parseInt(betValue));
+					bet(Integer.parseInt(betValue));
+					//doSetAction(mGameController.table.currentPlayer, Player.Action.Bet, Integer.parseInt(betValue));
 			}
 		});
 
@@ -1202,7 +1228,8 @@ public class PServer extends BaseGameActivity
 					Toast.makeText(getApplicationContext(), "You can't raise this amount, the minimun raise is: " + mGameController.minimun_bet, 3).show();
 				}
 				else
-					doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, raiseAmount);
+					raise(raiseAmount);
+					//doSetAction(mGameController.table.currentPlayer, Player.Action.Raise, raiseAmount);
 			}
 		});
 
