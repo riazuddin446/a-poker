@@ -42,7 +42,6 @@ import android.text.InputType;
 import android.view.Display;
 import android.widget.EditText;
 import android.widget.Toast;
-import client.Button;
 
 public class PServer extends BaseGameActivity
 {
