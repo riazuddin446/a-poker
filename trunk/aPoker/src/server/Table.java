@@ -197,8 +197,8 @@ public class Table
 	 */
 	public boolean isSeatInvolvedInPot(Pot pot, int s)
 	{
-		for (int i=0; i<pot.vsteats.size(); i++){
-			if(pot.vsteats.get(i)==s)
+		for (int i=0; i<pot.vseats.size(); i++){
+			if(pot.vseats.get(i)==s)
 				return true;
 		}
 
@@ -216,9 +216,9 @@ public class Table
 	{
 		int involved_count = 0;
 
-		for(int i=0; i<pot.vsteats.size(); i++)
+		for(int i=0; i<pot.vseats.size(); i++)
 		{
-			int s = pot.vsteats.get(i);
+			int s = pot.vseats.get(i);
 
 			for(int j=0; j<wl.size(); j++)
 			{
@@ -266,7 +266,7 @@ public class Table
 
 			//Last pot is current pot
 			Pot cur_pot = pots.get(pots.size()-1); //lastElement();
-			System.out.println(cur_pot.vsteats.size());
+			System.out.println(cur_pot.vseats.size());
 
 			//If current pot is final, create a new one
 			if(cur_pot.isFinal)
@@ -317,7 +317,7 @@ public class Table
 
 				//Set player 'involved in pot'
 				if(!isSeatInvolvedInPot(cur_pot, i)) //Check if it is not already involved
-					cur_pot.vsteats.add(i);					
+					cur_pot.vseats.add(i);					
 			}
 
 			if(!need_sidepot) //All players bets are the same, end here
@@ -404,11 +404,11 @@ public class Table
 	public class Pot
 	{
 		public int amount;
-		public Vector<Integer> vsteats;
+		public Vector<Integer> vseats;
 		public boolean isFinal;
 
 		public Pot(){
-			vsteats = new Vector<Integer>();
+			vseats = new Vector<Integer>();
 		}
 	}
 }
