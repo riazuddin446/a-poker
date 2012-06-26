@@ -49,7 +49,7 @@ public class Menu extends Activity {
 
 	private void accederPantallaPlay()
 	{
-		final Intent joinorcreate = new Intent(this, JoinOrCreate.class);
+		final Intent joinorcreate = new Intent(this, Play.class);
 		startActivity(joinorcreate);
 	}
 

@@ -39,12 +39,17 @@ public class Options extends Activity {
 
 	private void accederPantallaAbout()
 	{
-		Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
+		showMssg();
 	}
 
 	private void volverPantallaAnterior()
 	{
 		finish();
+	}
+	
+	private void showMssg()
+	{
+		Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
 	}
 
 }
