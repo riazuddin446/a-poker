@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.zorrozua.asier.R;
 
-public class JoinOrCreate extends Activity {
+public class Play extends Activity {
 
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -46,7 +46,7 @@ public class JoinOrCreate extends Activity {
 	
 	private void accederPantallaJoin()
 	{
-		Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
+		showMssg();
 	}
 	
 	private void accederPantallaCreate()
@@ -58,6 +58,11 @@ public class JoinOrCreate extends Activity {
 	private void volverPantallaAnterior()
 	{
 		finish();
+	}
+	
+	private void showMssg()
+	{
+		Toast.makeText(getApplicationContext(), "Coming soon...", 2).show();
 	}
 
 }

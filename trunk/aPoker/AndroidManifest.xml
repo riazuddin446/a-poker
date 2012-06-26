@@ -44,7 +44,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="client.JoinOrCreate"
+            android:name="client.Play"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
